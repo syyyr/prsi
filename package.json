@@ -1,0 +1,17 @@
+{
+  "name": "node-shortener",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "build/shortener.js",
+  "scripts": {
+    "clean": "rm -rf build/ node_modules/",
+    "build": "npx tsc",
+    "start": "npm run build && node build/main.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^3.8.3"
+  }
+}

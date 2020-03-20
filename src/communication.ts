@@ -1,34 +1,47 @@
 export function isPlayerRegistration(toCheck: any): toCheck is PlayerRegistration {
-    return typeof toCheck.name !== "undefined";
+    return typeof toCheck.registerPlayer !== "undefined";
 }
 
-export function isToken(toCheck: any): toCheck is Token {
-    return typeof toCheck.token !== "undefined";
+export function isPlayerInput(toCheck: any): toCheck is PlayerInput {
+    return typeof toCheck.playerInput !== "undefined";
+}
+
+export function isErrorResponse(toCheck: any): toCheck is ErrorResponse {
+    return typeof toCheck.error !== "undefined";
+}
+
+export function isFrontendState(toCheck: any): toCheck is FrontendState {
+    // TODO: add proper check
+    return true;
 }
 
 export class PlayerRegistration {
-    name: string;
+    registerPlayer: string;
     constructor(name: string) {
-        this.name = name;
+        this.registerPlayer = name;
     }
 }
 
-export enum ConnStatus {
-    Ok,
-    InvalidRequest,
+export class PlayerInput {
+    name: string;
+    playerInput: string;
+    constructor(name: string, playerInput: string) {
+        this.name = name;
+        this.playerInput = playerInput;
+    }
 }
 
 export class Response {
-    status: ConnStatus;
-    constructor(status: ConnStatus) {
-        this.status = status;
+}
+
+export class ErrorResponse extends Response {
+    error: string;
+    constructor(error: string) {
+        super();
+        this.error = error;
     }
 }
 
-export class Token extends Response {
-    token: string;
-    constructor(token: string) {
-        super(ConnStatus.Ok);
-        this.token = token;
-    }
+export class FrontendState extends Response {
+    // TODO: add what frontend needs
 }

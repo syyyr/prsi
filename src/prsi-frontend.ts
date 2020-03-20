@@ -1,10 +1,9 @@
-import {ConnStatus, PlayerRegistration, isToken} from "./communication";
+import {isErrorResponse, PlayerRegistration, isFrontendState} from "./communication";
 
 let playerName: null | string = null;
 while (playerName == null) {
     playerName = window.prompt("Username:");
 }
-let token: string | undefined;
 
 const connection = new window.WebSocket(`ws://${window.location.host}`);
 
@@ -18,21 +17,13 @@ connection.onmessage = (message) => {
 
     const parsed = JSON.parse(message.data);
 
-    if (typeof token === "undefined") {
-        if (parsed.status !== ConnStatus.Ok) {
-            console.log("Unable to register player.");
-            connection.close();
-            return;
-        }
+    if (isErrorResponse(parsed)) {
+        console.log(parsed.error);
+        return;
+    }
 
-        if (isToken(parsed)) {
-            console.log("Successfully registered.");
-            token = parsed.token;
-            return;
-        }
-
-        console.log("Expected token, but didn't get it.");
-        connection.close();
+    if (isFrontendState(parsed)) {
+        // TODO: show state on screen
     }
 };
 

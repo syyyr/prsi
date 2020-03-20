@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@types/express-ws": "^3.0.0",
+    "@types/ws": "^7.2.3",
     "express": "^4.17.1",
     "express-ws": "^4.0.0"
   }

@@ -1,4 +1,4 @@
-enum Color {
+export enum Color {
     Zaludy = "♦",
     Srdce = "♥",
     Listy = "♠",
@@ -87,7 +87,10 @@ enum ActionType {
     DrawSix = "DrawSix",
     DrawEight = "DrawEight",
     SkipTurn = "Ace",
-    Svrsek = "Svršek"
+    PlaySrdce = "PlaySrdce",
+    PlayKule = "PlayKul",
+    PlayZaludy = "PlayZaludy",
+    PlayListy = "PlayListy",
 }
 
 const sameCards = (a: Card, b: Card) => a.color === b.color && a.value === b.value;
@@ -107,7 +110,8 @@ export enum Status {
     DontHaveCard = "DontHaveCard",
     MustShuffle = "MustShuffle",
     NotASeven = "NotASeven",
-    NotAnAce = "NotAnAce"
+    NotAnAce = "NotAnAce",
+    WrongColor = "WrongColor"
 }
 
 class GameResolution {
@@ -144,8 +148,10 @@ class State {
 
 export class PlayDetails {
     card: Card;
-    constructor(card: Card) {
+    colorChange?: Color;
+    constructor(card: Card, changeTo?: Color) {
         this.card = card;
+        this.colorChange = changeTo;
     }
 }
 
@@ -235,6 +241,27 @@ export class Prsi {
                 this.skipTurn();
                 return;
             }
+
+        case ActionType.PlayZaludy:
+        case ActionType.PlayKule:
+        case ActionType.PlayListy:
+        case ActionType.PlaySrdce:
+            switch (playerAction.action) {
+            case PlayType.Play:
+                if (typeof playerAction.playDetails === "undefined") {
+                    throw new Error("User wanted to play, but didn't specify what.");
+                }
+                if (playerAction.playDetails.card.color !== this.changeActionToColor(this._currentGame.wantedAction)) {
+                    this._currentGame.status = Status.WrongColor;
+                    return;
+                }
+                this._currentGame.wantedAction = ActionType.Play;
+                this.playCard(playerAction.who, playerAction.playDetails);
+                return;
+            case PlayType.Draw:
+                this.drawCard(playerAction.who);
+                return;
+            }
         }
     }
 
@@ -283,24 +310,56 @@ export class Prsi {
             this._currentGame!.hands.get(player)!.push(this._currentGame!.deck.cards[this._currentGame!.drawn++]);
         }
 
+        console.log("this._curre", "=", this._currentGame.wantedAction);
         let n = this.drawInfo.get(this._currentGame.wantedAction)!.count;
         console.log(player, "draws", n);
         while (n--) {
             impl_draw();
         }
 
-        // After someone draws, the next person will definitely play
-        this._currentGame.wantedAction = ActionType.Play;
+        // After someone draws, the next person will (but keep color change)
+        if (
+            this._currentGame.wantedAction !== ActionType.PlaySrdce &&
+            this._currentGame.wantedAction !== ActionType.PlayKule &&
+            this._currentGame.wantedAction !== ActionType.PlayListy &&
+            this._currentGame.wantedAction !== ActionType.PlayZaludy
+        ) {
+            this._currentGame.wantedAction = ActionType.Play;
+        }
         this.nextPlayer();
     }
 
     readonly drawInfo = new Map([
+        [ActionType.PlayZaludy, {next: ActionType.PlayZaludy, count: 1}],
+        [ActionType.PlayListy, {next: ActionType.PlayListy, count: 1}],
+        [ActionType.PlayKule, {next: ActionType.PlayKule, count: 1}],
+        [ActionType.PlaySrdce, {next: ActionType.PlaySrdce, count: 1}],
         [ActionType.Play, {next: ActionType.DrawTwo, count: 1}],
         [ActionType.DrawTwo, {next: ActionType.DrawFour, count: 2}],
         [ActionType.DrawFour, {next: ActionType.DrawSix, count: 4}],
         [ActionType.DrawSix, {next: ActionType.DrawEight, count: 6}],
         [ActionType.DrawEight, {next: ActionType.DrawEight, count: 8}]
     ]);
+
+    private changeActionToColor(action: ActionType): Color {
+        switch (action) {
+            case ActionType.PlaySrdce: return Color.Srdce;
+            case ActionType.PlayListy: return Color.Listy;
+            case ActionType.PlayKule: return Color.Kule;
+            case ActionType.PlayZaludy: return Color.Zaludy;
+        }
+
+        throw new Error("Internal error.");
+    }
+
+    private changeColorToAction(color: Color): ActionType {
+        switch (color) {
+            case Color.Srdce: return ActionType.PlaySrdce;
+            case Color.Listy: return ActionType.PlayListy;
+            case Color.Kule: return ActionType.PlayKule;
+            case Color.Zaludy: return ActionType.PlayZaludy;
+        }
+    }
 
     private concludeGame() {
         if (typeof this._currentGame === "undefined") {
@@ -346,6 +405,14 @@ export class Prsi {
 
         if (details.card.value === Value.Eso) {
             this._currentGame.wantedAction = ActionType.SkipTurn;
+        }
+
+        if (details.card.value === Value.Svrsek) {
+            if (typeof details.colorChange === "undefined") {
+                throw new Error("Internal error.");
+            }
+            console.log(player, "changes to", details.colorChange);
+            this._currentGame.wantedAction = this.changeColorToAction(details.colorChange);
         }
 
         this.nextPlayer();

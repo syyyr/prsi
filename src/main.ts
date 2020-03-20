@@ -1,4 +1,4 @@
-import {Prsi, PlayerAction, PlayType, PlayDetails, Status} from "./prsi"
+import {Color, Prsi, PlayerAction, PlayType, PlayDetails, Status} from "./prsi"
 
 const prsi = new Prsi();
 prsi.registerPlayer("Typek");
@@ -14,7 +14,13 @@ while (true) {
     const player = state.whoseTurn;
     let status: Status = Status.Ok;
     state.hands.get(player)?.forEach((card) => {
-        prsi.resolveAction(new PlayerAction(PlayType.Play, player, new PlayDetails(card)));
+        prsi.resolveAction(
+            new PlayerAction(
+                PlayType.Play,
+                player,
+                new PlayDetails(
+                    card,
+                    [Color.Kule, Color.Listy, Color.Srdce, Color.Zaludy][Math.floor(Math.random() * 4)])));
         status = prsi.state().status;
     }, false);
 

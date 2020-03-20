@@ -182,7 +182,7 @@ export class Prsi {
                 if (typeof playerAction.playDetails === "undefined") {
                     throw new Error("User wanted to play, but didn't specify what.");
                 }
-                this.playCard(playerAction.who, playerAction.playDetails.card);
+                this.playCard(playerAction.who, playerAction.playDetails);
                 return;
             case PlayType.Draw:
                 this.drawCard(playerAction.who);
@@ -212,7 +212,7 @@ export class Prsi {
                     this._currentGame.status = Status.NotASeven;
                     return;
                 }
-                this.playCard(playerAction.who, playerAction.playDetails.card);
+                this.playCard(playerAction.who, playerAction.playDetails);
                 return;
             case PlayType.Draw:
                 this.drawCard(playerAction.who);
@@ -228,7 +228,7 @@ export class Prsi {
                     this._currentGame.status = Status.NotAnAce;
                     return;
                 }
-                this.playCard(playerAction.who, playerAction.playDetails.card);
+                this.playCard(playerAction.who, playerAction.playDetails);
                 return;
             case PlayType.Draw:
                 this.skipTurn();
@@ -314,7 +314,7 @@ export class Prsi {
         this._currentGame.whoseTurn = loser;
     }
 
-    private playCard(player: string, card: Card) {
+    private playCard(player: string, details: PlayDetails) {
         if (typeof this._currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
@@ -323,27 +323,27 @@ export class Prsi {
             throw new Error("User wanted to play a card he doesn't have.");
         }
 
-        if (!compatibleCards(card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1])) {
+        if (!compatibleCards(details.card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1])) {
             this._currentGame.status = Status.CardMismatch;
             return;
         }
 
-        this._currentGame.playedCards.push(card);
+        this._currentGame.playedCards.push(details.card);
 
-        const updatedHand = this._currentGame.hands.get(player)!.filter((x) => !sameCards(card, x));
+        const updatedHand = this._currentGame.hands.get(player)!.filter((x) => !sameCards(details.card, x));
         this._currentGame.hands.set(player, updatedHand);
-        console.log(player, "plays", card.toString());
+        console.log(player, "plays", details.card.toString());
 
         if (updatedHand.length === 0) {
             this.concludeGame();
             return;
         }
 
-        if (card.value === Value.Sedmicka) {
+        if (details.card.value === Value.Sedmicka) {
             this._currentGame.wantedAction = this.drawInfo.get(this._currentGame.wantedAction)!.next;
         }
 
-        if (card.value === Value.Eso) {
+        if (details.card.value === Value.Eso) {
             this._currentGame.wantedAction = ActionType.SkipTurn;
         }
 

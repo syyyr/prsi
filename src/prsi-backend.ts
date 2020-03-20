@@ -329,7 +329,7 @@ export class Prsi {
         this.nextPlayer();
     }
 
-    readonly drawInfo = new Map([
+    private readonly drawInfo = new Map([
         [ActionType.PlayZaludy, {next: ActionType.PlayZaludy, count: 1}],
         [ActionType.PlayListy, {next: ActionType.PlayListy, count: 1}],
         [ActionType.PlayKule, {next: ActionType.PlayKule, count: 1}],

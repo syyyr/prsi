@@ -86,7 +86,7 @@ enum ActionType {
     DrawFour = "DrawFour",
     DrawSix = "DrawSix",
     DrawEight = "DrawEight",
-    Ace = "Ace"
+    SkipTurn = "Ace"
 }
 
 const sameCards = (a: Card, b: Card) => a.color === b.color && a.value === b.value;
@@ -105,8 +105,8 @@ export enum Status {
     PlayerMismatch = "PlayerMismatch",
     DontHaveCard = "DontHaveCard",
     MustShuffle = "MustShuffle",
-    NotASeven = "NotASeven"
-
+    NotASeven = "NotASeven",
+    NotAnAce = "NotAnAce"
 }
 
 class GameResolution {
@@ -218,7 +218,34 @@ export class Prsi {
                 this.drawCard(playerAction.who);
                 return;
             }
+        case ActionType.SkipTurn:
+            switch (playerAction.action) {
+            case PlayType.Play:
+                if (typeof playerAction.playDetails === "undefined") {
+                    throw new Error("User wanted to play, but didn't specify what.");
+                }
+                if (playerAction.playDetails.card.value !== Value.Eso) {
+                    this._currentGame.status = Status.NotAnAce;
+                    return;
+                }
+                this.playCard(playerAction.who, playerAction.playDetails.card);
+                return;
+            case PlayType.Draw:
+                this.skipTurn();
+                return;
+            }
         }
+    }
+
+    private skipTurn(): void {
+        if (typeof this._currentGame === "undefined") {
+            throw new Error("Game isn't running.");
+        }
+
+        console.log(this._currentGame.whoseTurn, "skips");
+        // After someone skips, the next person will definitely play
+        this._currentGame.wantedAction = ActionType.Play;
+        this.nextPlayer();
     }
 
     private nextPlayer(): void {
@@ -314,6 +341,10 @@ export class Prsi {
 
         if (card.value === Value.Sedmicka) {
             this._currentGame.wantedAction = this.drawInfo.get(this._currentGame.wantedAction)!.next;
+        }
+
+        if (card.value === Value.Eso) {
+            this._currentGame.wantedAction = ActionType.SkipTurn;
         }
 
         this.nextPlayer();

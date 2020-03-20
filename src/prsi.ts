@@ -249,6 +249,7 @@ export class Prsi {
                 this._currentGame!.deck.cards = this._currentGame!.playedCards;
                 this._currentGame!.drawn = 0;
                 this._currentGame!.playedCards = [];
+                this._currentGame!.playedCards.push(this._currentGame!.deck.cards[this._currentGame!.drawn++]);
             }
 
             this._currentGame!.hands.get(player)!.push(this._currentGame!.deck.cards[this._currentGame!.drawn++]);

@@ -82,7 +82,10 @@ class Deck {
 enum ActionType {
     Shuffle = "Shuffle",
     Play = "Play",
-    Seven = "Seven",
+    DrawTwo = "DrawTwo",
+    DrawFour = "DrawFour",
+    DrawSix = "DrawSix",
+    DrawEight = "DrawEight",
     Ace = "Ace"
 }
 
@@ -101,7 +104,9 @@ export enum Status {
     CardMismatch = "CardMismatch",
     PlayerMismatch = "PlayerMismatch",
     DontHaveCard = "DontHaveCard",
-    MustShuffle = "MustShuffle"
+    MustShuffle = "MustShuffle",
+    NotASeven = "NotASeven"
+
 }
 
 class GameResolution {
@@ -154,7 +159,6 @@ export class PlayerAction {
     }
 }
 
-
 export class Prsi {
     private _players: string[] = [];
     private _history: State[] = [];
@@ -194,6 +198,26 @@ export class Prsi {
                 this.newGame();
                 return;
             }
+
+        case ActionType.DrawTwo:
+        case ActionType.DrawFour:
+        case ActionType.DrawSix:
+        case ActionType.DrawEight:
+            switch (playerAction.action) {
+            case PlayType.Play:
+                if (typeof playerAction.playDetails === "undefined") {
+                    throw new Error("User wanted to play, but didn't specify what.");
+                }
+                if (playerAction.playDetails.card.value !== Value.Sedmicka) {
+                    this._currentGame.status = Status.NotASeven;
+                    return;
+                }
+                this.playCard(playerAction.who, playerAction.playDetails.card);
+                return;
+            case PlayType.Draw:
+                this.drawCard(playerAction.who);
+                return;
+            }
         }
     }
 
@@ -219,16 +243,35 @@ export class Prsi {
             throw new Error("Internal error.");
         }
 
-        if (this._currentGame.drawn === this._currentGame.deck.cards.length) {
-            this._currentGame.deck.cards = this._currentGame.playedCards;
-            this._currentGame.drawn = 0;
-            this._currentGame.playedCards = [];
+
+        const impl_draw = () => {
+            if (this._currentGame!.drawn === this._currentGame!.deck.cards.length) {
+                this._currentGame!.deck.cards = this._currentGame!.playedCards;
+                this._currentGame!.drawn = 0;
+                this._currentGame!.playedCards = [];
+            }
+
+            this._currentGame!.hands.get(player)!.push(this._currentGame!.deck.cards[this._currentGame!.drawn++]);
         }
 
-        this._currentGame.hands.get(player)!.push(this._currentGame.deck.cards[this._currentGame.drawn++]);
+        let n = this.drawInfo.get(this._currentGame.wantedAction)!.count;
+        console.log(player, "draws", n);
+        while (n--) {
+            impl_draw();
+        }
+
+        // After someone draws, the next person will definitely play
+        this._currentGame.wantedAction = ActionType.Play;
         this.nextPlayer();
-        console.log(player, "draws");
     }
+
+    readonly drawInfo = new Map([
+        [ActionType.Play, {next: ActionType.DrawTwo, count: 1}],
+        [ActionType.DrawTwo, {next: ActionType.DrawFour, count: 2}],
+        [ActionType.DrawFour, {next: ActionType.DrawSix, count: 4}],
+        [ActionType.DrawSix, {next: ActionType.DrawEight, count: 6}],
+        [ActionType.DrawEight, {next: ActionType.DrawEight, count: 8}]
+    ]);
 
     private concludeGame() {
         if (typeof this._currentGame === "undefined") {
@@ -253,7 +296,7 @@ export class Prsi {
         }
 
         if (!compatibleCards(card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1])) {
-            this._currentGame.status = Status.CardMismatch;;
+            this._currentGame.status = Status.CardMismatch;
             return;
         }
 
@@ -266,6 +309,10 @@ export class Prsi {
         if (updatedHand.length === 0) {
             this.concludeGame();
             return;
+        }
+
+        if (card.value === Value.Sedmicka) {
+            this._currentGame.wantedAction = this.drawInfo.get(this._currentGame.wantedAction)!.next;
         }
 
         this.nextPlayer();

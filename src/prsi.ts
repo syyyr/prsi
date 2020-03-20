@@ -86,7 +86,8 @@ enum ActionType {
     DrawFour = "DrawFour",
     DrawSix = "DrawSix",
     DrawEight = "DrawEight",
-    SkipTurn = "Ace"
+    SkipTurn = "Ace",
+    Svrsek = "Svršek"
 }
 
 const sameCards = (a: Card, b: Card) => a.color === b.color && a.value === b.value;
@@ -319,7 +320,7 @@ export class Prsi {
             throw new Error("Game isn't running.");
         }
 
-        if (!this.playerHasCard) {
+        if (!this.playerHasCard(player, details.card)) {
             throw new Error("User wanted to play a card he doesn't have.");
         }
 

@@ -1,9 +1,9 @@
 {
-  "name": "node-shortener",
+  "name": "prsi",
   "version": "1.0.0",
   "description": "",
   "private": true,
-  "main": "build/shortener.js",
+  "main": "build/prsi.js",
   "scripts": {
     "clean": "rm -rf build/ node_modules/",
     "build": "npx tsc",

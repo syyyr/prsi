@@ -1,34 +1,4 @@
-export enum Color {
-    Zaludy = "♦",
-    Srdce = "♥",
-    Listy = "♠",
-    Kule = "♣"
-}
-
-enum Value {
-    Sedmicka = "7",
-    Osmicka = "8",
-    Devitka = "9",
-    Desitka = "10",
-    Spodek = "J",
-    Svrsek = "Q",
-    Kral = "K",
-    Eso = "A"
-}
-
-class Card {
-    public color: Color;
-    public value: Value;
-    constructor(color: Color, value: Value) {
-        this.color = color;
-        this.value = value;
-    }
-
-    public toString(): string {
-        return `${this.value}${this.color}`;
-    }
-}
-
+import {Color, Card, Status, Value} from "./prsi-types"
 
 const sortedDeck = [
     new Card(Color.Zaludy, Value.Sedmicka),
@@ -100,18 +70,6 @@ const compatibleCards = (a: Card, b: Card) => a.color === b.color || a.value ===
 export enum PlayType {
     Draw = "Draw",
     Play = "Play",
-}
-
-export enum Status {
-    Ok = "Ok",
-    ActionMismatch = "ActionMismatch",
-    CardMismatch = "CardMismatch",
-    PlayerMismatch = "PlayerMismatch",
-    DontHaveCard = "DontHaveCard",
-    MustShuffle = "MustShuffle",
-    NotASeven = "NotASeven",
-    NotAnAce = "NotAnAce",
-    WrongColor = "WrongColor"
 }
 
 class GameResolution {

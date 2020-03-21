@@ -2,7 +2,7 @@ import * as React from "react";
 import {FrontendState, StartGame, PlayerInput} from "./communication";
 import {Card, PlayDetails, PlayType, Value, Color} from "./types";
 
-export class Title extends React.Component {
+class Title extends React.Component {
     render() {
         return React.createElement("h1", null, "Prší");
     }

@@ -68,11 +68,6 @@ const processMessage = (ws: any, message: string): void => {
     }
 
     if (isPlayerInput(parsed)) {
-        if (parsed.name !== ws.__private_name) {
-            prsiLogger(`${ws.__private_name}: tried to act as ${parsed.name}.`, ws);
-            sendError(ws, new ErrorResponse("Someone else owns this username."));
-            return;
-        }
         updateOne(ws);
         return;
     }
@@ -83,7 +78,6 @@ const processMessage = (ws: any, message: string): void => {
         return;
     }
 
-    prsiLogger(`${ws.__private_name} tried to act as ${parsed.name}.`, ws);
     sendError(ws, new ErrorResponse("Invalid request."));
 };
 

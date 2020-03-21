@@ -28,10 +28,8 @@ export class PlayerRegistration {
 }
 
 export class PlayerInput {
-    name: string;
     playerInput: string;
-    constructor(name: string, playerInput: string) {
-        this.name = name;
+    constructor(playerInput: string) {
         this.playerInput = playerInput;
     }
 }

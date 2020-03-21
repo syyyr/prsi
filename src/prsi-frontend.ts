@@ -12,21 +12,38 @@ connection.onopen = () => {
     connection.send(JSON.stringify(new PlayerRegistration(playerName!)));
 }
 
+const removeChildren = (element: HTMLElement) => element.childNodes.forEach((child) => child.remove());
+
+const renderCard = (card: Card) => `${card.value}${card.color}`;
+
 const renderTopCard = (card: Card | null) => {
     const topCard = window.document.getElementById("topCard")!;
     if (card !== null) {
-        topCard.innerText = `Na vršku je ${card.value}${card.color}.`;
+        topCard.innerText = `Na vršku je ${renderCard(card)}.`;
     } else {
         topCard.innerText = "Hra nezačala.";
     }
+};
 
+const renderHand = (cards: Card[] | null) => {
+    const hand = window.document.getElementById("hand")!;
+    removeChildren(hand);
+    if (cards !== null) {
+        const handText = window.document.createElement("p");
+        handText.innerHTML = "Tvoje ruka:";
+        hand.appendChild(handText);
+        cards.forEach((card) => {
+            const tag = window.document.createElement("p");
+            tag.innerText = renderCard(card);
+            hand.appendChild(tag);
+        });
+    }
 };
 
 const render = (state: FrontendState) => {
     renderTopCard(state.topCard);
+    renderHand(state.hand);
 };
-
-
 
 connection.onmessage = (message) => {
     console.log("ws got data:", message);

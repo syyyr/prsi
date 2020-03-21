@@ -45,8 +45,10 @@ export class ErrorResponse extends Response {
 
 export class FrontendState extends Response {
     topCard: Card | null;
-    constructor(topCard: Card | null) {
+    hand: Card[] | null;
+    constructor(topCard: Card | null, hand: Card[] | null) {
         super();
         this.topCard = topCard;
+        this.hand = hand;
     }
 }

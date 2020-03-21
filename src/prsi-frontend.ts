@@ -1,4 +1,4 @@
-import {isErrorResponse, PlayerRegistration, isFrontendState} from "./communication";
+import {isErrorResponse, PlayerRegistration, isFrontendState} from "./prsi-communication";
 
 let playerName: null | string = null;
 while (playerName == null) {

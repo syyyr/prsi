@@ -2,7 +2,7 @@ import Prsi from "./prsi-backend";
 import express from "express";
 import path from "path";
 import ws from "express-ws";
-import {isPlayerRegistration, isPlayerInput, Response, ErrorResponse, FrontendState} from "./communication";
+import {isPlayerRegistration, isPlayerInput, Response, ErrorResponse, FrontendState} from "./prsi-communication";
 
 let prsiLogger: (msg: string, req?: express.Request) => void;
 const prsi = new Prsi();

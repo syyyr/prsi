@@ -1,4 +1,4 @@
-import {isErrorResponse, PlayerRegistration, isFrontendState, FrontendState} from "./prsi-communication";
+import {ErrorResponse, isErrorResponse, PlayerRegistration, isFrontendState, FrontendState} from "./prsi-communication";
 import {Card} from "./prsi-types";
 
 let playerName: null | string = null;
@@ -40,6 +40,13 @@ const renderHand = (cards: Card[] | null) => {
     }
 };
 
+const renderError = (error: ErrorResponse) => {
+    const tag = window.document.createElement("p");
+    tag.className = "errorOutput";
+    tag.innerText = error.error;
+    window.document.getElementById("title")!.insertAdjacentElement("afterend", tag);
+};
+
 const render = (state: FrontendState) => {
     renderTopCard(state.topCard);
     renderHand(state.hand);
@@ -52,10 +59,12 @@ connection.onmessage = (message) => {
 
     if (isErrorResponse(parsed)) {
         console.log(parsed.error);
+        renderError(parsed);
         return;
     }
 
     if (isFrontendState(parsed)) {
+        window.document.getElementById("error")?.remove();
         render(parsed);
     }
 };

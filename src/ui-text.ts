@@ -14,8 +14,9 @@ export class TextUI extends UI {
         return [Color.Kule, Color.Listy, Color.Srdce, Color.Zaludy].map((color) => React.createElement(
             "p",
             {
-                onClick: () => onClick()
-            }
+                onClick: () => onClick(color)
+            },
+            color
         ));
     }
 }

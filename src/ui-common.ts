@@ -43,13 +43,13 @@ class StartButton extends React.Component<{onClick: () => void}> {
 
 const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
 
-export abstract class UI extends React.Component<FrontendState & {ws: any}, {pickerVisible: boolean}> {
+export abstract class UI extends React.Component<FrontendState & {ws: any}, {picker: null | Color}> {
     abstract renderCard(card: Card, onClick?: () => void): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
 
     constructor(props: FrontendState & {ws: any}) {
         super(props);
-        this.setState({pickerVisible: false});
+        this.state = {picker: null};
     }
 
     renderPlayers(players: string[]): React.ReactNode {
@@ -82,12 +82,13 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
 
     renderHand(hand: Card[]): React.ReactNode {
         return hand.map((card) => React.createElement(CardComponent, {
-            renderer: this.renderCard.bind(null, card, () => {
-                if (this.state.pickerVisible) {
+            renderer: () => this.renderCard(card, () => {
+                if (this.state.picker !== null) {
                     return;
                 }
                 if (card.value === Value.Svrsek) {
-                    this.setState({pickerVisible: true});
+                    this.setState({picker: card.color});
+                    return;
                 }
                 this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card))));
             })
@@ -108,17 +109,22 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
             elems.push(this.renderPrompt("Hra nezačala."));
         }
 
+        if (this.props.gameStarted === "yes") {
+            elems.push(this.renderDrawButton);
+        }
+
         if (typeof this.props.hand !== "undefined") {
             elems.push(React.createElement("p", null, "Tvoje ruka:"));
             elems.push(this.renderHand(this.props.hand));
         }
 
-        if (this.state.pickerVisible) {
+        if (this.state.picker !== null) {
             elems.push(React.createElement(
                 ColorPicker,
                 {
-                    renderer: this.renderPicker.bind(null, (color: Color) => {
-                        this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(new Card(color, Value.Svrsek)))));
+                    renderer: () => this.renderPicker((color: Color) => {
+                        this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(new Card(this.state.picker!, Value.Svrsek), color))));
+                        this.setState({picker: null});
                     })
                 }
             ));

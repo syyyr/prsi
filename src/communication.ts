@@ -40,24 +40,19 @@ export class StartGame {
     startGame: null = null;
 }
 
-export class Response {
-}
-
-export class ErrorResponse extends Response {
+export class ErrorResponse {
     error: string;
     constructor(error: string) {
-        super();
         this.error = error;
     }
 }
 
-export class FrontendState extends Response {
+export class FrontendState {
     gameStarted: "yes" | "no";
     players: string[];
     topCard?: Card;
     hand?: Card[];
     constructor(gameStarted: "yes" | "no", players: string[], topCard?: Card, hand?: Card[]) {
-        super();
         this.gameStarted = gameStarted;
         this.players = players;
         this.topCard = topCard;

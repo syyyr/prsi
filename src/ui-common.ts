@@ -28,6 +28,19 @@ class ColorPicker extends React.Component<Renderer> {
     }
 }
 
+class StartButton extends React.Component<{onClick: () => void}> {
+    render() {
+        return React.createElement(
+            "button",
+            {
+                className: "block",
+                onClick: this.props.onClick
+            },
+            "Start");
+
+    }
+}
+
 const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
 
 export abstract class UI extends React.Component<FrontendState & {ws: any}, {pickerVisible: boolean}> {
@@ -55,10 +68,9 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
 
     renderStartButton(): React.ReactNode {
         return React.createElement(
-            "button",
+            StartButton,
             {
                 key: "startButton",
-                className: "block",
                 onClick: () => startGame(this.props.ws)
             },
             "Start");

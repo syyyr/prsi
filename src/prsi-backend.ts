@@ -87,12 +87,14 @@ class State {
     public drawn: number = 0;
     public hands: Map<string, Card[]> = new Map();
     public whoseTurn: string;
+    public players: string[];
     public gameState: "active" | "ended" = "active";
     public wantedAction: ActionType;
     public status: Status = Status.Ok;
     public gameResolution?: GameResolution;
 
-    constructor(whoStarts: string) {
+    constructor(players: string[], whoStarts: string) {
+        this.players = players;
         this.whoseTurn = whoStarts;
         this.wantedAction = ActionType.Play;
     }
@@ -440,7 +442,7 @@ export class Prsi {
 
     private newState(shuffler?: string): State {
         if (typeof shuffler === "undefined") {
-            return new State(this.getRandomPlayer());
+            return new State(this._players, this.getRandomPlayer());
         }
 
         let firstTurnPlayerIndex = this._players.indexOf(shuffler) + 1;
@@ -448,7 +450,7 @@ export class Prsi {
             firstTurnPlayerIndex = 0;
         }
 
-        return new State(this._players[firstTurnPlayerIndex]);
+        return new State(this._players, this._players[firstTurnPlayerIndex]);
     }
 
     public registerPlayer(name: string): void {
@@ -460,6 +462,11 @@ export class Prsi {
 
     public unregisterPlayer(name: string): void {
         this._players = this._players.filter((player) => player !== name);
+
+        // If a player disconnected during a game, reset.
+        if (this._currentGame?.players.some((player) => player === name)) {
+            this._currentGame = undefined;
+        }
     }
 
     public players(): string[] {

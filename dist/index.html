@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Prší</title>
+        <style>
+@font-face {
+    font-family: Helvetica;
+    src: url("helvetica.otf");
+}
+p {
+    font-size: 1em;
+}
+body {
+    font-family: "Helvetica";
+    width: 90%;
+    margin: auto;
+}
+.okInput {
+    border-color: black;
+    background: white;
+}
+.errorOutput {
+    color: red;
+    font-weight: bold;
+}
+.noselect {
+    /* https://stackoverflow.com/a/9314458/12263846 */
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                          supported by Chrome and Opera */
+}
+        </style>
+    </head>
+    <body class="noselect">
+        <h1 id="title">Prší</h1>
+        <p id="players"></p>
+        <p id="topCardText"></p>
+        <div id="hand"></div>
+        <p class="errorOutput" id="errorOutput"></p>
+        <script src="bundle.js"> </script>
+    </body>
+</html>

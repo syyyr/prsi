@@ -2,7 +2,7 @@ import Prsi from "./prsi-backend";
 import express from "express";
 import path from "path";
 import ws from "express-ws";
-import {isPlayerRegistration, isPlayerInput, Response, ErrorResponse, FrontendState} from "./prsi-communication";
+import {isPlayerRegistration, isPlayerInput, Response, ErrorResponse, FrontendState, isStartGame} from "./prsi-communication";
 
 let prsiLogger: (msg: string, ws?: any) => void;
 const prsi = new Prsi();
@@ -24,6 +24,7 @@ const buildFrontendStateFor = (player: string): FrontendState => {
     const state = prsi.state();
     return {
         players: prsi.players(),
+        gameStarted: typeof state !== "undefined" ? "yes" : "no",
         topCard: state?.playedCards[state.playedCards.length - 1],
         hand: state?.hands.get(player)!,
     };
@@ -73,6 +74,12 @@ const processMessage = (ws: any, message: string): void => {
             return;
         }
         updateOne(ws);
+        return;
+    }
+
+    if (isStartGame(parsed)) {
+        prsi.newGame();
+        updateEveryone();
         return;
     }
 

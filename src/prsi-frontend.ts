@@ -1,4 +1,4 @@
-import {ErrorResponse, isErrorResponse, PlayerRegistration, isFrontendState, FrontendState} from "./prsi-communication";
+import {StartGame, ErrorResponse, isErrorResponse, PlayerRegistration, isFrontendState, FrontendState} from "./prsi-communication";
 import {Card} from "./prsi-types";
 
 let playerName: null | string = null;
@@ -51,7 +51,23 @@ const renderError = (error: ErrorResponse) => {
     window.document.getElementById("title")!.insertAdjacentElement("afterend", tag);
 };
 
+const renderStartButton = (gameStarted: "yes" | "no") => {
+    if (gameStarted === "yes") {
+        window.document.getElementById("startButton")?.remove();
+        return;
+    }
+    if (window.document.getElementById("startButton") !== null) {
+        return;
+    }
+    const tag = window.document.createElement("button");
+    tag.innerText = "Start";
+    tag.id = "startButton";
+    tag.onclick = () => connection.send(JSON.stringify(new StartGame()));
+    window.document.getElementById("title")!.insertAdjacentElement("afterend", tag);
+};
+
 const render = (state: FrontendState) => {
+    renderStartButton(state.gameStarted);
     renderPlayers(state.players);
     renderTopCard(state.topCard);
     renderHand(state.hand);

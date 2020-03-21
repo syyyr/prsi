@@ -16,6 +16,10 @@ export function isFrontendState(toCheck: any): toCheck is FrontendState {
     return typeof toCheck.players !== "undefined";
 }
 
+export function isStartGame(toCheck: any): toCheck is FrontendState {
+    return typeof toCheck.startGame !== "undefined";
+}
+
 export class PlayerRegistration {
     registerPlayer: string;
     constructor(name: string) {
@@ -32,6 +36,10 @@ export class PlayerInput {
     }
 }
 
+export class StartGame {
+    startGame: null = null;
+}
+
 export class Response {
 }
 
@@ -44,11 +52,13 @@ export class ErrorResponse extends Response {
 }
 
 export class FrontendState extends Response {
+    gameStarted: "yes" | "no";
     players: string[];
     topCard?: Card;
     hand?: Card[];
-    constructor(players: string[], topCard?: Card, hand?: Card[]) {
+    constructor(gameStarted: "yes" | "no", players: string[], topCard?: Card, hand?: Card[]) {
         super();
+        this.gameStarted = gameStarted;
         this.players = players;
         this.topCard = topCard;
         this.hand = hand;

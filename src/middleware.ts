@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import ws from "express-ws";
-import Prsi from "./backend";
+import Prsi, { PlayerAction } from "./backend";
 import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame} from "./communication";
 
 let prsiLogger: (msg: string, ws?: any) => void;
@@ -68,6 +68,7 @@ const processMessage = (ws: any, message: string): void => {
     }
 
     if (isPlayerInput(parsed)) {
+        prsi.resolveAction(new PlayerAction(parsed.playType, ws.__private_name, parsed.playDetails));
         updateOne(ws);
         return;
     }

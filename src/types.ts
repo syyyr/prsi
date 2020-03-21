@@ -40,3 +40,17 @@ export enum Status {
     NotAnAce = "NotAnAce",
     WrongColor = "WrongColor"
 }
+
+export enum PlayType {
+    Draw = "Draw",
+    Play = "Play",
+}
+
+export class PlayDetails {
+    card: Card;
+    colorChange?: Color;
+    constructor(card: Card, changeTo?: Color) {
+        this.card = card;
+        this.colorChange = changeTo;
+    }
+}

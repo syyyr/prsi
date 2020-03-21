@@ -1,4 +1,4 @@
-import {Color, Card, Status, Value} from "./types"
+import {Color, Card, PlayType, PlayDetails, Status, Value} from "./types"
 
 const sortedDeck = [
     new Card(Color.Zaludy, Value.Sedmicka),
@@ -67,11 +67,6 @@ const sameCards = (a: Card, b: Card) => a.color === b.color && a.value === b.val
 
 const compatibleCards = (a: Card, b: Card) => a.color === b.color || a.value === b.value;
 
-export enum PlayType {
-    Draw = "Draw",
-    Play = "Play",
-}
-
 class GameResolution {
     winner: string;
     loser: string;
@@ -103,15 +98,6 @@ class State {
         this.hands.forEach((cards, player) => {
             console.log(`'${player}' => [${cards.map((card) => card.toString()).join(", ")}]`);
         });
-    }
-}
-
-export class PlayDetails {
-    card: Card;
-    colorChange?: Color;
-    constructor(card: Card, changeTo?: Color) {
-        this.card = card;
-        this.colorChange = changeTo;
     }
 }
 

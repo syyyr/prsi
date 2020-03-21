@@ -1,11 +1,11 @@
-import {Card} from "./types"
+import {Card, PlayType, PlayDetails} from "./types"
 
 export function isPlayerRegistration(toCheck: any): toCheck is PlayerRegistration {
     return typeof toCheck.registerPlayer !== "undefined";
 }
 
 export function isPlayerInput(toCheck: any): toCheck is PlayerInput {
-    return typeof toCheck.playerInput !== "undefined";
+    return typeof toCheck.playType !== "undefined";
 }
 
 export function isErrorResponse(toCheck: any): toCheck is ErrorResponse {
@@ -28,9 +28,11 @@ export class PlayerRegistration {
 }
 
 export class PlayerInput {
-    playerInput: string;
-    constructor(playerInput: string) {
-        this.playerInput = playerInput;
+    playType: PlayType;
+    playDetails?: PlayDetails;
+    constructor(playType: PlayType, playDetails?: PlayDetails) {
+        this.playType = playType;
+        this.playDetails = playDetails;
     }
 }
 

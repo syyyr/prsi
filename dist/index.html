@@ -17,6 +17,15 @@ body {
     width: 90%;
     margin: auto;
 }
+.fit-content {
+    width: fit-content;
+}
+.player {
+    margin-left: 0.3em;
+}
+.inline {
+    display: inline;
+}
 .okInput {
     border-color: black;
     background: white;
@@ -35,14 +44,21 @@ body {
     user-select: none; /* Non-prefixed version, currently
                           supported by Chrome and Opera */
 }
+.block {
+    display: block;
+}
+.inline-block {
+    display: inline-block;
+}
+.clickable {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
         </style>
     </head>
     <body class="noselect">
-        <h1 id="title">Prší</h1>
-        <p id="players"></p>
-        <p id="topCardText"></p>
-        <div id="hand"></div>
-        <p class="errorOutput" id="errorOutput"></p>
+        <div id="game"></div>
         <script src="bundle.js"> </script>
     </body>
 </html>

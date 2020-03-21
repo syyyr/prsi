@@ -338,7 +338,6 @@ export class Prsi {
 
         const updatedHand = this._currentGame.hands.get(player)!.filter((x) => !sameCards(details.card, x));
         this._currentGame.hands.set(player, updatedHand);
-        console.log(player, "plays", details.card.toString());
 
         if (updatedHand.length === 0) {
             this.concludeGame();

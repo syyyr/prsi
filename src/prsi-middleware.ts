@@ -23,44 +23,61 @@ const idGen = (function*(): Generator {
 const buildFrontendStateFor = (player: string): FrontendState => {
     const state = prsi.state();
     return {
-        topCard: state ? state.playedCards[state.playedCards.length - 1] : null,
-        hand: state ? state.hands.get(player)! : null,
+        players: prsi.players(),
+        topCard: state?.playedCards[state.playedCards.length - 1],
+        hand: state?.hands.get(player)!,
     };
 };
 
-const processMessage = (ws: any, message: string): Response => {
+const updateEveryone = () => {
+    openSockets.forEach((socket) => socket.send(JSON.stringify(buildFrontendStateFor(socket.__private_name))));
+};
+
+const updateOne = (ws: any) => {
+    ws.send(JSON.stringify(buildFrontendStateFor(ws.__private_name)));
+};
+
+const sendError = (ws: any, error: ErrorResponse) => {
+    ws.send(JSON.stringify(error));
+}
+
+const processMessage = (ws: any, message: string): void => {
     let parsed: any;
 
     try {
         parsed = JSON.parse(message);
     } catch (err) {
-        return new ErrorResponse("Invalid request");
+        sendError(ws, new ErrorResponse("Invalid request."));
+        return;
     }
 
     if (isPlayerRegistration(parsed)) {
         openSockets.push(ws);
         if (openSockets.some((socket) => socket.__private_name === parsed.registerPlayer)) {
             prsiLogger(`"${parsed.registerPlayer}" already belongs to someone else.`, ws);
-            return new ErrorResponse("Someone else owns this username.");
+            sendError(ws, new ErrorResponse("Someone else owns this username."));
+            return;
         }
 
         ws.__private_name = parsed.registerPlayer;
         prsi.registerPlayer(parsed.registerPlayer);
         prsiLogger(`Registered "${parsed.registerPlayer}".`, ws);
-        return buildFrontendStateFor(parsed.registerPlayer);
+        updateEveryone();
+        return;
     }
 
     if (isPlayerInput(parsed)) {
         if (parsed.name !== ws.__private_name) {
             prsiLogger(`${ws.__private_name}: tried to act as ${parsed.name}.`, ws);
-            return new ErrorResponse("Someone else owns this username.");
+            sendError(ws, new ErrorResponse("Someone else owns this username."));
+            return;
         }
-
-        return buildFrontendStateFor(parsed.name);
+        updateOne(ws);
+        return;
     }
 
     prsiLogger(`${ws.__private_name} tried to act as ${parsed.name}.`, ws);
-    return new ErrorResponse("Invalid request.");
+    sendError(ws, new ErrorResponse("Invalid request."));
 };
 
 const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: string, _req?: express.Request) => console.log(msg)) => {
@@ -88,7 +105,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
         (ws as any).__private_id = idGen.next().value;
         prsiLogger("New websocket.", ws);
         ws.on("message", (message) => {
-            ws.send(JSON.stringify(processMessage(ws, message.toString())));
+            processMessage(ws, message.toString());
         });
 
         ws.on("close", () => {
@@ -105,6 +122,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
             prsiLogger(`${name} disconnected.`, ws);
 
             openSockets.splice(closed, 1);
+            updateEveryone();
         });
     });
 

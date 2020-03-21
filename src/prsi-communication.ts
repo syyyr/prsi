@@ -13,7 +13,7 @@ export function isErrorResponse(toCheck: any): toCheck is ErrorResponse {
 }
 
 export function isFrontendState(toCheck: any): toCheck is FrontendState {
-    return typeof toCheck.topCard !== "undefined";
+    return typeof toCheck.players !== "undefined";
 }
 
 export class PlayerRegistration {
@@ -44,10 +44,12 @@ export class ErrorResponse extends Response {
 }
 
 export class FrontendState extends Response {
-    topCard: Card | null;
-    hand: Card[] | null;
-    constructor(topCard: Card | null, hand: Card[] | null) {
+    players: string[];
+    topCard?: Card;
+    hand?: Card[];
+    constructor(players: string[], topCard?: Card, hand?: Card[]) {
         super();
+        this.players = players;
         this.topCard = topCard;
         this.hand = hand;
     }

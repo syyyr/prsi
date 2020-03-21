@@ -16,19 +16,23 @@ const removeChildren = (element: HTMLElement) => element.childNodes.forEach((chi
 
 const renderCard = (card: Card) => `${card.value}${card.color}`;
 
-const renderTopCard = (card: Card | null) => {
+const renderTopCard = (card?: Card) => {
     const topCard = window.document.getElementById("topCard")!;
-    if (card !== null) {
+    if (typeof card !== "undefined") {
         topCard.innerText = `Na vršku je ${renderCard(card)}.`;
     } else {
         topCard.innerText = "Hra nezačala.";
     }
 };
 
-const renderHand = (cards: Card[] | null) => {
+const renderPlayers = (players: string[]) => {
+    window.document.getElementById("players")!.innerText = `Players: ${players.join(" | ")}`;
+};
+
+const renderHand = (cards?: Card[]) => {
     const hand = window.document.getElementById("hand")!;
     removeChildren(hand);
-    if (cards !== null) {
+    if (typeof cards !== "undefined") {
         const handText = window.document.createElement("p");
         handText.innerHTML = "Tvoje ruka:";
         hand.appendChild(handText);
@@ -48,6 +52,7 @@ const renderError = (error: ErrorResponse) => {
 };
 
 const render = (state: FrontendState) => {
+    renderPlayers(state.players);
     renderTopCard(state.topCard);
     renderHand(state.hand);
 };

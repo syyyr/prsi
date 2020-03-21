@@ -8,13 +8,13 @@ prsi.registerPlayer("Lama");
 prsi.newGame();
 while (true) {
     const state = prsi.state();
-    state.printHands();
-    if (state.gameState === "ended") {
+    state!.printHands();
+    if (state!.gameState === "ended") {
         break;
     }
-    const player = state.whoseTurn;
+    const player = state!.whoseTurn;
     let status: Status = Status.Ok;
-    state.hands.get(player)?.forEach((card) => {
+    state!.hands.get(player)?.forEach((card) => {
         prsi.resolveAction(
             new PlayerAction(
                 PlayType.Play,
@@ -22,7 +22,7 @@ while (true) {
                 new PlayDetails(
                     card,
                     [Color.Kule, Color.Listy, Color.Srdce, Color.Zaludy][Math.floor(Math.random() * 4)])));
-        status = prsi.state().status;
+        status = prsi.state()!.status;
     }, false);
 
     if (status !== Status.Ok) {
@@ -30,4 +30,4 @@ while (true) {
     }
 }
 
-console.log(prsi.state().gameResolution);
+console.log(prsi.state()!.gameResolution);

@@ -466,10 +466,7 @@ export class Prsi {
         return this._players.slice(0);
     }
 
-    public state(): State {
-        if (typeof this._currentGame === "undefined") {
-            throw new Error("Internal error.");
-        }
+    public state(): State | undefined {
         return this._currentGame;
     }
 }

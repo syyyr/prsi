@@ -1,3 +1,5 @@
+import {Card} from "./prsi-types"
+
 export function isPlayerRegistration(toCheck: any): toCheck is PlayerRegistration {
     return typeof toCheck.registerPlayer !== "undefined";
 }
@@ -11,8 +13,7 @@ export function isErrorResponse(toCheck: any): toCheck is ErrorResponse {
 }
 
 export function isFrontendState(toCheck: any): toCheck is FrontendState {
-    // TODO: add proper check
-    return true;
+    return typeof toCheck.topCard !== "undefined";
 }
 
 export class PlayerRegistration {
@@ -43,5 +44,9 @@ export class ErrorResponse extends Response {
 }
 
 export class FrontendState extends Response {
-    // TODO: add what frontend needs
+    topCard: Card | null;
+    constructor(topCard: Card | null) {
+        super();
+        this.topCard = topCard;
+    }
 }

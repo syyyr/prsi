@@ -1,16 +1,32 @@
-import {isErrorResponse, PlayerRegistration, isFrontendState} from "./prsi-communication";
+import {isErrorResponse, PlayerRegistration, isFrontendState, FrontendState} from "./prsi-communication";
+import {Card} from "./prsi-types";
 
 let playerName: null | string = null;
 while (playerName == null) {
     playerName = window.prompt("Username:");
 }
-
 const connection = new window.WebSocket(`ws://${window.location.host}`);
 
 connection.onopen = () => {
     console.log("ws opened");
     connection.send(JSON.stringify(new PlayerRegistration(playerName!)));
 }
+
+const renderTopCard = (card: Card | null) => {
+    const topCard = window.document.getElementById("topCard")!;
+    if (card !== null) {
+        topCard.innerText = `Na vršku je ${card.value}${card.color}.`;
+    } else {
+        topCard.innerText = "Hra nezačala.";
+    }
+
+};
+
+const render = (state: FrontendState) => {
+    renderTopCard(state.topCard);
+};
+
+
 
 connection.onmessage = (message) => {
     console.log("ws got data:", message);
@@ -23,7 +39,7 @@ connection.onmessage = (message) => {
     }
 
     if (isFrontendState(parsed)) {
-        // TODO: show state on screen
+        render(parsed);
     }
 };
 

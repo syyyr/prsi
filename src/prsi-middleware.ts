@@ -13,6 +13,13 @@ type AugmentedSocket = (WebSocket & {
 
 const openSockets: AugmentedSocket[] = [];
 
+const buildFrontendState = (): FrontendState => {
+    const state = prsi.state();
+    return {
+        topCard: state ? state.playedCards[state.playedCards.length - 1] : null
+    }
+};
+
 const processMessage = (ws: any, message: string): Response => {
     let parsed: any;
 
@@ -32,7 +39,7 @@ const processMessage = (ws: any, message: string): Response => {
         ws.__private_name = parsed.registerPlayer;
         prsi.registerPlayer(parsed.registerPlayer);
         prsiLogger(`Registered "${parsed.registerPlayer}".`);
-        return new FrontendState();
+        return buildFrontendState();
     }
 
     if (isPlayerInput(parsed)) {
@@ -41,7 +48,7 @@ const processMessage = (ws: any, message: string): Response => {
             return new ErrorResponse("Someone else owns this username.");
         }
 
-        return new FrontendState();
+        return buildFrontendState();
     }
 
     prsiLogger(`${ws.__private_name} tried to act as ${parsed.name}.`);

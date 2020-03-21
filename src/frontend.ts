@@ -1,5 +1,5 @@
-import {StartGame, ErrorResponse, isErrorResponse, PlayerRegistration, isFrontendState, FrontendState} from "./prsi-communication";
-import {Card} from "./prsi-types";
+import {StartGame, ErrorResponse, isErrorResponse, PlayerRegistration, isFrontendState, FrontendState} from "./communication";
+import {Card} from "./types";
 
 let playerName: null | string = null;
 while (playerName == null) {

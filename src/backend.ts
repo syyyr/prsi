@@ -1,4 +1,4 @@
-import {Color, Card, Status, Value} from "./prsi-types"
+import {Color, Card, Status, Value} from "./types"
 
 const sortedDeck = [
     new Card(Color.Zaludy, Value.Sedmicka),

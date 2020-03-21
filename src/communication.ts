@@ -1,4 +1,4 @@
-import {Card} from "./prsi-types"
+import {Card} from "./types"
 
 export function isPlayerRegistration(toCheck: any): toCheck is PlayerRegistration {
     return typeof toCheck.registerPlayer !== "undefined";

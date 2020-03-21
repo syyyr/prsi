@@ -326,7 +326,7 @@ export class Prsi {
             throw new Error("User wanted to play a card he doesn't have.");
         }
 
-        if (!compatibleCards(details.card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1])) {
+        if (details.card.value !== Value.Svrsek && !compatibleCards(details.card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1])) {
             this._currentGame.status = Status.CardMismatch;
             return;
         }

@@ -12,7 +12,11 @@ connection.onopen = () => {
     connection.send(JSON.stringify(new PlayerRegistration(playerName!)));
 }
 
-const removeChildren = (element: HTMLElement) => element.childNodes.forEach((child) => child.remove());
+const removeChildren = (element: HTMLElement) => {
+    while (element.firstChild) {
+        element.firstChild.remove();
+    }
+};
 
 const renderCard = (card: Card) => `${card.value}${card.color}`;
 

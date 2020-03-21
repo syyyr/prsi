@@ -1,6 +1,6 @@
 import * as React from "react";
 import {FrontendState, StartGame, PlayerInput} from "./communication";
-import {Card, PlayDetails, PlayType, Value, Color} from "./types";
+import {Card, PlayDetails, PlayType, Value, Color, ActionType} from "./types";
 
 class Title extends React.Component {
     render() {
@@ -41,6 +41,19 @@ class StartButton extends React.Component<{onClick: () => void}> {
     }
 }
 
+class DrawButton extends React.Component<{text: string, onClick: () => void}> {
+    render() {
+        return React.createElement(
+            "button",
+            {
+                className: "block",
+                onClick: this.props.onClick
+            },
+            this.props.text);
+
+    }
+}
+
 const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
 
 export abstract class UI extends React.Component<FrontendState & {ws: any}, {picker: null | Color}> {
@@ -58,7 +71,7 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
             ...players.map((player) => React.createElement(
                 "p",
                 {
-                    className: "player fit-content inline-block",
+                    className: "left-margin fit-content inline-block",
                     key: "player:" + player
                 },
                 player)
@@ -74,6 +87,19 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
                 onClick: () => startGame(this.props.ws)
             },
             "Start");
+    }
+
+    renderDrawButton(text: string): React.ReactNode {
+        return React.createElement(
+            DrawButton,
+            {
+                key: "drawButton",
+                onClick: () => {
+                    this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)));
+                },
+                text
+            },
+            null);
     }
 
     renderPrompt(text: string): React.ReactNode {
@@ -110,13 +136,35 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
             elems.push(this.renderPrompt("Hra nezačala."));
         }
 
-        if (this.props.gameStarted === "yes") {
-            elems.push(this.renderDrawButton);
+        if (this.props.gameStarted === "yes" && typeof this.props.wantedAction !== "undefined") {
+            elems.push(this.renderDrawButton((() => {
+                switch (this.props.wantedAction!) {
+                    case ActionType.Play:
+                    case ActionType.PlayKule:
+                    case ActionType.PlayListy:
+                    case ActionType.PlayZaludy:
+                    case ActionType.PlaySrdce:
+                        return "Líznout si";
+                    case ActionType.DrawTwo:
+                        return "Líznout dvě";
+                    case ActionType.DrawFour:
+                        return "Líznout čtyři";
+                    case ActionType.DrawSix:
+                        return "Líznout šest";
+                    case ActionType.DrawEight:
+                        return "Líznout osm";
+                    case ActionType.SkipTurn:
+                        return "Stojím";
+                    case ActionType.Shuffle:
+                        return "Zamíchat";
+                }
+            })()));
         }
 
         if (typeof this.props.hand !== "undefined") {
-            elems.push(React.createElement("p", {key: "hand-text"}, "Tvoje ruka:"));
+            elems.push(React.createElement("p", {key: "hand-text", className: "inline-block"}, "Tvoje ruka:"));
             elems.push(this.renderHand(this.props.hand));
+            elems.push(React.createElement("br", {key: "hand-text-linebreak"}));
         }
 
         if (this.state.picker !== null) {

@@ -46,6 +46,20 @@ export enum PlayType {
     Play = "Play",
 }
 
+export enum ActionType {
+    Shuffle = "Shuffle",
+    Play = "Play",
+    DrawTwo = "DrawTwo",
+    DrawFour = "DrawFour",
+    DrawSix = "DrawSix",
+    DrawEight = "DrawEight",
+    SkipTurn = "Ace",
+    PlaySrdce = "PlaySrdce",
+    PlayKule = "PlayKule",
+    PlayZaludy = "PlayZaludy",
+    PlayListy = "PlayListy",
+}
+
 export class PlayDetails {
     card: Card;
     colorChange?: Color;

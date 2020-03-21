@@ -28,6 +28,7 @@ const buildFrontendStateFor = (player: string): FrontendState => {
         gameStarted: typeof state !== "undefined" ? "yes" : "no",
         topCard: state?.playedCards[state.playedCards.length - 1],
         hand: state?.hands.get(player)!,
+        wantedAction: state?.wantedAction
     };
 };
 

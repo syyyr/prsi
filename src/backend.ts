@@ -1,4 +1,4 @@
-import {Color, Card, PlayType, PlayDetails, Status, Value} from "./types"
+import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value} from "./types"
 
 const sortedDeck = [
     new Card(Color.Zaludy, Value.Sedmicka),
@@ -47,20 +47,6 @@ class Deck {
             --unshuffledLen;
         }
     }
-}
-
-enum ActionType {
-    Shuffle = "Shuffle",
-    Play = "Play",
-    DrawTwo = "DrawTwo",
-    DrawFour = "DrawFour",
-    DrawSix = "DrawSix",
-    DrawEight = "DrawEight",
-    SkipTurn = "Ace",
-    PlaySrdce = "PlaySrdce",
-    PlayKule = "PlayKul",
-    PlayZaludy = "PlayZaludy",
-    PlayListy = "PlayListy",
 }
 
 const sameCards = (a: Card, b: Card) => a.color === b.color && a.value === b.value;

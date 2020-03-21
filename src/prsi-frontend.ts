@@ -30,7 +30,7 @@ const renderTopCard = (card?: Card) => {
 };
 
 const renderPlayers = (players: string[]) => {
-    window.document.getElementById("players")!.innerText = `Players: ${players.join(" | ")}`;
+    window.document.getElementById("players")!.innerText = `Hráči: ${players.join(" | ")}`;
 };
 
 const renderHand = (cards?: Card[]) => {

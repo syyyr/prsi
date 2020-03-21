@@ -77,11 +77,12 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
     }
 
     renderPrompt(text: string): React.ReactNode {
-        return React.createElement(Prompt, {text});
+        return React.createElement(Prompt, {key: "prompt", text});
     }
 
     renderHand(hand: Card[]): React.ReactNode {
         return hand.map((card) => React.createElement(CardComponent, {
+            key: `hand:${card.value}${card.color}`,
             renderer: () => this.renderCard(card, () => {
                 if (this.state.picker !== null) {
                     return;
@@ -114,7 +115,7 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
         }
 
         if (typeof this.props.hand !== "undefined") {
-            elems.push(React.createElement("p", null, "Tvoje ruka:"));
+            elems.push(React.createElement("p", {key: "hand-text"}, "Tvoje ruka:"));
             elems.push(this.renderHand(this.props.hand));
         }
 
@@ -122,6 +123,7 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
             elems.push(React.createElement(
                 ColorPicker,
                 {
+                    key: "picker",
                     renderer: () => this.renderPicker((color: Color) => {
                         this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(new Card(this.state.picker!, Value.Svrsek), color))));
                         this.setState({picker: null});
@@ -130,6 +132,6 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
             ));
         }
 
-        return React.createElement("div", null, [...elems]);
+        return React.createElement("div", {key: "root"}, [...elems]);
     }
 }

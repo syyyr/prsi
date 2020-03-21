@@ -29,7 +29,6 @@ connection.onmessage = (message) => {
             React.createElement(TextUI, {...parsed, ws: connection}, null),
             window.document.getElementById("game")
         );
-
     }
 };
 

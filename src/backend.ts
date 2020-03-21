@@ -119,7 +119,7 @@ export class Prsi {
 
     public resolveAction(playerAction: PlayerAction): void {
         if (typeof this._currentGame === "undefined") {
-            throw new Error("Internal error.");
+            throw new Error("Game hasn't started.");
         }
         this._currentGame.status = Status.Ok;
 
@@ -216,7 +216,6 @@ export class Prsi {
             throw new Error("Game isn't running.");
         }
 
-        console.log(this._currentGame.whoseTurn, "skips");
         // After someone skips, the next person will definitely play
         this._currentGame.wantedAction = ActionType.Play;
         this.nextPlayer();
@@ -241,7 +240,7 @@ export class Prsi {
         }
 
         if (!this._currentGame.hands.has(player)) {
-            throw new Error("Internal error.");
+            throw new Error("User tried to play a card he doesn't have.");
         }
 
 
@@ -256,9 +255,7 @@ export class Prsi {
             this._currentGame!.hands.get(player)!.push(this._currentGame!.deck.cards[this._currentGame!.drawn++]);
         }
 
-        console.log("this._curre", "=", this._currentGame.wantedAction);
         let n = this.drawInfo.get(this._currentGame.wantedAction)!.count;
-        console.log(player, "draws", n);
         while (n--) {
             impl_draw();
         }
@@ -354,9 +351,8 @@ export class Prsi {
 
         if (details.card.value === Value.Svrsek) {
             if (typeof details.colorChange === "undefined") {
-                throw new Error("Internal error.");
+                throw new Error("User didn't specify which color he wants.");
             }
-            console.log(player, "changes to", details.colorChange);
             this._currentGame.wantedAction = this.changeColorToAction(details.colorChange);
         }
 
@@ -368,7 +364,7 @@ export class Prsi {
             throw new Error("Game isn't running.");
         }
         if (!this._currentGame.hands.has(player)) {
-            throw new Error("Internal error.");
+            throw new Error("playerHasCard: User doesn' exist.");
         }
         return this._currentGame.hands.get(player)!.some(sameCards.bind(null, cardToCheck));
     }

@@ -10,7 +10,7 @@ class Title extends React.Component {
 
 class Prompt extends React.Component<{text: string}> {
     render() {
-        return React.createElement("p", {key: "prompt", className: "block"}, this.props.text);
+        return React.createElement("p", {key: "prompt", className: "inline-block"}, this.props.text);
     }
 }
 
@@ -75,7 +75,8 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
                     key: "player:" + player
                 },
                 player)
-            )
+            ),
+            React.createElement("br", {key: "players-linebreak"})
         ]
     }
 

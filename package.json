@@ -10,7 +10,7 @@
     "build-webpack": "npx webpack",
     "build": "npm run build-tsc && npm run build-webpack",
     "postinstall": "npm run build",
-    "start": "npm run build && node build/main.js",
+    "start": "npm --silent run build && node build/main.js",
     "test": "npm run build-tsc && while node build/main.js; do :; done"
   },
   "author": "",

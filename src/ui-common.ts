@@ -164,7 +164,7 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
         if (typeof this.props.gameInfo !== "undefined") {
             elems.push(React.createElement("p", {key: "hand-text", className: "inline-block"}, "Tvoje ruka:"));
             elems.push(this.renderHand(this.props.gameInfo.hand));
-            elems.push(React.createElement("br", {key: "hand-text-linebreak"}));
+            elems.push(React.createElement("br", {key: "hand-linebreak"}));
         }
 
         if (this.state.picker !== null) {

@@ -47,16 +47,25 @@ export class ErrorResponse {
     }
 }
 
+export class FrontendInfo {
+    wantedAction: ActionType;
+    topCard: Card;
+    hand: Card[];
+    constructor(wantedAction: ActionType, topCard: Card, hand: Card[]) {
+        this.wantedAction = wantedAction;
+        this.topCard = topCard;
+        this.hand = hand;
+    }
+
+}
+
 export class FrontendState {
     gameStarted: "yes" | "no";
     players: string[];
-    wantedAction?: ActionType;
-    topCard?: Card;
-    hand?: Card[];
-    constructor(gameStarted: "yes" | "no", players: string[], topCard?: Card, hand?: Card[]) {
+    gameInfo?: FrontendInfo;
+    constructor(gameStarted: "yes" | "no", players: string[], frontendInfo?: FrontendInfo) {
         this.gameStarted = gameStarted;
         this.players = players;
-        this.topCard = topCard;
-        this.hand = hand;
+        this.gameInfo = frontendInfo;
     }
 }

@@ -129,16 +129,16 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
             elems.push(this.renderStartButton());
         }
         elems.push(this.renderPlayers(this.props.players));
-        if (typeof this.props.topCard !== "undefined") {
+        if (typeof this.props.gameInfo !== "undefined") {
             elems.push(this.renderPrompt("Na vršku je:"));
-            elems.push(this.renderCard(this.props.topCard));
+            elems.push(this.renderCard(this.props.gameInfo.topCard));
         } else {
             elems.push(this.renderPrompt("Hra nezačala."));
         }
 
-        if (this.props.gameStarted === "yes" && typeof this.props.wantedAction !== "undefined") {
+        if (typeof this.props.gameInfo !== "undefined") {
             elems.push(this.renderDrawButton((() => {
-                switch (this.props.wantedAction!) {
+                switch (this.props.gameInfo.wantedAction!) {
                     case ActionType.Play:
                     case ActionType.PlayKule:
                     case ActionType.PlayListy:
@@ -161,9 +161,9 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
             })()));
         }
 
-        if (typeof this.props.hand !== "undefined") {
+        if (typeof this.props.gameInfo !== "undefined") {
             elems.push(React.createElement("p", {key: "hand-text", className: "inline-block"}, "Tvoje ruka:"));
-            elems.push(this.renderHand(this.props.hand));
+            elems.push(this.renderHand(this.props.gameInfo.hand));
             elems.push(React.createElement("br", {key: "hand-text-linebreak"}));
         }
 

@@ -183,10 +183,6 @@ export class Prsi {
                 if (typeof playerAction.playDetails === "undefined") {
                     throw new Error("User wanted to play, but didn't specify what.");
                 }
-                if (playerAction.playDetails.card.color !== this.changeActionToColor(this._currentGame.wantedAction)) {
-                    this._currentGame.status = Status.WrongColor;
-                    return;
-                }
                 this.playCard(playerAction.who, playerAction.playDetails);
                 return;
             case PlayType.Draw:
@@ -316,6 +312,18 @@ export class Prsi {
         return false;
     }
 
+    private canBePlayed(card: Card) {
+        if (typeof this._currentGame === "undefined") {
+            throw new Error("Game isn't running.");
+        }
+
+        if (card.value === Value.Svrsek) {
+            return true;
+        }
+
+        return compatibleCards(card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1]);
+    }
+
     private playCard(player: string, details: PlayDetails) {
         if (typeof this._currentGame === "undefined") {
             throw new Error("Game isn't running.");
@@ -325,9 +333,7 @@ export class Prsi {
             throw new Error("User wanted to play a card he doesn't have.");
         }
 
-        if (details.card.value !== Value.Svrsek
-            && !compatibleCards(details.card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1])
-            && !this.resolveChangeCard(details.card.color)) {
+        if (!this.canBePlayed(details.card) && !this.resolveChangeCard(details.card.color)) {
             this._currentGame.status = Status.CardMismatch;
             return;
         }

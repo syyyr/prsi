@@ -206,7 +206,7 @@ export abstract class UI extends React.Component<FrontendState & {ws: any, thisN
         [ActionType.Play]: new PresentedStrings({
             [Status.Ok]: {you: "Hraješ.", other: "@PLAYERNAME@ hraje."},
             [Status.CardMismatch]: {you: "Tohle tam nemůžeš dát. Musíš zahrát @TOPVALUE@ nebo @TOPCOLOR@ (nebo si lízni)."},
-            [Status.PlayerMismatch]: {other: "Teď nehraješ, hraje, @PLAYERNAME@."}
+            [Status.PlayerMismatch]: {other: "Teď nehraješ, hraje @PLAYERNAME@."}
         }),
         [ActionType.PlayKule]: this.genPlayColor(Color.Kule),
         [ActionType.PlayListy]: this.genPlayColor(Color.Listy),

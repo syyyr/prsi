@@ -7,7 +7,7 @@ let playerName: null | string = null;
 while (playerName == null) {
     playerName = window.prompt("Username:");
 }
-const connection = new window.WebSocket(`ws://${window.location.host}`);
+const connection = new window.WebSocket(`ws${window.location.protocol === "https:" ? "s" : ""}://${window.location.host}`);
 
 connection.onopen = () => {
     console.log("ws opened");

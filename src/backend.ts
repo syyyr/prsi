@@ -187,7 +187,6 @@ export class Prsi {
                     this._currentGame.status = Status.WrongColor;
                     return;
                 }
-                this._currentGame.wantedAction = ActionType.Play;
                 this.playCard(playerAction.who, playerAction.playDetails);
                 return;
             case PlayType.Draw:
@@ -303,6 +302,20 @@ export class Prsi {
         this._currentGame.whoseTurn = loser;
     }
 
+    private resolveChangeCard(color: Color): boolean {
+        if (typeof this._currentGame === "undefined") {
+            throw new Error("Game isn't running.");
+        }
+        // try here, because the helper function only works on Play* actions
+        try {
+            if (color === this.changeActionToColor(this._currentGame.wantedAction)) {
+                this._currentGame.wantedAction = ActionType.Play;
+                return true;
+            }
+        } catch {}
+        return false;
+    }
+
     private playCard(player: string, details: PlayDetails) {
         if (typeof this._currentGame === "undefined") {
             throw new Error("Game isn't running.");
@@ -312,7 +325,9 @@ export class Prsi {
             throw new Error("User wanted to play a card he doesn't have.");
         }
 
-        if (details.card.value !== Value.Svrsek && !compatibleCards(details.card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1])) {
+        if (details.card.value !== Value.Svrsek
+            && !compatibleCards(details.card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1])
+            && !this.resolveChangeCard(details.card.color)) {
             this._currentGame.status = Status.CardMismatch;
             return;
         }

@@ -1,4 +1,4 @@
-import {ActionType, Card, PlayType, PlayDetails} from "./types"
+import {ActionType, Card, PlayType, PlayDetails, Status} from "./types"
 
 export function isPlayerRegistration(toCheck: any): toCheck is PlayerRegistration {
     return typeof toCheck.registerPlayer !== "undefined";
@@ -49,14 +49,17 @@ export class ErrorResponse {
 
 export class FrontendInfo {
     wantedAction: ActionType;
+    status: Status;
+    who: string;
     topCard: Card;
     hand: Card[];
-    constructor(wantedAction: ActionType, topCard: Card, hand: Card[]) {
+    constructor(wantedAction: ActionType, status: Status, who: string, topCard: Card, hand: Card[]) {
         this.wantedAction = wantedAction;
+        this.status = status;
+        this.who = who;
         this.topCard = topCard;
         this.hand = hand;
     }
-
 }
 
 export class FrontendState {

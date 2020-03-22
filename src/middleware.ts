@@ -27,9 +27,11 @@ const buildFrontendStateFor = (player: string): FrontendState => {
         players: prsi.players(),
         gameStarted: typeof state !== "undefined" ? "yes" : "no",
         gameInfo: typeof state !== "undefined" ? {
+            wantedAction: state.wantedAction,
+            status: state.status,
+            who: state.whoseTurn,
             topCard: state.playedCards[state.playedCards.length - 1],
-            hand: state.hands.get(player)!,
-            wantedAction: state.wantedAction
+            hand: state.hands.get(player)!
         } : undefined
     };
 };

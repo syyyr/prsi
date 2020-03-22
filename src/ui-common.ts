@@ -64,7 +64,6 @@ type Override = {
 }
 
 class PresentedStrings {
-
     [Status.Ok]: YouOther = {you: "ERROR: Ok/you", other: "ERROR: Ok/other"};
     [Status.PlayerMismatch]: YouOther = {you: "ERROR: PlayerMismatch/you", other: "ERROR: PlayerMismatch/other"};
     [Status.CardMismatch]: YouOther = {you: "ERROR: CardMismatch/you", other: "ERROR: CardMismatch/other"};
@@ -127,7 +126,7 @@ export abstract class UI extends React.Component<FrontendState & {ws: any, thisN
             "Start");
     }
 
-    renderDrawButton(wantedAction: ActionType): React.ReactNode {
+    renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode {
         return React.createElement(
             DrawButton,
             {
@@ -136,6 +135,9 @@ export abstract class UI extends React.Component<FrontendState & {ws: any, thisN
                     this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)));
                 },
                 text: (() => {
+                    if (this.props.thisName !== whoseTurn && wantedAction !== ActionType.Shuffle) {
+                        return "Líznout si";
+                    }
                     switch (wantedAction) {
                     case ActionType.Play:
                     case ActionType.PlayKule:
@@ -260,7 +262,7 @@ export abstract class UI extends React.Component<FrontendState & {ws: any, thisN
         }
 
         if (typeof this.props.gameInfo !== "undefined") {
-            elems.push(this.renderDrawButton(this.props.gameInfo.wantedAction));
+            elems.push(this.renderDrawButton(this.props.gameInfo.wantedAction, this.props.gameInfo.who));
         }
 
         if (typeof this.props.gameInfo !== "undefined") {

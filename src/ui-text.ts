@@ -16,6 +16,7 @@ export class TextUI extends UI {
             ...[Color.Kule, Color.Listy, Color.Srdce, Color.Zaludy].map((color) => React.createElement(
                 "p",
                 {
+                    key: color,
                     className: "inline-block clickable left-margin",
                     onClick: () => onClick(color)
                 },

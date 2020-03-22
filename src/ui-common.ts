@@ -190,6 +190,17 @@ export abstract class UI extends React.Component<FrontendState & {ws: any, thisN
         [Color.Zaludy]: "žaludy",
     }
 
+    readonly values = {
+        [Value.Sedmicka]: "sedmu",
+        [Value.Osmicka]: "osmičku",
+        [Value.Devitka]: "devítku",
+        [Value.Desitka]: "desítku",
+        [Value.Spodek]: "spodka",
+        [Value.Svrsek]: "svrška",
+        [Value.Kral]: "krále",
+        [Value.Eso]: "eso",
+    }
+
     genPlayColor(color: Color): PresentedStrings {
         return new PresentedStrings({
             [Status.Ok]: {you: `Hraješ. (${this.colors[color]})`, other: "@PLAYERNAME@ hraje."},
@@ -231,8 +242,8 @@ export abstract class UI extends React.Component<FrontendState & {ws: any, thisN
     renderInstructions(wantedAction: ActionType, status: Status, you: string, turn: string, topCard: Card): React.ReactNode {
         const text = this.instructions[wantedAction][status][you === turn ? "you" : "other"]
             .replace("@PLAYERNAME@", turn)
-            .replace("@TOPCOLOR@", topCard.color)
-            .replace("@TOPVALUE", topCard.value);
+            .replace("@TOPCOLOR@", this.colors[topCard.color])
+            .replace("@TOPVALUE@", this.values[topCard.value]);
 
         return React.createElement(Prompt, {key: "instructions", text}, null);
     }

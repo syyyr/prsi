@@ -52,7 +52,7 @@ export enum ActionType {
     DrawFour = "DrawFour",
     DrawSix = "DrawSix",
     DrawEight = "DrawEight",
-    SkipTurn = "Ace",
+    SkipTurn = "SkipTurn",
     PlaySrdce = "PlaySrdce",
     PlayKule = "PlayKule",
     PlayZaludy = "PlayZaludy",

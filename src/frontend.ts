@@ -26,7 +26,7 @@ connection.onmessage = (message) => {
 
     if (isFrontendState(parsed)) {
         ReactDOM.render(
-            React.createElement(TextUI, {...parsed, ws: connection}, null),
+            React.createElement(TextUI, {...parsed, ws: connection, thisName: playerName!}, null),
             window.document.getElementById("game")
         );
     }

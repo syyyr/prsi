@@ -56,11 +56,11 @@ class DrawButton extends React.Component<{text: string, onClick: () => void}> {
 
 const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
 
-export abstract class UI extends React.Component<FrontendState & {ws: any}, {picker: null | Color}> {
+export abstract class UI extends React.Component<FrontendState & {ws: any, thisName: string}, {picker: null | Color}> {
     abstract renderCard(card: Card, onClick?: () => void): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
 
-    constructor(props: FrontendState & {ws: any}) {
+    constructor(props: FrontendState & {ws: any, thisName: string}) {
         super(props);
         this.state = {picker: null};
     }

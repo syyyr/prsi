@@ -38,7 +38,6 @@ export enum Status {
     MustShuffle = "MustShuffle",
     NotASeven = "NotASeven",
     NotAnAce = "NotAnAce",
-    WrongColor = "WrongColor"
 }
 
 export enum PlayType {

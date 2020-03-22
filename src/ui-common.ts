@@ -98,7 +98,28 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
                 onClick: () => {
                     this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)));
                 },
-                text
+                text: (() => {
+                    switch (wantedAction) {
+                    case ActionType.Play:
+                    case ActionType.PlayKule:
+                    case ActionType.PlayListy:
+                    case ActionType.PlayZaludy:
+                    case ActionType.PlaySrdce:
+                        return "Líznout si";
+                    case ActionType.DrawTwo:
+                        return "Líznout dvě";
+                    case ActionType.DrawFour:
+                        return "Líznout čtyři";
+                    case ActionType.DrawSix:
+                        return "Líznout šest";
+                    case ActionType.DrawEight:
+                        return "Líznout osm";
+                    case ActionType.SkipTurn:
+                        return "Stojím";
+                    case ActionType.Shuffle:
+                        return "Zamíchat";
+                    }
+                })()
             },
             null);
     }
@@ -138,28 +159,7 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
         }
 
         if (typeof this.props.gameInfo !== "undefined") {
-            elems.push(this.renderDrawButton((() => {
-                switch (this.props.gameInfo.wantedAction!) {
-                    case ActionType.Play:
-                    case ActionType.PlayKule:
-                    case ActionType.PlayListy:
-                    case ActionType.PlayZaludy:
-                    case ActionType.PlaySrdce:
-                        return "Líznout si";
-                    case ActionType.DrawTwo:
-                        return "Líznout dvě";
-                    case ActionType.DrawFour:
-                        return "Líznout čtyři";
-                    case ActionType.DrawSix:
-                        return "Líznout šest";
-                    case ActionType.DrawEight:
-                        return "Líznout osm";
-                    case ActionType.SkipTurn:
-                        return "Stojím";
-                    case ActionType.Shuffle:
-                        return "Zamíchat";
-                }
-            })()));
+            elems.push(this.renderDrawButton(this.props.gameInfo.wantedAction));
         }
 
         if (typeof this.props.gameInfo !== "undefined") {

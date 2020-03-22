@@ -219,7 +219,8 @@ export abstract class UI extends React.Component<FrontendState & {ws: any, thisN
         [ActionType.Play]: new PresentedStrings({
             [Status.Ok]: {you: "Hraješ.", other: "@PLAYERNAME@ hraje."},
             [Status.CardMismatch]: {you: "Tohle tam nemůžeš dát. Musíš zahrát @TOPVALUE@ nebo @TOPCOLOR@ (nebo si lízni)."},
-            [Status.PlayerMismatch]: {other: "Teď nehraješ, hraje @PLAYERNAME@."}
+            [Status.PlayerMismatch]: {other: "Teď nehraješ, hraje @PLAYERNAME@."},
+            [Status.MustShuffle]: {you: "Hra skončila, musíš zamíchat.", other: "Hra skončila, @PLAYERNAME@ musí zamíchat."}
         }),
         [ActionType.PlayKule]: this.genPlayColor(Color.Kule),
         [ActionType.PlayListy]: this.genPlayColor(Color.Listy),
@@ -227,7 +228,7 @@ export abstract class UI extends React.Component<FrontendState & {ws: any, thisN
         [ActionType.PlaySrdce]: this.genPlayColor(Color.Srdce),
         [ActionType.Shuffle]: new PresentedStrings({
             [Status.Ok]: {you: "Mícháš.", other: "Míchá @PLAYERNAME@."},
-            [Status.PlayerMismatch]: {other: "Ty nemícháš, míchá @PLAYERNAME@"},
+            [Status.PlayerMismatch]: {other: "Ty nemícháš, míchá @PLAYERNAME@."},
         }),
         [ActionType.DrawTwo]: this.genPlaySeven("dvě"),
         [ActionType.DrawFour]: this.genPlaySeven("čtyři"),

@@ -90,7 +90,7 @@ export abstract class UI extends React.Component<FrontendState & {ws: any}, {pic
             "Start");
     }
 
-    renderDrawButton(text: string): React.ReactNode {
+    renderDrawButton(wantedAction: ActionType): React.ReactNode {
         return React.createElement(
             DrawButton,
             {

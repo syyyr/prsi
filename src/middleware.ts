@@ -96,7 +96,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
         if (typeof ws !== "undefined") {
             logger(msg, {
                 session: {
-                    id: `ws/${ws.__private_id}`
+                    myId: `ws/${ws.__private_id}`
                 }
             } as any);
         } else {

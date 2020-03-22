@@ -1,6 +1,6 @@
 import * as React from "react";
 import {FrontendState, StartGame, PlayerInput} from "./communication";
-import {Card, PlayDetails, PlayType, Value, Color, ActionType} from "./types";
+import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status} from "./types";
 
 class Title extends React.Component {
     render() {
@@ -51,6 +51,43 @@ class DrawButton extends React.Component<{text: string, onClick: () => void}> {
             },
             this.props.text);
 
+    }
+}
+
+interface YouOther {
+    you: string;
+    other: string;
+}
+
+type Override = {
+    [key in keyof typeof Status]?: {you?: string, other?: string};
+}
+
+class PresentedStrings {
+
+    [Status.Ok]: YouOther = {you: "ERROR: Ok/you", other: "ERROR: Ok/other"};
+    [Status.PlayerMismatch]: YouOther = {you: "ERROR: PlayerMismatch/you", other: "ERROR: PlayerMismatch/other"};
+    [Status.CardMismatch]: YouOther = {you: "ERROR: CardMismatch/you", other: "ERROR: CardMismatch/other"};
+    [Status.ActionMismatch]: YouOther = {you: "ERROR: ActionMismatch/you", other: "ERROR: ActionMismatch/other"};
+    [Status.DontHaveCard]: YouOther = {you: "ERROR: DontHaveCard/you", other: "ERROR: DontHaveCard/other"};
+    [Status.NotAnAce]: YouOther = {you: "ERROR: NotAnAce/you", other: "ERROR: NotAnAce/other"};
+    [Status.NotASeven]: YouOther = {you: "ERROR: NotASeven/you", other: "ERROR: NotASeven/other"};
+    [Status.MustShuffle]: YouOther = {you: "ERROR: MustShuffle/you", other: "ERROR: MustShuffle/other"};
+    constructor(overrides?: Override) {
+        if (typeof overrides === "undefined") {
+            return;
+        }
+
+        Object.keys(overrides).forEach((key: string) => {
+            const actualKey = key as Status; // TODO: check if Object.keys can return the enum
+            const override = overrides[actualKey]!;
+            if (typeof override.you !== "undefined") {
+                this[actualKey].you = override.you;
+            }
+            if (typeof override.other !== "undefined") {
+                this[actualKey].other = override.other;
+            }
+        });
     }
 }
 
@@ -144,6 +181,60 @@ export abstract class UI extends React.Component<FrontendState & {ws: any, thisN
         }));
     }
 
+    readonly colors = {
+        [Color.Kule]: "kule",
+        [Color.Listy]: "listy",
+        [Color.Srdce]: "srdce",
+        [Color.Zaludy]: "žaludy",
+    }
+
+    genPlayColor(color: Color): PresentedStrings {
+        return new PresentedStrings({
+            [Status.Ok]: {you: `Hraješ. (${this.colors[color]})`, other: "@PLAYERNAME@ hraje."},
+            [Status.CardMismatch]: {you: `Tohle tam nemůžeš dát. Musíš zahrát ${this.colors[color]}.`}
+        });
+    }
+
+    genPlaySeven(drawCount: string): PresentedStrings {
+        return new PresentedStrings({
+            [Status.Ok]: {you: `Lížeš ${drawCount}${drawCount !== "osm" ? ", nebo zahraj sedmu" : ""}.`, other: "@PLAYERNAME@ hraje."},
+            [Status.NotASeven]: {you: `Tohle tam nemůžeš dát. Lízej ${drawCount}${drawCount !== "osm" ? ", nebo zahraj sedmu" : ""}.`}
+        });
+    }
+
+    readonly instructions: {[key in keyof typeof ActionType]: PresentedStrings} = {
+        [ActionType.Play]: new PresentedStrings({
+            [Status.Ok]: {you: "Hraješ.", other: "@PLAYERNAME@ hraje."},
+            [Status.CardMismatch]: {you: "Tohle tam nemůžeš dát. Musíš zahrát @TOPVALUE@ nebo @TOPCOLOR@ (nebo si lízni)."},
+            [Status.PlayerMismatch]: {other: "Teď nehraješ, hraje, @PLAYERNAME@."}
+        }),
+        [ActionType.PlayKule]: this.genPlayColor(Color.Kule),
+        [ActionType.PlayListy]: this.genPlayColor(Color.Listy),
+        [ActionType.PlayZaludy]: this.genPlayColor(Color.Zaludy),
+        [ActionType.PlaySrdce]: this.genPlayColor(Color.Srdce),
+        [ActionType.Shuffle]: new PresentedStrings({
+            [Status.Ok]: {you: "Mícháš.", other: "Míchá @PLAYERNAME@."},
+            [Status.PlayerMismatch]: {other: "Ty nemícháš, míchá @PLAYERNAME@"},
+        }),
+        [ActionType.DrawTwo]: this.genPlaySeven("dvě"),
+        [ActionType.DrawFour]: this.genPlaySeven("čtyři"),
+        [ActionType.DrawSix]: this.genPlaySeven("šest"),
+        [ActionType.DrawEight]: this.genPlaySeven("osm"),
+        [ActionType.SkipTurn]: new PresentedStrings({
+            [Status.Ok]: {you: "Stojíš nebo zahraj eso.", other: "@PLAYERNAME@ hraje."},
+            [Status.NotAnAce]: {you: "Tohle tam nemůžeš dát. Buď stojíš, nebo zahraj eso."}
+        }),
+    };
+
+    renderInstructions(wantedAction: ActionType, status: Status, you: string, turn: string, topCard: Card): React.ReactNode {
+        const text = this.instructions[wantedAction][status][you === turn ? "you" : "other"]
+            .replace("@PLAYERNAME@", turn)
+            .replace("@TOPCOLOR@", topCard.color)
+            .replace("@TOPVALUE", topCard.value);
+
+        return React.createElement(Prompt, {key: "instructions", text}, null);
+    }
+
     render() {
         const elems = [];
         elems.push(React.createElement(Title, {key: "title"}, null));
@@ -151,6 +242,16 @@ export abstract class UI extends React.Component<FrontendState & {ws: any, thisN
             elems.push(this.renderStartButton());
         }
         elems.push(this.renderPlayers(this.props.players));
+
+        if (typeof this.props.gameInfo !== "undefined") {
+            elems.push(this.renderInstructions(this.props.gameInfo.wantedAction,
+                this.props.gameInfo.status,
+                this.props.thisName,
+                this.props.gameInfo.who,
+                this.props.gameInfo.topCard));
+            elems.push(React.createElement("br", {key: "instructions-linebreak"}));
+        }
+
         if (typeof this.props.gameInfo !== "undefined") {
             elems.push(this.renderPrompt("Na vršku je:"));
             elems.push(this.renderCard(this.props.gameInfo.topCard));

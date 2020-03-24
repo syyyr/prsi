@@ -14,24 +14,11 @@ connection.onopen = () => {
     connection.send(JSON.stringify(new PlayerRegistration(playerName!)));
 }
 
-connection.onmessage = (message) => {
-    console.log("ws got data:", message);
-
-    const parsed = JSON.parse(message.data);
-
-    if (isErrorResponse(parsed)) {
-        console.log(parsed.error);
-        return;
-    }
-
-    if (isFrontendState(parsed)) {
-        ReactDOM.render(
-            React.createElement(TextUI, {...parsed, ws: connection, thisName: playerName!}, null),
-            window.document.getElementById("game")
-        );
-    }
-};
-
 connection.onclose = () => {
     console.log("ws closed");
 }
+
+ReactDOM.render(
+    React.createElement(ImgUI, {ws: connection, thisName: playerName!}, null),
+    window.document.getElementById("game")
+);

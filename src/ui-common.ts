@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FrontendState, StartGame, PlayerInput} from "./communication";
+import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput} from "./communication";
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status} from "./types";
 
 class Title extends React.Component {
@@ -92,13 +92,27 @@ class PresentedStrings {
 
 const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
 
-export abstract class UI extends React.Component<FrontendState & {ws: any, thisName: string}, {picker: null | Color}> {
+export abstract class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
     abstract renderCard(card: Card, onClick?: () => void): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
 
-    constructor(props: FrontendState & {ws: any, thisName: string}) {
+    constructor(props: {ws: any, thisName: string}) {
         super(props);
         this.state = {picker: null};
+        this.props.ws.onmessage = (message: any) => {
+            console.log("ws got data:", message);
+
+            const parsed = JSON.parse(message.data);
+
+            if (isErrorResponse(parsed)) {
+                console.log(parsed.error);
+                return;
+            }
+
+            if (isFrontendState(parsed)) {
+                this.setState({gameState: parsed, picker: this.state.picker});
+            }
+        };
     }
 
     renderPlayers(players: string[]): React.ReactNode {
@@ -252,36 +266,33 @@ export abstract class UI extends React.Component<FrontendState & {ws: any, thisN
     render() {
         const elems = [];
         elems.push(React.createElement(Title, {key: "title"}, null));
-        if (this.props.gameStarted === "no") {
+        if (typeof this.state.gameState === "undefined") {
+            return elems;
+        }
+        if (this.state.gameState.gameStarted === "no") {
             elems.push(this.renderStartButton());
         }
-        elems.push(this.renderPlayers(this.props.players));
+        elems.push(this.renderPlayers(this.state.gameState.players));
 
-        if (typeof this.props.gameInfo !== "undefined") {
-            elems.push(this.renderInstructions(this.props.gameInfo.wantedAction,
-                this.props.gameInfo.status,
-                this.props.thisName,
-                this.props.gameInfo.who,
-                this.props.gameInfo.topCard));
-            elems.push(React.createElement("br", {key: "instructions-linebreak"}));
-        }
-
-        if (typeof this.props.gameInfo !== "undefined") {
-            elems.push(this.renderPrompt("Na vršku je:"));
-            elems.push(this.renderCard(this.props.gameInfo.topCard));
-        } else {
+        if (typeof this.state.gameState.gameInfo === "undefined") {
             elems.push(this.renderPrompt("Hra nezačala."));
+            return elems;
         }
+        elems.push(this.renderInstructions(this.state.gameState.gameInfo.wantedAction,
+            this.state.gameState.gameInfo.status,
+            this.props.thisName,
+            this.state.gameState.gameInfo.who,
+            this.state.gameState.gameInfo.topCard));
+        elems.push(React.createElement("br", {key: "instructions-linebreak"}));
 
-        if (typeof this.props.gameInfo !== "undefined") {
-            elems.push(this.renderDrawButton(this.props.gameInfo.wantedAction, this.props.gameInfo.who));
-        }
+        elems.push(this.renderPrompt("Na vršku je:"));
+        elems.push(this.renderCard(this.state.gameState.gameInfo.topCard));
 
-        if (typeof this.props.gameInfo !== "undefined") {
-            elems.push(React.createElement("p", {key: "hand-text", className: "inline-block"}, "Tvoje ruka:"));
-            elems.push(this.renderHand(this.props.gameInfo.hand));
-            elems.push(React.createElement("br", {key: "hand-linebreak"}));
-        }
+        elems.push(this.renderDrawButton(this.state.gameState.gameInfo.wantedAction, this.state.gameState.gameInfo.who));
+
+        elems.push(React.createElement("p", {key: "hand-text", className: "inline-block"}, "Tvoje ruka:"));
+        elems.push(this.renderHand(this.state.gameState.gameInfo.hand));
+        elems.push(React.createElement("br", {key: "hand-linebreak"}));
 
         if (this.state.picker !== null) {
             elems.push(React.createElement(

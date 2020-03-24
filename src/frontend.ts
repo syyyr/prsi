@@ -1,7 +1,8 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import {isErrorResponse, PlayerRegistration, isFrontendState} from "./communication";
+import {PlayerRegistration} from "./communication";
 import {TextUI} from "./ui-text";
+import {ImgUI} from "./ui-img";
 
 let playerName: null | string = null;
 while (playerName == null) {

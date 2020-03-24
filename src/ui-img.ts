@@ -1,7 +1,8 @@
 import * as React from "react";
 import {UI} from "./ui-common";
 import {Card, Color} from "./types";
-import {images} from "./card-images";
+import images from "./card-images";
+import colors from "./color-images";
 
 export class ImgUI extends UI {
     renderCard(card: Card, onClick?: () => void): React.ReactNode {
@@ -16,13 +17,13 @@ export class ImgUI extends UI {
         return [
             React.createElement("p", {key: "changeTo", className: "fit-content inline-block"}, "Měním na:"),
             ...[Color.Kule, Color.Listy, Color.Srdce, Color.Zaludy].map((color) => React.createElement(
-                "p",
+                "img",
                 {
                     key: color,
                     className: "inline-block clickable left-margin",
-                    onClick: () => onClick(color)
-                },
-                color
+                    onClick: () => onClick(color),
+                    src: colors[color]
+                }
             ))
         ];
     }

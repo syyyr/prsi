@@ -9,7 +9,8 @@ export class ImgUI extends UI {
         const options = {
             onClick,
             className: `left-margin inline-block fit-content ${typeof onClick !== "undefined" ? "clickable" : ""}`,
-            src: images[card.color][card.value]
+            src: images[card.color][card.value],
+            draggable: false
         }
         return React.createElement("img", {key: "card", ...options});
     }
@@ -22,7 +23,8 @@ export class ImgUI extends UI {
                     key: color,
                     className: "inline-block clickable left-margin",
                     onClick: () => onClick(color),
-                    src: colors[color]
+                    src: colors[color],
+                    draggable: false
                 }
             ))
         ];

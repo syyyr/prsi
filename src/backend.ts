@@ -304,6 +304,9 @@ export class Prsi {
         }
         // try here, because the helper function only works on Play* actions
         try {
+            if (this._currentGame.wantedAction == ActionType.Play) {
+                return false;
+            }
             if (color === this.changeActionToColor(this._currentGame.wantedAction)) {
                 this._currentGame.wantedAction = ActionType.Play;
                 return true;
@@ -333,7 +336,7 @@ export class Prsi {
             throw new Error("User wanted to play a card he doesn't have.");
         }
 
-        if (!this.canBePlayed(details.card) && !this.resolveChangeCard(details.card.color)) {
+        if (!this.resolveChangeCard(details.card.color) && !this.canBePlayed(details.card)) {
             this._currentGame.status = Status.CardMismatch;
             return;
         }

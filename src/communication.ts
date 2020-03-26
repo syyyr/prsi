@@ -47,18 +47,24 @@ export class ErrorResponse {
     }
 }
 
+export type CardCounts = {
+    [key in string]: number
+}
+
 export class FrontendInfo {
     wantedAction: ActionType;
     status: Status;
     who: string;
     topCard: Card;
+    cardCount: CardCounts;
     hand: Card[];
-    constructor(wantedAction: ActionType, status: Status, who: string, topCard: Card, hand: Card[]) {
+    constructor(wantedAction: ActionType, status: Status, who: string, topCard: Card, hand: Card[], cardCount: CardCounts) {
         this.wantedAction = wantedAction;
         this.status = status;
         this.who = who;
         this.topCard = topCard;
         this.hand = hand;
+        this.cardCount = cardCount;
     }
 }
 

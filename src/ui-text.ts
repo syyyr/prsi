@@ -24,4 +24,19 @@ export class TextUI extends UI {
             ))
         ];
     }
+
+    renderPlayers(players: string[], whoseTurn?: string): React.ReactNode {
+        return [
+            React.createElement("p", {className: "fit-content inline-block", key: "players"}, "Hráči:"),
+            ...players.map((player) => React.createElement(
+                "p",
+                {
+                    className: `left-margin fit-content inline-block ${typeof whoseTurn !== "undefined" && player == whoseTurn ? "bold" : ""}`,
+                    key: "player:" + player
+                },
+                player)
+            ),
+            React.createElement("br", {key: "players-linebreak"})
+        ]
+    }
 }

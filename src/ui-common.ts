@@ -1,5 +1,5 @@
 import * as React from "react";
-import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput} from "./communication";
+import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, CardCounts} from "./communication";
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status} from "./types";
 
 class Title extends React.Component {
@@ -95,6 +95,7 @@ const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
 export abstract class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
     abstract renderCard(card: Card, onClick?: () => void): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
+    abstract renderPlayers(players: string[], whoseTurn?: string, cardCounts?: CardCounts): React.ReactNode;
 
     constructor(props: {ws: any, thisName: string}) {
         super(props);
@@ -113,21 +114,6 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
                 this.setState({gameState: parsed, picker: this.state.picker});
             }
         };
-    }
-
-    renderPlayers(players: string[], whoseTurn?: string): React.ReactNode {
-        return [
-            React.createElement("p", {className: "fit-content inline-block", key: "players"}, "Hráči:"),
-            ...players.map((player) => React.createElement(
-                "p",
-                {
-                    className: `left-margin fit-content inline-block ${typeof whoseTurn !== "undefined" && player == whoseTurn ? "bold" : ""}`,
-                    key: "player:" + player
-                },
-                player)
-            ),
-            React.createElement("br", {key: "players-linebreak"})
-        ]
     }
 
     renderStartButton(): React.ReactNode {
@@ -272,7 +258,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         if (this.state.gameState.gameStarted === "no") {
             elems.push(this.renderStartButton());
         }
-        elems.push(this.renderPlayers(this.state.gameState.players, this.state.gameState.gameInfo?.who));
+        elems.push(this.renderPlayers(this.state.gameState.players, this.state.gameState.gameInfo?.who, this.state.gameState.gameInfo?.cardCount));
 
         if (typeof this.state.gameState.gameInfo === "undefined") {
             elems.push(this.renderPrompt("Hra nezačala."));

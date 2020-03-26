@@ -115,13 +115,13 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         };
     }
 
-    renderPlayers(players: string[]): React.ReactNode {
+    renderPlayers(players: string[], whoseTurn?: string): React.ReactNode {
         return [
             React.createElement("p", {className: "fit-content inline-block", key: "players"}, "Hráči:"),
             ...players.map((player) => React.createElement(
                 "p",
                 {
-                    className: "left-margin fit-content inline-block",
+                    className: `left-margin fit-content inline-block ${typeof whoseTurn !== "undefined" && player == whoseTurn ? "bold" : ""}`,
                     key: "player:" + player
                 },
                 player)
@@ -272,7 +272,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         if (this.state.gameState.gameStarted === "no") {
             elems.push(this.renderStartButton());
         }
-        elems.push(this.renderPlayers(this.state.gameState.players));
+        elems.push(this.renderPlayers(this.state.gameState.players, this.state.gameState.gameInfo?.who));
 
         if (typeof this.state.gameState.gameInfo === "undefined") {
             elems.push(this.renderPrompt("Hra nezačala."));

@@ -183,6 +183,7 @@ export class Prsi {
                 if (typeof playerAction.playDetails === "undefined") {
                     throw new Error("User wanted to play, but didn't specify what.");
                 }
+
                 this.playCard(playerAction.who, playerAction.playDetails);
                 return;
             case PlayType.Draw:
@@ -254,10 +255,10 @@ export class Prsi {
     }
 
     private readonly drawInfo = new Map([
-        [ActionType.PlayZaludy, {next: ActionType.PlayZaludy, count: 1}],
-        [ActionType.PlayListy, {next: ActionType.PlayListy, count: 1}],
-        [ActionType.PlayKule, {next: ActionType.PlayKule, count: 1}],
-        [ActionType.PlaySrdce, {next: ActionType.PlaySrdce, count: 1}],
+        [ActionType.PlayZaludy, {next: ActionType.DrawTwo, count: 1}],
+        [ActionType.PlayListy, {next: ActionType.DrawTwo, count: 1}],
+        [ActionType.PlayKule, {next: ActionType.DrawTwo, count: 1}],
+        [ActionType.PlaySrdce, {next: ActionType.DrawTwo, count: 1}],
         [ActionType.Play, {next: ActionType.DrawTwo, count: 1}],
         [ActionType.DrawTwo, {next: ActionType.DrawFour, count: 2}],
         [ActionType.DrawFour, {next: ActionType.DrawSix, count: 4}],
@@ -304,11 +305,7 @@ export class Prsi {
         }
         // try here, because the helper function only works on Play* actions
         try {
-            if (this._currentGame.wantedAction == ActionType.Play) {
-                return false;
-            }
             if (color === this.changeActionToColor(this._currentGame.wantedAction)) {
-                this._currentGame.wantedAction = ActionType.Play;
                 return true;
             }
         } catch {}
@@ -324,6 +321,14 @@ export class Prsi {
             return true;
         }
 
+        switch (this._currentGame.wantedAction) {
+        case ActionType.PlayZaludy:
+        case ActionType.PlayKule:
+        case ActionType.PlayListy:
+        case ActionType.PlaySrdce:
+            return this.resolveChangeCard(card.color);
+        }
+
         return compatibleCards(card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1]);
     }
 
@@ -336,7 +341,7 @@ export class Prsi {
             throw new Error("User wanted to play a card he doesn't have.");
         }
 
-        if (!this.resolveChangeCard(details.card.color) && !this.canBePlayed(details.card)) {
+        if (!this.canBePlayed(details.card)) {
             this._currentGame.status = Status.CardMismatch;
             return;
         }
@@ -353,17 +358,15 @@ export class Prsi {
 
         if (details.card.value === Value.Sedmicka) {
             this._currentGame.wantedAction = this.drawInfo.get(this._currentGame.wantedAction)!.next;
-        }
-
-        if (details.card.value === Value.Eso) {
+        } else if (details.card.value === Value.Eso) {
             this._currentGame.wantedAction = ActionType.SkipTurn;
-        }
-
-        if (details.card.value === Value.Svrsek) {
+        } else if (details.card.value === Value.Svrsek) {
             if (typeof details.colorChange === "undefined") {
                 throw new Error("User didn't specify which color he wants.");
             }
             this._currentGame.wantedAction = this.changeColorToAction(details.colorChange);
+        } else {
+            this._currentGame.wantedAction = ActionType.Play;
         }
 
         this.nextPlayer();

@@ -114,7 +114,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
 
             if (isFrontendState(parsed)) {
                 console.log("new state ", parsed);
-                this.setState({gameState: parsed, picker: this.state.picker});
+                this.setState({gameState: parsed, picker: null});
             }
         };
     }

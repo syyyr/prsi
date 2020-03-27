@@ -218,7 +218,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         });
     }
 
-    readonly instructions: {[key in keyof typeof ActionType]: InstructionStrings} = {
+    readonly instructionStrings: {[key in keyof typeof ActionType]: InstructionStrings} = {
         [ActionType.Play]: new InstructionStrings({
             [Status.Ok]: {you: "Hraješ.", other: "@PLAYERNAME@ hraje."},
             [Status.CardMismatch]: {you: "Tohle tam nemůžeš dát. Musíš zahrát @TOPVALUE@ nebo @TOPCOLOR@ (nebo si lízni)."},
@@ -264,7 +264,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
                 this.colorStrings[lastPlay.playDetails.colorChange])
             .replace("@CARDS_GENITIVE@", typeof lastPlay.playDetails === "undefined"? "CARD unavailable" :
                 CARDS_GENITIVE[lastPlay.playDetails.card.color][lastPlay.playDetails.card.value]);
-        const instructions = this.instructions[wantedAction][status][you === turn ? "you" : "other"]
+        const instructions = this.instructionStrings[wantedAction][status][you === turn ? "you" : "other"]
             .replace("@PLAYERNAME@", turn)
             .replace("@TOPCOLOR@", this.colorStrings[topCard.color])
             .replace("@TOPVALUE@", this.values[topCard.value]);

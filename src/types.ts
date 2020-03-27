@@ -1,19 +1,19 @@
 export enum Color {
-    Zaludy = "♦",
-    Srdce = "♥",
-    Listy = "♠",
-    Kule = "♣"
+    Zaludy = "Zaludy",
+    Srdce = "Srdce",
+    Listy = "Listy",
+    Kule = "Kule"
 }
 
 export enum Value {
-    Sedmicka = "7",
-    Osmicka = "8",
-    Devitka = "9",
-    Desitka = "10",
-    Spodek = "J",
-    Svrsek = "Q",
-    Kral = "K",
-    Eso = "A"
+    Sedmicka = "Sedmicka",
+    Osmicka = "Osmicka",
+    Devitka = "Devitka",
+    Desitka = "Desitka",
+    Spodek = "Spodek",
+    Svrsek = "Svrsek",
+    Kral = "Kral",
+    Eso = "Eso"
 }
 
 export class Card {
@@ -65,5 +65,34 @@ export class PlayDetails {
     constructor(card: Card, changeTo?: Color) {
         this.card = card;
         this.colorChange = changeTo;
+    }
+}
+
+export enum LastAction {
+    Play = "Play",
+    SkipTurn = "SkipTurn",
+    Draw = "Draw",
+    DrawTwo = "DrawTwo",
+    DrawFour = "DrawFour",
+    DrawSix = "DrawSix",
+    DrawEight = "DrawEight",
+    Won = "Won",
+    Change = "Change",
+}
+
+export interface LastPlay {
+    playerAction: LastAction;
+    who: string;
+    playDetails?: PlayDetails;
+}
+
+export class PlayerAction {
+    action: PlayType;
+    who: string;
+    playDetails?: PlayDetails;
+    constructor(action: PlayType, who: string, playDetails?: PlayDetails) {
+        this.action = action;
+        this.who = who;
+        this.playDetails = playDetails;
     }
 }

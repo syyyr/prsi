@@ -1,4 +1,4 @@
-import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value} from "./types"
+import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value, PlayerAction, LastPlay, LastAction} from "./types"
 
 const sortedDeck = [
     new Card(Color.Zaludy, Value.Sedmicka),
@@ -73,6 +73,7 @@ class State {
     public wantedAction: ActionType;
     public status: Status = Status.Ok;
     public gameResolution?: GameResolution;
+    public lastPlay?: LastPlay;
 
     constructor(players: string[], whoStarts: string) {
         this.players = players;
@@ -84,17 +85,6 @@ class State {
         this.hands.forEach((cards, player) => {
             console.log(`'${player}' => [${cards.map((card) => card.toString()).join(", ")}]`);
         });
-    }
-}
-
-export class PlayerAction {
-    action: PlayType;
-    who: string;
-    playDetails?: PlayDetails;
-    constructor(action: PlayType, who: string, playDetails?: PlayDetails) {
-        this.action = action;
-        this.who = who;
-        this.playDetails = playDetails;
     }
 }
 
@@ -157,6 +147,7 @@ export class Prsi {
                 this.drawCard(playerAction.who);
                 return;
             }
+
         case ActionType.SkipTurn:
             switch (playerAction.action) {
             case PlayType.Play:
@@ -171,6 +162,11 @@ export class Prsi {
                 return;
             case PlayType.Draw:
                 this.skipTurn();
+                this._currentGame.lastPlay = {
+                    who: playerAction.who,
+                    playDetails: playerAction.playDetails,
+                    playerAction: LastAction.SkipTurn
+                }
                 return;
             }
 
@@ -237,12 +233,27 @@ export class Prsi {
             this._currentGame!.hands.get(player)!.push(this._currentGame!.deck.cards[this._currentGame!.drawn++]);
         }
 
-        let n = this.drawInfo.get(this._currentGame.wantedAction)!.count;
-        while (n--) {
-            impl_draw();
-        }
+        const n = this.drawInfo.get(this._currentGame.wantedAction)!.count;
+        Array.from({length: n}).forEach(impl_draw);
 
-        // After someone draws, the next person will (but keep color change)
+        this._currentGame.lastPlay = {
+            who: player,
+            playerAction: (() => {
+                switch (n) {
+                case 1:
+                    return LastAction.Draw;
+                case 2:
+                    return LastAction.DrawTwo;
+                case 4:
+                    return LastAction.DrawFour;
+                case 6:
+                    return LastAction.DrawSix;
+                case 8:
+                    return LastAction.DrawEight;
+                }})()
+        };
+
+        // After someone draws, the next person will surely play (but keep color change)
         if (
             this._currentGame.wantedAction !== ActionType.PlaySrdce &&
             this._currentGame.wantedAction !== ActionType.PlayKule &&
@@ -254,7 +265,7 @@ export class Prsi {
         this.nextPlayer();
     }
 
-    private readonly drawInfo = new Map([
+    private readonly drawInfo = new Map<ActionType, {next: ActionType, count: 1|2|4|6|8}>([
         [ActionType.PlayZaludy, {next: ActionType.DrawTwo, count: 1}],
         [ActionType.PlayListy, {next: ActionType.DrawTwo, count: 1}],
         [ActionType.PlayKule, {next: ActionType.DrawTwo, count: 1}],
@@ -297,6 +308,10 @@ export class Prsi {
         this._currentGame.gameResolution = new GameResolution(winner, loser);
         this._currentGame.wantedAction = ActionType.Shuffle;
         this._currentGame.whoseTurn = loser;
+        this._currentGame.lastPlay = {
+            playerAction: LastAction.Won,
+            who: winner
+        }
     }
 
     private resolveChangeCard(color: Color): boolean {
@@ -356,17 +371,28 @@ export class Prsi {
             return;
         }
 
+        let lastAction: LastAction;
         if (details.card.value === Value.Sedmicka) {
             this._currentGame.wantedAction = this.drawInfo.get(this._currentGame.wantedAction)!.next;
+            lastAction = LastAction.Play;
         } else if (details.card.value === Value.Eso) {
             this._currentGame.wantedAction = ActionType.SkipTurn;
+            lastAction = LastAction.Play;
         } else if (details.card.value === Value.Svrsek) {
             if (typeof details.colorChange === "undefined") {
                 throw new Error("User didn't specify which color he wants.");
             }
             this._currentGame.wantedAction = this.changeColorToAction(details.colorChange);
+            lastAction = LastAction.Change;
         } else {
             this._currentGame.wantedAction = ActionType.Play;
+            lastAction = LastAction.Play;
+        }
+
+        this._currentGame.lastPlay = {
+            who: player,
+            playerAction: lastAction,
+            playDetails: details
         }
 
         this.nextPlayer();

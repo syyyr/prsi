@@ -1,6 +1,7 @@
 import * as React from "react";
 import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, CardCounts} from "./communication";
-import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status} from "./types";
+import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction} from "./types";
+import {CARDS_GENITIVE} from "./card-strings"
 
 class Title extends React.Component {
     render() {
@@ -8,9 +9,12 @@ class Title extends React.Component {
     }
 }
 
-class Prompt extends React.Component<{text: string}> {
+class Prompt extends React.Component<{instructions: string, lastPlay?: string}> {
     render() {
-        return React.createElement("p", {key: "prompt", className: "inline-block"}, this.props.text);
+        return React.createElement(
+            "p",
+            {key: "prompt", className: "inline-block"},
+            `${typeof this.props.lastPlay !== "undefined" ? this.props.lastPlay  + " " : ""}${this.props.instructions}`);
     }
 }
 
@@ -59,11 +63,11 @@ interface YouOther {
     other: string;
 }
 
-type Override = {
+type InstructionOverride = {
     [key in keyof typeof Status]?: {you?: string, other?: string};
 }
 
-class PresentedStrings {
+class InstructionStrings {
     [Status.Ok]: YouOther = {you: "ERROR: Ok/you", other: "ERROR: Ok/other"};
     [Status.PlayerMismatch]: YouOther = {you: "ERROR: PlayerMismatch/you", other: "ERROR: PlayerMismatch/other"};
     [Status.CardMismatch]: YouOther = {you: "ERROR: CardMismatch/you", other: "ERROR: CardMismatch/other"};
@@ -72,7 +76,7 @@ class PresentedStrings {
     [Status.NotAnAce]: YouOther = {you: "ERROR: NotAnAce/you", other: "ERROR: NotAnAce/other"};
     [Status.NotASeven]: YouOther = {you: "ERROR: NotASeven/you", other: "ERROR: NotASeven/other"};
     [Status.MustShuffle]: YouOther = {you: "ERROR: MustShuffle/you", other: "ERROR: MustShuffle/other"};
-    constructor(overrides?: Override) {
+    constructor(overrides?: InstructionOverride) {
         if (typeof overrides === "undefined") {
             return;
         }
@@ -101,8 +105,6 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         super(props);
         this.state = {picker: null};
         this.props.ws.onmessage = (message: any) => {
-            console.log("ws got data:", message);
-
             const parsed = JSON.parse(message.data);
 
             if (isErrorResponse(parsed)) {
@@ -111,6 +113,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
             }
 
             if (isFrontendState(parsed)) {
+                console.log("new state ", parsed);
                 this.setState({gameState: parsed, picker: this.state.picker});
             }
         };
@@ -164,7 +167,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
     }
 
     renderPrompt(text: string): React.ReactNode {
-        return React.createElement(Prompt, {key: "prompt", text});
+        return React.createElement(Prompt, {key: "prompt", instructions: text});
     }
 
     renderHand(hand: Card[]): React.ReactNode {
@@ -183,7 +186,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         }));
     }
 
-    readonly colors = {
+    readonly colorStrings = {
         [Color.Kule]: "kule",
         [Color.Listy]: "listy",
         [Color.Srdce]: "srdce",
@@ -201,22 +204,22 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         [Value.Eso]: "eso",
     }
 
-    genPlayColor(color: Color): PresentedStrings {
-        return new PresentedStrings({
-            [Status.Ok]: {you: `Hraješ. (${this.colors[color]})`, other: "@PLAYERNAME@ hraje."},
-            [Status.CardMismatch]: {you: `Tohle tam nemůžeš dát. Musíš zahrát ${this.colors[color]}.`}
+    genPlayColor(color: Color): InstructionStrings {
+        return new InstructionStrings({
+            [Status.Ok]: {you: `Hraješ. (${this.colorStrings[color]})`, other: "@PLAYERNAME@ hraje."},
+            [Status.CardMismatch]: {you: `Tohle tam nemůžeš dát. Musíš zahrát ${this.colorStrings[color]}.`}
         });
     }
 
-    genPlaySeven(drawCount: string): PresentedStrings {
-        return new PresentedStrings({
+    genPlaySeven(drawCount: string): InstructionStrings {
+        return new InstructionStrings({
             [Status.Ok]: {you: `Lížeš ${drawCount}${drawCount !== "osm" ? ", nebo zahraj sedmu" : ""}.`, other: "@PLAYERNAME@ hraje."},
             [Status.NotASeven]: {you: `Tohle tam nemůžeš dát. Lízej ${drawCount}${drawCount !== "osm" ? ", nebo zahraj sedmu" : ""}.`}
         });
     }
 
-    readonly instructions: {[key in keyof typeof ActionType]: PresentedStrings} = {
-        [ActionType.Play]: new PresentedStrings({
+    readonly instructions: {[key in keyof typeof ActionType]: InstructionStrings} = {
+        [ActionType.Play]: new InstructionStrings({
             [Status.Ok]: {you: "Hraješ.", other: "@PLAYERNAME@ hraje."},
             [Status.CardMismatch]: {you: "Tohle tam nemůžeš dát. Musíš zahrát @TOPVALUE@ nebo @TOPCOLOR@ (nebo si lízni)."},
             [Status.PlayerMismatch]: {other: "Teď nehraješ, hraje @PLAYERNAME@."},
@@ -226,7 +229,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         [ActionType.PlayListy]: this.genPlayColor(Color.Listy),
         [ActionType.PlayZaludy]: this.genPlayColor(Color.Zaludy),
         [ActionType.PlaySrdce]: this.genPlayColor(Color.Srdce),
-        [ActionType.Shuffle]: new PresentedStrings({
+        [ActionType.Shuffle]: new InstructionStrings({
             [Status.Ok]: {you: "Mícháš.", other: "Míchá @PLAYERNAME@."},
             [Status.PlayerMismatch]: {other: "Ty nemícháš, míchá @PLAYERNAME@."},
         }),
@@ -234,19 +237,39 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         [ActionType.DrawFour]: this.genPlaySeven("čtyři"),
         [ActionType.DrawSix]: this.genPlaySeven("šest"),
         [ActionType.DrawEight]: this.genPlaySeven("osm"),
-        [ActionType.SkipTurn]: new PresentedStrings({
+        [ActionType.SkipTurn]: new InstructionStrings({
             [Status.Ok]: {you: "Stojíš nebo zahraj eso.", other: "@PLAYERNAME@ hraje."},
             [Status.NotAnAce]: {you: "Tohle tam nemůžeš dát. Buď stojíš, nebo zahraj eso."}
         }),
     };
 
-    renderInstructions(wantedAction: ActionType, status: Status, you: string, turn: string, topCard: Card): React.ReactNode {
-        const text = this.instructions[wantedAction][status][you === turn ? "you" : "other"]
+    readonly lastPlayStrings: {[key in keyof typeof LastAction]: YouOther} = {
+        [LastAction.Play]: {you: "Zahráls @CARDS_GENITIVE@.", other: "@PLAYERNAME@ zahrál @CARDS_GENITIVE@."},
+        [LastAction.SkipTurn]: {you: "Stojíš.", other: "@PLAYERNAME@ stojí."},
+        [LastAction.Draw]: {you: "Líznuls.", other: "@PLAYERNAME@ líznul."},
+        [LastAction.DrawTwo]: {you: "Líznuls dvě.", other: "@PLAYERNAME@ líznul dvě."},
+        [LastAction.DrawFour]: {you: "Líznuls čtyři.", other: "@PLAYERNAME@ líznul čtyři."},
+        [LastAction.DrawSix]: {you: "Líznuls šest.", other: "@PLAYERNAME@ líznul šest."},
+        [LastAction.DrawEight]: {you: "Líznuls osm.", other: "@PLAYERNAME@ líznul osm."},
+        [LastAction.Change]: {you: "Změnils na @COLORCHANGE@.", other: "@PLAYERNAME@ změnil na @COLORCHANGE@."},
+        [LastAction.Won]: {you: "Vyhráls.", other: "@PLAYERNAME@ vyhrál, je totiž lepší než ty."},
+    };
+
+    renderInstructions(wantedAction: ActionType, status: Status, you: string, turn: string, topCard: Card, lastPlay?: LastPlay): React.ReactNode {
+        const lastPlayStr = status !== Status.Ok || typeof lastPlay === "undefined" ? undefined :
+            this.lastPlayStrings[lastPlay.playerAction][you === lastPlay.who ? "you" : "other"]
+            .replace("@PLAYERNAME@", lastPlay.who)
+            .replace("@COLORCHANGE@", typeof lastPlay.playDetails === "undefined" ? "PLAYDETAILS unavailable" :
+                typeof lastPlay.playDetails.colorChange === "undefined" ? "COLORCHANGE unavailable" :
+                this.colorStrings[lastPlay.playDetails.colorChange])
+            .replace("@CARDS_GENITIVE@", typeof lastPlay.playDetails === "undefined"? "CARD unavailable" :
+                CARDS_GENITIVE[lastPlay.playDetails.card.color][lastPlay.playDetails.card.value]);
+        const instructions = this.instructions[wantedAction][status][you === turn ? "you" : "other"]
             .replace("@PLAYERNAME@", turn)
-            .replace("@TOPCOLOR@", this.colors[topCard.color])
+            .replace("@TOPCOLOR@", this.colorStrings[topCard.color])
             .replace("@TOPVALUE@", this.values[topCard.value]);
 
-        return React.createElement(Prompt, {key: "instructions", text}, null);
+        return React.createElement(Prompt, {key: "instructions", instructions, lastPlay: lastPlayStr}, null);
     }
 
     render() {
@@ -268,7 +291,8 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
             this.state.gameState.gameInfo.status,
             this.props.thisName,
             this.state.gameState.gameInfo.who,
-            this.state.gameState.gameInfo.topCard));
+            this.state.gameState.gameInfo.topCard,
+            this.state.gameState.gameInfo.lastPlay));
         elems.push(React.createElement("br", {key: "instructions-linebreak"}));
 
         elems.push(this.renderPrompt("Na vršku je:"));

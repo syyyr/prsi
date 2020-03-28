@@ -57,7 +57,7 @@ export class FrontendInfo {
     who: string;
     topCard: Card;
     cardCount: CardCounts;
-    hand: Card[];
+    hand?: Card[];
     lastPlay?: LastPlay;
     constructor(wantedAction: ActionType, status: Status, who: string, topCard: Card, hand: Card[], cardCount: CardCounts) {
         this.wantedAction = wantedAction;

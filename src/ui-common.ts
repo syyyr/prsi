@@ -298,11 +298,12 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         elems.push(this.renderPrompt("Na vršku je:"));
         elems.push(this.renderCard(this.state.gameState.gameInfo.topCard));
 
-        elems.push(this.renderDrawButton(this.state.gameState.gameInfo.wantedAction, this.state.gameState.gameInfo.who));
-
-        elems.push(React.createElement("p", {key: "hand-text", className: "inline-block"}, "Tvoje ruka:"));
-        elems.push(this.renderHand(this.state.gameState.gameInfo.hand));
-        elems.push(React.createElement("br", {key: "hand-linebreak"}));
+        if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
+            elems.push(this.renderDrawButton(this.state.gameState.gameInfo.wantedAction, this.state.gameState.gameInfo.who));
+            elems.push(React.createElement("p", {key: "hand-text", className: "inline-block"}, "Tvoje ruka:"));
+            elems.push(this.renderHand(this.state.gameState.gameInfo.hand));
+            elems.push(React.createElement("br", {key: "hand-linebreak"}));
+        }
 
         if (this.state.picker !== null) {
             elems.push(React.createElement(

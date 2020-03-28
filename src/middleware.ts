@@ -31,7 +31,7 @@ const buildFrontendStateFor = (player: string): FrontendState => {
             status: state.status,
             who: state.whoseTurn,
             topCard: state.playedCards[state.playedCards.length - 1],
-            hand: state.hands.get(player)!,
+            hand: state.hands.get(player),
             cardCount: (() => {const res: CardCounts = {}; state.hands.forEach((cards, name) => res[name] = cards.length); return res;})(),
             lastPlay: state.lastPlay
         } : undefined

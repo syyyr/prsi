@@ -18,7 +18,7 @@ export class ImgUI extends UI {
     renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode {
         const options = {
             onClick,
-            className: `left-margin inline-block fit-content ${typeof onClick !== "undefined" ? "clickable" : ""} ${halo ? "halo" : ""}`,
+            className: `left-margin inline-block max-height ${typeof onClick !== "undefined" ? "clickable" : ""} ${halo ? "halo" : ""}`,
             src: images[card.color][card.value],
             draggable: false
         }

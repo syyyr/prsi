@@ -204,12 +204,12 @@ export class Prsi {
             throw new Error("Game isn't running.");
         }
 
-        let firstTurnPlayerIndex = this._players.indexOf(this._currentGame.whoseTurn) + 1;
-        if (firstTurnPlayerIndex === this._players.length) {
+        let firstTurnPlayerIndex = this._currentGame.players.indexOf(this._currentGame.whoseTurn) + 1;
+        if (firstTurnPlayerIndex === this._currentGame.players.length) {
             firstTurnPlayerIndex = 0;
         }
+        this._currentGame.whoseTurn = this._currentGame.players[firstTurnPlayerIndex];
 
-        this._currentGame.whoseTurn = this._players[firstTurnPlayerIndex];
     }
 
     private drawCard(player: string): void {
@@ -462,7 +462,7 @@ export class Prsi {
 
     private newState(shuffler?: string): State {
         if (typeof shuffler === "undefined") {
-            return new State(this._players, this.getRandomPlayer());
+            return new State([...this._players], this.getRandomPlayer());
         }
 
         let firstTurnPlayerIndex = this._players.indexOf(shuffler) + 1;
@@ -470,7 +470,7 @@ export class Prsi {
             firstTurnPlayerIndex = 0;
         }
 
-        return new State(this._players, this._players[firstTurnPlayerIndex]);
+        return new State([...this._players], this._players[firstTurnPlayerIndex]);
     }
 
     public registerPlayer(name: string): void {

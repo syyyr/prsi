@@ -97,7 +97,8 @@ class InstructionStrings {
 const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
 
 export abstract class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
-    abstract renderCard(card: Card, onClick?: () => void): React.ReactNode;
+    // FIXME: change halo to enum, or something
+    abstract renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
     abstract renderPlayers(players: string[], whoseTurn?: string, cardCounts?: CardCounts): React.ReactNode;
 
@@ -173,7 +174,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
     renderHand(hand: Card[]): React.ReactNode {
         return hand.map((card) => React.createElement(CardComponent, {
             key: `hand:${card.value}${card.color}`,
-            renderer: () => this.renderCard(card, () => {
+            renderer: () => this.renderCard(card, true, () => {
                 if (this.state.gameState!.gameInfo!.who === this.props.thisName && card.value === Value.Svrsek) {
                     this.setState({picker: card.color});
                     return;
@@ -301,7 +302,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         elems.push(React.createElement("br", {key: "instructions-linebreak"}));
 
         elems.push(this.renderPrompt("Na vršku je:"));
-        elems.push(this.renderCard(this.state.gameState.gameInfo.topCard));
+        elems.push(this.renderCard(this.state.gameState.gameInfo.topCard, false));
 
         if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
             elems.push(this.renderDrawButton(this.state.gameState.gameInfo.wantedAction, this.state.gameState.gameInfo.who));

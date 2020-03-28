@@ -15,10 +15,10 @@ class Player extends React.Component<{name: string, shouldEmphasize: boolean}> {
 }
 
 export class ImgUI extends UI {
-    renderCard(card: Card, onClick?: () => void): React.ReactNode {
+    renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode {
         const options = {
             onClick,
-            className: `left-margin inline-block fit-content ${typeof onClick !== "undefined" ? "clickable" : ""}`,
+            className: `left-margin inline-block fit-content ${typeof onClick !== "undefined" ? "clickable" : ""} ${halo ? "halo" : ""}`,
             src: images[card.color][card.value],
             draggable: false
         }

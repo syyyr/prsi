@@ -3,7 +3,7 @@ import {UI} from "./ui-common";
 import {Card, Color} from "./types";
 
 export class TextUI extends UI {
-    renderCard(card: Card, onClick?: () => void): React.ReactNode {
+    renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode {
         const options = {
             onClick,
             className: `left-margin inline-block fit-content ${typeof onClick !== "undefined" ? "clickable" : ""}`

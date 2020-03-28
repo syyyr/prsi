@@ -430,6 +430,14 @@ export class Prsi {
         });
 
         this._currentGame.playedCards.push(this._currentGame.deck.cards[this._currentGame.drawn++]);
+        switch (this._currentGame.playedCards[0].value) {
+        case Value.Eso:
+            this._currentGame.wantedAction = ActionType.SkipTurn;
+            break;
+        case Value.Sedmicka:
+            this._currentGame.wantedAction = ActionType.DrawTwo;
+            break;
+        }
     }
 
     private getRandomPlayer(): string {

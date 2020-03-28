@@ -77,6 +77,7 @@ export enum LastAction {
     DrawSix = "DrawSix",
     DrawEight = "DrawEight",
     Change = "Change",
+    Disconnect = "Disconnect",
 }
 
 export class LastPlay {

@@ -242,7 +242,8 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         [ActionType.DrawEight]: this.genPlaySeven("osm"),
         [ActionType.SkipTurn]: new InstructionStrings({
             [Status.Ok]: {you: "Stojíš nebo zahraj eso.", other: "@PLAYERNAME@ hraje."},
-            [Status.NotAnAce]: {you: "Tohle tam nemůžeš dát. Buď stojíš, nebo zahraj eso."}
+            [Status.NotAnAce]: {you: "Tohle tam nemůžeš dát. Buď stojíš, nebo zahraj eso."},
+            [Status.PlayerMismatch]: {other: "Teď nehraješ, hraje @PLAYERNAME@."}
         }),
     };
 
@@ -255,6 +256,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         [LastAction.DrawSix]: {you: "Líznuls šest.", other: "@PLAYERNAME@ líznul šest."},
         [LastAction.DrawEight]: {you: "Líznuls osm.", other: "@PLAYERNAME@ líznul osm."},
         [LastAction.Change]: {you: "Změnils na @COLORCHANGE@.", other: "@PLAYERNAME@ změnil na @COLORCHANGE@."},
+        [LastAction.Disconnect]: {you: "Odpojil ses? Tohle bys neměl vidět.", other: "@PLAYERNAME@ se odpojil."},
     };
 
     renderInstructions(wantedAction: ActionType, status: Status, you: string, turn: string, topCard: Card, lastPlay?: LastPlay): React.ReactNode {

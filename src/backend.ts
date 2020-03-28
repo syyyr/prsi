@@ -459,10 +459,28 @@ export class Prsi {
     public unregisterPlayer(name: string): void {
         this._players = this._players.filter((player) => player !== name);
 
-        // If a player disconnected during a game, reset.
-        if (this._currentGame?.players.some((player) => player === name)) {
-            this._currentGame = undefined;
+        if (typeof this._currentGame === "undefined") {
+            return;
         }
+
+        // If a player disconnected during a game
+        if (this._currentGame.whoseTurn === name) {
+            this._currentGame.lastPlay = {
+                didWin: false,
+                playerAction: LastAction.Disconnect,
+                who: name,
+            }
+            this.nextPlayer();
+        }
+        this._currentGame.players = this._currentGame.players.filter((player) => player !== name);
+        // Just end the game if there is just one player.
+        if (this._currentGame.players.length < 2) {
+            this._currentGame = undefined;
+            return;
+        }
+        const hand = this._currentGame.hands.get(name);
+        hand?.forEach((card) => this._currentGame!.deck.cards.push(card));
+        this._currentGame.hands.delete(name);
     }
 
     public players(): string[] {

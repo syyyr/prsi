@@ -70,7 +70,7 @@ class State {
     public whoseTurn: string;
     public players: string[];
     public gameState: "active" | "ended" = "active";
-    public wantedAction: ActionType;
+    public wantedAction: ActionType = ActionType.Play;
     public status: Status = Status.Ok;
     public gameResolution?: GameResolution;
     public lastPlay?: LastPlay;
@@ -78,7 +78,6 @@ class State {
     constructor(players: string[], whoStarts: string) {
         this.players = players;
         this.whoseTurn = whoStarts;
-        this.wantedAction = ActionType.Play;
     }
 
     public printHands(): void {

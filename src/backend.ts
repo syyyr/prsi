@@ -412,6 +412,9 @@ export class Prsi {
     }
 
     public newGame(): void {
+        if (this._players.length < 2) {
+            throw new Error("Tried to start a game with one player.");
+        }
         if (typeof this._currentGame !== "undefined") {
             this._history.push(this._currentGame);
         }

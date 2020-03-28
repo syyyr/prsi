@@ -283,7 +283,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         if (typeof this.state.gameState === "undefined") {
             return elems;
         }
-        if (this.state.gameState.gameStarted === "no") {
+        if (this.state.gameState.gameStarted === "no" && this.state.gameState.players.length >= 2) {
             elems.push(this.renderStartButton());
         }
         elems.push(this.renderPlayers(this.state.gameState.players, this.state.gameState.gameInfo?.who, this.state.gameState.gameInfo?.cardCount));

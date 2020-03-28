@@ -47,7 +47,7 @@ export class ImgUI extends UI {
                     const countElements = Array.from({length: typeof cardCounts !== "undefined" ? cardCounts[player] : 0});
                     return [
                         React.createElement(Player, {
-                            name: player,
+                            name: this.props.thisName === player ? `${player} (ty)` : player,
                             key: player,
                             shouldEmphasize: typeof whoseTurn !== "undefined" && whoseTurn === player}, null
                         ),

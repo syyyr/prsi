@@ -207,14 +207,16 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
     genPlayColor(color: Color): InstructionStrings {
         return new InstructionStrings({
             [Status.Ok]: {you: `Hraješ. (${this.colorStrings[color]})`, other: "@PLAYERNAME@ hraje."},
-            [Status.CardMismatch]: {you: `Tohle tam nemůžeš dát. Musíš zahrát ${this.colorStrings[color]}.`}
+            [Status.CardMismatch]: {you: `Tohle tam nemůžeš dát. Musíš zahrát ${this.colorStrings[color]}.`},
+            [Status.PlayerMismatch]: {other: "Teď nehraješ, hraje @PLAYERNAME@."}
         });
     }
 
     genPlaySeven(drawCount: string): InstructionStrings {
         return new InstructionStrings({
             [Status.Ok]: {you: `Lížeš ${drawCount}${drawCount !== "osm" ? ", nebo zahraj sedmu" : ""}.`, other: "@PLAYERNAME@ hraje."},
-            [Status.NotASeven]: {you: `Tohle tam nemůžeš dát. Lízej ${drawCount}${drawCount !== "osm" ? ", nebo zahraj sedmu" : ""}.`}
+            [Status.NotASeven]: {you: `Tohle tam nemůžeš dát. Lízej ${drawCount}${drawCount !== "osm" ? ", nebo zahraj sedmu" : ""}.`},
+            [Status.PlayerMismatch]: {other: "Teď nehraješ, hraje @PLAYERNAME@."}
         });
     }
 

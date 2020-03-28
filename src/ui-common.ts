@@ -234,6 +234,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         [ActionType.Shuffle]: new InstructionStrings({
             [Status.Ok]: {you: "Mícháš.", other: "Míchá @PLAYERNAME@."},
             [Status.PlayerMismatch]: {other: "Ty nemícháš, míchá @PLAYERNAME@."},
+            [Status.MustShuffle]: {you: "Hra skončila, musíš zamíchat.", other: "Hra skončila, @PLAYERNAME@ musí zamíchat."}
         }),
         [ActionType.DrawTwo]: this.genPlaySeven("dvě"),
         [ActionType.DrawFour]: this.genPlaySeven("čtyři"),

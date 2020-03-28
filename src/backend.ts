@@ -69,6 +69,7 @@ class State {
     public hands: Map<string, Card[]> = new Map();
     public whoseTurn: string;
     public players: string[];
+    public winners: string[] = [];
     public gameState: "active" | "ended" = "active";
     public wantedAction: ActionType = ActionType.Play;
     public status: Status = Status.Ok;
@@ -164,7 +165,8 @@ export class Prsi {
                 this._currentGame.lastPlay = {
                     who: playerAction.who,
                     playDetails: playerAction.playDetails,
-                    playerAction: LastAction.SkipTurn
+                    playerAction: LastAction.SkipTurn,
+                    didWin: false
                 }
                 return;
             }
@@ -203,6 +205,10 @@ export class Prsi {
             throw new Error("Game isn't running.");
         }
 
+        if (this._currentGame.players.length === 1) {
+            this.concludeGame();
+        }
+
         let firstTurnPlayerIndex = this._currentGame.players.indexOf(this._currentGame.whoseTurn) + 1;
         if (firstTurnPlayerIndex === this._currentGame.players.length) {
             firstTurnPlayerIndex = 0;
@@ -237,6 +243,7 @@ export class Prsi {
 
         this._currentGame.lastPlay = {
             who: player,
+            didWin: false,
             playerAction: (() => {
                 switch (n) {
                 case 1:
@@ -303,14 +310,10 @@ export class Prsi {
 
         this._currentGame.gameState = "ended";
         const winner = this._currentGame.whoseTurn;
-        const loser = this.loser();
+        const loser = this._currentGame.players[0];
         this._currentGame.gameResolution = new GameResolution(winner, loser);
         this._currentGame.wantedAction = ActionType.Shuffle;
         this._currentGame.whoseTurn = loser;
-        this._currentGame.lastPlay = {
-            playerAction: LastAction.Won,
-            who: winner
-        }
     }
 
     private resolveChangeCard(color: Color): boolean {
@@ -365,11 +368,6 @@ export class Prsi {
         const updatedHand = this._currentGame.hands.get(player)!.filter((x) => !sameCards(details.card, x));
         this._currentGame.hands.set(player, updatedHand);
 
-        if (updatedHand.length === 0) {
-            this.concludeGame();
-            return;
-        }
-
         let lastAction: LastAction;
         if (details.card.value === Value.Sedmicka) {
             this._currentGame.wantedAction = this.drawInfo.get(this._currentGame.wantedAction)!.next;
@@ -388,10 +386,16 @@ export class Prsi {
             lastAction = LastAction.Play;
         }
 
+        if (updatedHand.length === 0) {
+            this._currentGame.players = this._currentGame.players.filter((player) => player !== this._currentGame!.whoseTurn);
+            this._currentGame.winners.push(this._currentGame.whoseTurn);
+        }
+
         this._currentGame.lastPlay = {
             who: player,
             playerAction: lastAction,
-            playDetails: details
+            playDetails: details,
+            didWin: updatedHand.length === 0
         }
 
         this.nextPlayer();
@@ -405,33 +409,6 @@ export class Prsi {
             throw new Error("playerHasCard: User doesn' exist.");
         }
         return this._currentGame.hands.get(player)!.some(sameCards.bind(null, cardToCheck));
-    }
-
-    private loser(): string {
-        if (typeof this._currentGame === "undefined") {
-            throw new Error("Game isn't running.");
-        }
-
-        if (this._currentGame.gameState !== "ended") {
-            throw new Error("No loser yet.");
-        }
-
-        let mostCards: number = 0;
-        for (const [, cards] of this._currentGame.hands) {
-            if (cards.length > mostCards) {
-                mostCards = cards.length;
-            }
-        }
-
-        let losers = [];
-
-        for (const [player, cards] of this._currentGame.hands) {
-            if (cards.length === mostCards) {
-                losers.push(player);
-            }
-        }
-
-        return losers[Math.floor(Math.random() * losers.length)];
     }
 
     public newGame(): void {

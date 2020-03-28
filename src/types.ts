@@ -76,14 +76,20 @@ export enum LastAction {
     DrawFour = "DrawFour",
     DrawSix = "DrawSix",
     DrawEight = "DrawEight",
-    Won = "Won",
     Change = "Change",
 }
 
-export interface LastPlay {
+export class LastPlay {
     playerAction: LastAction;
     who: string;
+    didWin: boolean;
     playDetails?: PlayDetails;
+    constructor(playerAction: LastAction, who: string, didWin: boolean, playDetails?: PlayDetails) {
+        this.playerAction = playerAction;
+        this.who = who;
+        this.didWin = didWin;
+        this.playDetails = playDetails;
+    }
 }
 
 export class PlayerAction {

@@ -174,12 +174,12 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         return hand.map((card) => React.createElement(CardComponent, {
             key: `hand:${card.value}${card.color}`,
             renderer: () => this.renderCard(card, () => {
-                if (this.state.picker !== null) {
-                    return;
-                }
                 if (card.value === Value.Svrsek) {
                     this.setState({picker: card.color});
                     return;
+                }
+                if (this.state.picker !== null) {
+                    this.setState({picker: null});
                 }
                 this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card))));
             })

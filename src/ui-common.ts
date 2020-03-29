@@ -291,6 +291,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
             elems.push(this.renderPrompt("Hra nezačala."));
             return elems;
         }
+
         elems.push(this.renderInstructions(this.state.gameState.gameInfo.wantedAction,
             this.state.gameState.gameInfo.status,
             this.props.thisName,
@@ -298,6 +299,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
             this.state.gameState.gameInfo.topCard,
             this.state.gameState.gameInfo.lastPlay));
 
+        const playfield = [];
         const topCard = [];
 
         if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
@@ -305,11 +307,14 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         }
 
         topCard.push(this.renderCard(this.state.gameState.gameInfo.topCard, false));
-        elems.push(React.createElement("div", {className: "flex-row topCard-container"}, topCard));
+        playfield.push(React.createElement("div", {className: "flex-row topCard-container"}, topCard));
 
         if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
-            elems.push(this.renderHand(this.state.gameState.gameInfo.hand));
+            playfield.push(this.renderHand(this.state.gameState.gameInfo.hand));
         }
+
+        playfield.push(React.createElement("img", {className: "playfield-logo"}, null));
+        elems.push(React.createElement("div", {className: "playfield"}, playfield));
 
         if (this.state.picker !== null) {
             elems.push(React.createElement(

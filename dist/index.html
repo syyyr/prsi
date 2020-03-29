@@ -20,15 +20,6 @@ body {
 .max-height {
     max-height: 10em;
 }
-.fit-content {
-    width: fit-content;
-}
-.left-margin {
-    margin-left: 0.3em;
-}
-.inline {
-    display: inline;
-}
 .okInput {
     border-color: black;
     background: white;
@@ -47,12 +38,6 @@ body {
     user-select: none; /* Non-prefixed version, currently
                           supported by Chrome and Opera */
 }
-.block {
-    display: block;
-}
-.inline-block {
-    display: inline-block;
-}
 .clickable {
     color: blue;
     text-decoration: underline;
@@ -64,10 +49,36 @@ body {
 .halo:hover {
     filter: drop-shadow(0 0 1em grey);
 }
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+.align-center {
+    text-align: center;
+}
+.player-container {
+    width: 20em;
+    flex-wrap: wrap;
+}
+.hand-container {
+    width: 50em;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: auto;
+}
+.topCard-container {
+    justify-content: center;
+}
         </style>
     </head>
     <body class="noselect">
-        <div id="game"></div>
+        <div class="flex-column" id="game"></div>
         <script src="bundle.js"> </script>
     </body>
 </html>

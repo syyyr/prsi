@@ -5,7 +5,7 @@ import {CARDS_GENITIVE} from "./card-strings"
 
 class Title extends React.Component {
     render() {
-        return React.createElement("h1", null, "Prší");
+        return React.createElement("h1", {className: "align-center"}, "Prší");
     }
 }
 
@@ -13,7 +13,7 @@ class Prompt extends React.Component<{instructions: string, lastPlay?: string}> 
     render() {
         return React.createElement(
             "p",
-            {key: "prompt", className: "inline-block"},
+            {key: "prompt", className: "flex-row align-center"},
             `${typeof this.props.lastPlay !== "undefined" ? this.props.lastPlay  + " " : ""}${this.props.instructions}`);
     }
 }
@@ -37,7 +37,6 @@ class StartButton extends React.Component<{onClick: () => void}> {
         return React.createElement(
             "button",
             {
-                className: "block",
                 onClick: this.props.onClick
             },
             "Start");
@@ -50,7 +49,6 @@ class DrawButton extends React.Component<{text: string, onClick: () => void}> {
         return React.createElement(
             "button",
             {
-                className: "block",
                 onClick: this.props.onClick
             },
             this.props.text);
@@ -172,7 +170,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
     }
 
     renderHand(hand: Card[]): React.ReactNode {
-        return hand.map((card) => React.createElement(CardComponent, {
+        return React.createElement("div", {className: "flex-row hand-container"}, hand.map((card) => React.createElement(CardComponent, {
             key: `hand:${card.value}${card.color}`,
             renderer: () => this.renderCard(card, true, () => {
                 if (this.state.gameState!.gameInfo!.who === this.props.thisName && card.value === Value.Svrsek) {
@@ -184,7 +182,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
                 }
                 this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card))));
             })
-        }));
+        })));
     }
 
     readonly colorStrings = {
@@ -299,16 +297,18 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
             this.state.gameState.gameInfo.who,
             this.state.gameState.gameInfo.topCard,
             this.state.gameState.gameInfo.lastPlay));
-        elems.push(React.createElement("br", {key: "instructions-linebreak"}));
 
-        elems.push(this.renderPrompt("Na vršku je:"));
-        elems.push(this.renderCard(this.state.gameState.gameInfo.topCard, false));
+        const topCard = [];
 
         if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
-            elems.push(this.renderDrawButton(this.state.gameState.gameInfo.wantedAction, this.state.gameState.gameInfo.who));
-            elems.push(React.createElement("p", {key: "hand-text", className: "inline-block"}, "Tvoje ruka:"));
+            topCard.push(this.renderDrawButton(this.state.gameState.gameInfo.wantedAction, this.state.gameState.gameInfo.who));
+        }
+
+        topCard.push(this.renderCard(this.state.gameState.gameInfo.topCard, false));
+        elems.push(React.createElement("div", {className: "flex-row topCard-container"}, topCard));
+
+        if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
             elems.push(this.renderHand(this.state.gameState.gameInfo.hand));
-            elems.push(React.createElement("br", {key: "hand-linebreak"}));
         }
 
         if (this.state.picker !== null) {

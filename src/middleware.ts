@@ -2,8 +2,8 @@ import express from "express";
 import path from "path";
 import ws from "express-ws";
 import Prsi from "./backend";
-import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, CardCounts} from "./communication";
-import {Status, PlayerAction} from "./types";
+import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame} from "./communication";
+import {Status, PlayerAction, Place} from "./types";
 
 let prsiLogger: (msg: string, ws?: any) => void;
 const prsi = new Prsi();
@@ -23,6 +23,10 @@ const idGen = (function*(): Generator {
 
 const buildFrontendStateFor = (player: string): FrontendState => {
     const state = prsi.state();
+    const playerInfo: {[key in string]: number | Place} = {};
+    state?.players.forEach(
+        (playerState) => playerInfo[playerState.name] = playerState.place !== null ? playerState.place : state.hands.get(playerState.name)!.length
+    );
     return {
         players: prsi.players(),
         gameStarted: typeof state !== "undefined" ? "yes" : "no",
@@ -32,7 +36,7 @@ const buildFrontendStateFor = (player: string): FrontendState => {
             who: state.whoseTurn,
             topCard: state.playedCards[state.playedCards.length - 1],
             hand: state.hands.get(player),
-            cardCount: (() => {const res: CardCounts = {}; state.hands.forEach((cards, name) => res[name] = cards.length); return res;})(),
+            playerInfo,
             lastPlay: state.lastPlay
         } : undefined
     };

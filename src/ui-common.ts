@@ -1,6 +1,6 @@
 import * as React from "react";
-import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, CardCounts} from "./communication";
-import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction} from "./types";
+import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput} from "./communication";
+import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction, Place} from "./types";
 import {CARDS_GENITIVE} from "./card-strings"
 
 class Title extends React.Component {
@@ -98,7 +98,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
     // FIXME: change halo to enum, or something
     abstract renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
-    abstract renderPlayers(players: string[], whoseTurn?: string, cardCounts?: CardCounts): React.ReactNode;
+    abstract renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: number | Place}): React.ReactNode;
 
     constructor(props: {ws: any, thisName: string}) {
         super(props);
@@ -285,7 +285,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         if (this.state.gameState.gameStarted === "no" && this.state.gameState.players.length >= 2) {
             elems.push(this.renderStartButton());
         }
-        elems.push(this.renderPlayers(this.state.gameState.players, this.state.gameState.gameInfo?.who, this.state.gameState.gameInfo?.cardCount));
+        elems.push(this.renderPlayers(this.state.gameState.players, this.state.gameState.gameInfo?.who, this.state.gameState.gameInfo?.playerInfo));
 
         if (typeof this.state.gameState.gameInfo === "undefined") {
             elems.push(this.renderPrompt("Hra nezačala."));

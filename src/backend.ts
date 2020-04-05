@@ -1,4 +1,4 @@
-import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value, PlayerAction, LastPlay, LastAction} from "./types"
+import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value, PlayerAction, LastPlay, LastAction, Place} from "./types"
 
 const sortedDeck = [
     new Card(Color.Zaludy, Value.Sedmicka),
@@ -49,18 +49,18 @@ class Deck {
     }
 }
 
+class PlayerState {
+    name: string;
+    place: null | Place = null;
+    canBeReturned: boolean = false;
+    constructor(name: string) {
+        this.name = name;
+    }
+}
+
 const sameCards = (a: Card, b: Card) => a.color === b.color && a.value === b.value;
 
 const compatibleCards = (a: Card, b: Card) => a.color === b.color || a.value === b.value;
-
-class GameResolution {
-    winner: string;
-    loser: string;
-    constructor(winner: string, loser: string) {
-        this.winner = winner;
-        this.loser = loser;
-    }
-}
 
 class State {
     public deck: Deck = new Deck();
@@ -68,16 +68,15 @@ class State {
     public drawn: number = 0;
     public hands: Map<string, Card[]> = new Map();
     public whoseTurn: string;
-    public players: string[];
-    public winners: string[] = [];
+    public players: PlayerState[];
+    public nextPlace: Place = Place.First;
     public gameState: "active" | "ended" = "active";
     public wantedAction: ActionType = ActionType.Play;
     public status: Status = Status.Ok;
-    public gameResolution?: GameResolution;
     public lastPlay?: LastPlay;
 
     constructor(players: string[], whoStarts: string) {
-        this.players = players;
+        this.players = players.map((name) => new PlayerState(name));
         this.whoseTurn = whoStarts;
     }
 
@@ -205,15 +204,20 @@ export class Prsi {
             throw new Error("Game isn't running.");
         }
 
-        if (this._currentGame.players.length === 1) {
+        if (this._currentGame.players.filter((player) => player.place === null).length === 1) {
             this.concludeGame();
+            return;
         }
 
-        let firstTurnPlayerIndex = this._currentGame.players.indexOf(this._currentGame.whoseTurn) + 1;
-        if (firstTurnPlayerIndex === this._currentGame.players.length) {
-            firstTurnPlayerIndex = 0;
-        }
-        this._currentGame.whoseTurn = this._currentGame.players[firstTurnPlayerIndex];
+        let curPlayer = this._currentGame.players.findIndex((playerState) => playerState.name === this._currentGame!.whoseTurn);
+        do {
+            curPlayer++;
+            if (curPlayer === this._currentGame.players.length) {
+                curPlayer = 0;
+            }
+        } while (this._currentGame.players[curPlayer].place !== null);
+
+        this._currentGame.whoseTurn = this._currentGame.players[curPlayer].name;
 
     }
 
@@ -309,11 +313,10 @@ export class Prsi {
         }
 
         this._currentGame.gameState = "ended";
-        const winner = this._currentGame.whoseTurn;
-        const loser = this._currentGame.players[0];
-        this._currentGame.gameResolution = new GameResolution(winner, loser);
+        const loser = this._currentGame.players.findIndex((player) => player.place === null);
+        this._currentGame.players[loser].place = this.nextPlace();
         this._currentGame.wantedAction = ActionType.Shuffle;
-        this._currentGame.whoseTurn = loser;
+        this._currentGame.whoseTurn = this._currentGame.players[loser].name;
     }
 
     private resolveChangeCard(color: Color): boolean {
@@ -349,12 +352,39 @@ export class Prsi {
         return compatibleCards(card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1]);
     }
 
-    private playCard(player: string, details: PlayDetails) {
+    private nextPlace(): Place {
         if (typeof this._currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
 
-        if (!this.playerHasCard(player, details.card)) {
+        const res = this._currentGame.nextPlace;
+
+        this._currentGame.nextPlace = ((): Place => {
+            switch (this._currentGame!.nextPlace) {
+                case Place.First:
+                    return Place.Second;
+                case Place.Second:
+                    return Place.Third;
+                case Place.Third:
+                    return Place.Fourth;
+                case Place.Fourth:
+                    return Place.Fifth;
+                case Place.Fifth:
+                    return Place.Sixth;
+                default:
+                    return Place.Sixth;
+            }
+        })();
+
+        return res;
+    }
+
+    private playCard(who: string, details: PlayDetails) {
+        if (typeof this._currentGame === "undefined") {
+            throw new Error("Game isn't running.");
+        }
+
+        if (!this.playerHasCard(who, details.card)) {
             throw new Error("User wanted to play a card he doesn't have.");
         }
 
@@ -365,8 +395,8 @@ export class Prsi {
 
         this._currentGame.playedCards.push(details.card);
 
-        const updatedHand = this._currentGame.hands.get(player)!.filter((x) => !sameCards(details.card, x));
-        this._currentGame.hands.set(player, updatedHand);
+        const updatedHand = this._currentGame.hands.get(who)!.filter((x) => !sameCards(details.card, x));
+        this._currentGame.hands.set(who, updatedHand);
 
         let lastAction: LastAction;
         if (details.card.value === Value.Sedmicka) {
@@ -387,12 +417,11 @@ export class Prsi {
         }
 
         if (updatedHand.length === 0) {
-            this._currentGame.players = this._currentGame.players.filter((player) => player !== this._currentGame!.whoseTurn);
-            this._currentGame.winners.push(this._currentGame.whoseTurn);
+            this._currentGame.players.find((player) => player.name === who)!.place = this.nextPlace();
         }
 
         this._currentGame.lastPlay = {
-            who: player,
+            who: who,
             playerAction: lastAction,
             playDetails: details,
             didWin: updatedHand.length === 0
@@ -483,7 +512,7 @@ export class Prsi {
             }
             this.nextPlayer();
         }
-        this._currentGame.players = this._currentGame.players.filter((player) => player !== name);
+        this._currentGame.players = this._currentGame.players.filter((player) => player.name !== name);
         // Just end the game if there is just one player.
         if (this._currentGame.players.length < 2) {
             this._currentGame = undefined;

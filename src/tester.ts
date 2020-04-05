@@ -29,5 +29,3 @@ while (true) {
         prsi.resolveAction(new PlayerAction(PlayType.Draw, player));
     }
 }
-
-console.log(prsi.state()!.gameResolution);

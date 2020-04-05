@@ -62,9 +62,11 @@ export enum ActionType {
 export class PlayDetails {
     card: Card;
     colorChange?: Color;
-    constructor(card: Card, changeTo?: Color) {
+    returned?: string;
+    constructor(card: Card, changeTo?: Color, returned?: string) {
         this.card = card;
         this.colorChange = changeTo;
+        this.returned = returned;
     }
 }
 
@@ -78,6 +80,7 @@ export enum LastAction {
     DrawEight = "DrawEight",
     Change = "Change",
     Disconnect = "Disconnect",
+    Return = "Return",
 }
 
 export class LastPlay {

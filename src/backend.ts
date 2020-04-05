@@ -72,6 +72,7 @@ class State {
     public nextPlace: Place = Place.First;
     public gameState: "active" | "ended" = "active";
     public wantedAction: ActionType = ActionType.Play;
+    public lastAction: ActionType = ActionType.Play;
     public status: Status = Status.Ok;
     public lastPlay?: LastPlay;
 
@@ -120,6 +121,15 @@ export class Prsi {
         case ActionType.Shuffle:
             switch (playerAction.action) {
             case PlayType.Play:
+                if (playerAction.playDetails?.card.value === Value.Sedmicka && playerAction.playDetails.card.color === Color.Srdce) {
+                    if (this._currentGame.lastAction !== ActionType.SkipTurn && this.canBePlayed(playerAction.playDetails.card)) {
+                        console.log(this._currentGame.lastAction);
+                        this._currentGame.wantedAction = this.drawInfo.get(this._currentGame.lastAction)!.next;
+                        console.log(this._currentGame.wantedAction);
+                        this.playCard(playerAction.who, playerAction.playDetails);
+                        return;
+                    }
+                }
                 this._currentGame.status = Status.MustShuffle;
                 return;
             case PlayType.Draw:
@@ -215,6 +225,7 @@ export class Prsi {
             if (curPlayer === this._currentGame.players.length) {
                 curPlayer = 0;
             }
+            this._currentGame.players[curPlayer].canBeReturned = false;
         } while (this._currentGame.players[curPlayer].place !== null);
 
         this._currentGame.whoseTurn = this._currentGame.players[curPlayer].name;
@@ -315,6 +326,7 @@ export class Prsi {
         this._currentGame.gameState = "ended";
         const loser = this._currentGame.players.findIndex((player) => player.place === null);
         this._currentGame.players[loser].place = this.nextPlace();
+        this._currentGame.lastAction = this._currentGame.wantedAction ;
         this._currentGame.wantedAction = ActionType.Shuffle;
         this._currentGame.whoseTurn = this._currentGame.players[loser].name;
     }
@@ -352,6 +364,27 @@ export class Prsi {
         return compatibleCards(card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1]);
     }
 
+    private rollbackPlace() {
+        if (typeof this._currentGame === "undefined") {
+            throw new Error("Game isn't running.");
+        }
+
+        switch (this._currentGame.nextPlace) {
+        case Place.Second:
+            this._currentGame.nextPlace = Place.First;
+        case Place.Third:
+            this._currentGame.nextPlace = Place.Second;
+        case Place.Fourth:
+            this._currentGame.nextPlace = Place.Third;
+        case Place.Fifth:
+            this._currentGame.nextPlace = Place.Fourth;
+        case Place.Sixth:
+            this._currentGame.nextPlace = Place.Fifth;
+        default:
+            this._currentGame.nextPlace = Place.First;
+        }
+    }
+
     private nextPlace(): Place {
         if (typeof this._currentGame === "undefined") {
             throw new Error("Game isn't running.");
@@ -379,6 +412,37 @@ export class Prsi {
         return res;
     }
 
+    private checkReturnToGame() {
+        if (typeof this._currentGame === "undefined") {
+            throw new Error("Game isn't running.");
+        }
+
+        const curPlayer = this._currentGame.players.findIndex((playerState) => playerState.name === this._currentGame!.whoseTurn);
+        let i = curPlayer;
+        do {
+            i++;
+            if (i === this._currentGame.players.length) {
+                i = 0;
+            }
+
+            if (this._currentGame.players[i].canBeReturned) {
+                return this._currentGame.players[i].name;
+            }
+        } while (i !== curPlayer);
+    }
+
+    private resolveReturnToGame(who: string) {
+        if (typeof this._currentGame === "undefined") {
+            throw new Error("Game isn't running.");
+        }
+        this._currentGame.players.find((player) => player.name === this._currentGame?.whoseTurn)!.place = null;
+        this.rollbackPlace();
+        this._currentGame.players.find((player) => player.name === who)!.place = null;
+        this.drawCard(who);
+        this._currentGame.whoseTurn = who;
+        this._currentGame.wantedAction = ActionType.Play;
+    }
+
     private playCard(who: string, details: PlayDetails) {
         if (typeof this._currentGame === "undefined") {
             throw new Error("Game isn't running.");
@@ -399,7 +463,13 @@ export class Prsi {
         this._currentGame.hands.set(who, updatedHand);
 
         let lastAction: LastAction;
-        if (details.card.value === Value.Sedmicka) {
+        const returned = this.checkReturnToGame();
+        if (details.card.value === Value.Sedmicka && details.card.color === Color.Srdce && typeof returned !== "undefined") {
+            this.resolveReturnToGame(returned);
+            details.returned = returned;
+            lastAction = LastAction.Return;
+            this._currentGame.wantedAction = ActionType.Play;
+        } else if (details.card.value === Value.Sedmicka) {
             this._currentGame.wantedAction = this.drawInfo.get(this._currentGame.wantedAction)!.next;
             lastAction = LastAction.Play;
         } else if (details.card.value === Value.Eso) {
@@ -418,6 +488,7 @@ export class Prsi {
 
         if (updatedHand.length === 0) {
             this._currentGame.players.find((player) => player.name === who)!.place = this.nextPlace();
+            this._currentGame.players.find((player) => player.name === who)!.canBeReturned = true;
         }
 
         this._currentGame.lastPlay = {

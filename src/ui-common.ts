@@ -256,6 +256,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         [LastAction.DrawEight]: {you: "Líznuls osm.", other: "@PLAYERNAME@ líznul osm."},
         [LastAction.Change]: {you: "Změnils na @COLORCHANGE@.", other: "@PLAYERNAME@ změnil na @COLORCHANGE@."},
         [LastAction.Disconnect]: {you: "Odpojil ses? Tohle bys neměl vidět.", other: "@PLAYERNAME@ se odpojil."},
+        [LastAction.Return]: {you: "Zahráls červenou sedmičku a vrátils @RETURN@ do hry!", other: "@PLAYERNAME@ zahrál červenou sedmičku a vrátil @RETURN@ do hry!"},
     };
 
     renderInstructions(wantedAction: ActionType, status: Status, you: string, turn: string, topCard: Card, lastPlay?: LastPlay): React.ReactNode {
@@ -267,6 +268,8 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
                 this.colorStrings[lastPlay.playDetails.colorChange])
             .replace("@CARDS_GENITIVE@", typeof lastPlay.playDetails === "undefined"? "CARD unavailable" :
                 CARDS_GENITIVE[lastPlay.playDetails.card.color][lastPlay.playDetails.card.value])
+            .replace("@RETURN@", typeof lastPlay.playDetails === "undefined" || typeof lastPlay.playDetails.returned === "undefined" ? "RETURN unavailable" :
+                lastPlay.playDetails.returned)
             .replace(/\.$/, !lastPlay.didWin ? "." : lastPlay.who === you ? " a vyhráls." : " a vyhrál.");
         const instructions = this.instructionStrings[wantedAction][status][you === turn ? "you" : "other"]
             .replace("@PLAYERNAME@", turn)

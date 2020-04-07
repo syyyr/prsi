@@ -18,7 +18,7 @@ export class ImgUI extends UI {
     renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode {
         const options = {
             onClick,
-            className: `max-height${typeof onClick !== "undefined" ? " clickable" : ""}${halo ? " halo" : ""}`,
+            className: `playfield-height${typeof onClick !== "undefined" ? " clickable" : ""}${halo ? " halo" : ""}`,
             src: images[card.color][card.value],
             draggable: false
         }

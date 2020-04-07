@@ -44,15 +44,9 @@ class StartButton extends React.Component<{onClick: () => void}> {
     }
 }
 
-class DrawButton extends React.Component<{text: string, onClick: () => void}> {
+class DrawButton extends React.Component<Renderer> {
     render() {
-        return React.createElement(
-            "button",
-            {
-                onClick: this.props.onClick
-            },
-            this.props.text);
-
+        return this.props.renderer();
     }
 }
 
@@ -99,6 +93,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
     abstract renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
     abstract renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: number | Place}): React.ReactNode;
+    abstract renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode;
 
     constructor(props: {ws: any, thisName: string}) {
         super(props);
@@ -128,42 +123,6 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
             "Start");
     }
 
-    renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode {
-        return React.createElement(
-            DrawButton,
-            {
-                key: "drawButton",
-                onClick: () => {
-                    this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)));
-                },
-                text: (() => {
-                    if (this.props.thisName !== whoseTurn && wantedAction !== ActionType.Shuffle) {
-                        return "Líznout si";
-                    }
-                    switch (wantedAction) {
-                    case ActionType.Play:
-                    case ActionType.PlayKule:
-                    case ActionType.PlayListy:
-                    case ActionType.PlayZaludy:
-                    case ActionType.PlaySrdce:
-                        return "Líznout si";
-                    case ActionType.DrawTwo:
-                        return "Líznout dvě";
-                    case ActionType.DrawFour:
-                        return "Líznout čtyři";
-                    case ActionType.DrawSix:
-                        return "Líznout šest";
-                    case ActionType.DrawEight:
-                        return "Líznout osm";
-                    case ActionType.SkipTurn:
-                        return "Stojím";
-                    case ActionType.Shuffle:
-                        return "Zamíchat";
-                    }
-                })()
-            },
-            null);
-    }
 
     renderPrompt(text: string): React.ReactNode {
         return React.createElement(Prompt, {key: "prompt", instructions: text});
@@ -306,7 +265,9 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         const topCard = [];
 
         if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
-            topCard.push(this.renderDrawButton(this.state.gameState.gameInfo.wantedAction, this.state.gameState.gameInfo.who));
+            topCard.push(React.createElement(DrawButton, {
+                renderer: () => this.renderDrawButton(this.state.gameState!.gameInfo!.wantedAction, this.state.gameState!.gameInfo!.who)
+            }));
         }
 
         topCard.push(this.renderCard(this.state.gameState.gameInfo.topCard, false));

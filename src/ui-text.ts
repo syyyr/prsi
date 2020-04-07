@@ -1,6 +1,7 @@
 import * as React from "react";
 import {UI} from "./ui-common";
-import {Card, Color} from "./types";
+import {Card, Color, ActionType, PlayType} from "./types";
+import {PlayerInput} from "./communication";
 
 export class TextUI extends UI {
     renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode {
@@ -38,5 +39,42 @@ export class TextUI extends UI {
             ),
             React.createElement("br", {key: "players-linebreak"})
         ]
+    }
+
+    renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode {
+        return React.createElement(
+            "button",
+            {
+                key: "drawButton",
+                onClick: () => {
+                    this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)));
+                },
+            },
+            (() => {
+                    if (this.props.thisName !== whoseTurn && wantedAction !== ActionType.Shuffle) {
+                        return "Líznout si";
+                    }
+                    switch (wantedAction) {
+                        case ActionType.Play:
+                        case ActionType.PlayKule:
+                        case ActionType.PlayListy:
+                        case ActionType.PlayZaludy:
+                        case ActionType.PlaySrdce:
+                            return "Líznout si";
+                        case ActionType.DrawTwo:
+                            return "Líznout dvě";
+                        case ActionType.DrawFour:
+                            return "Líznout čtyři";
+                        case ActionType.DrawSix:
+                            return "Líznout šest";
+                        case ActionType.DrawEight:
+                            return "Líznout osm";
+                        case ActionType.SkipTurn:
+                            return "Stojím";
+                        case ActionType.Shuffle:
+                            return "Zamíchat";
+                    }
+                })()
+        );
     }
 }

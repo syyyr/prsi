@@ -41,7 +41,7 @@ export class ImgUI extends UI {
     }
 
     private renderCardBack(key: string): React.ReactNode {
-        return React.createElement("img", {key, className: "cardback"}, null);
+        return React.createElement("img", {key, className: "cardback cardBacks-container-height"}, null);
     }
 
     private renderPlace(place: Place): React.ReactNode {
@@ -95,38 +95,14 @@ export class ImgUI extends UI {
 
     renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode {
         return React.createElement(
-            "button",
+            "img",
             {
                 key: "drawButton",
+                className: "cardback halo playfield-height",
                 onClick: () => {
                     this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)));
                 },
-            },
-            (() => {
-                    if (this.props.thisName !== whoseTurn && wantedAction !== ActionType.Shuffle) {
-                        return "Líznout si";
-                    }
-                    switch (wantedAction) {
-                        case ActionType.Play:
-                        case ActionType.PlayKule:
-                        case ActionType.PlayListy:
-                        case ActionType.PlayZaludy:
-                        case ActionType.PlaySrdce:
-                            return "Líznout si";
-                        case ActionType.DrawTwo:
-                            return "Líznout dvě";
-                        case ActionType.DrawFour:
-                            return "Líznout čtyři";
-                        case ActionType.DrawSix:
-                            return "Líznout šest";
-                        case ActionType.DrawEight:
-                            return "Líznout osm";
-                        case ActionType.SkipTurn:
-                            return "Stojím";
-                        case ActionType.Shuffle:
-                            return "Zamíchat";
-                    }
-                })()
+            }
         );
     }
 }

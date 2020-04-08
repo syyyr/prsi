@@ -139,6 +139,6 @@ export class ImgUI extends UI {
     }
 
     renderTitle(): React.ReactNode {
-        return React.createElement("h1", {className: "align-center"}, "Prší");
+        return React.createElement("img", {className: "logo align-center playfield-logo"});
     }
 }

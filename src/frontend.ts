@@ -5,7 +5,7 @@ import {TextUI} from "./ui-text";
 import {ImgUI} from "./ui-img";
 
 let playerName: null | string = null;
-while (playerName == null) {
+while (playerName === null || playerName === "") {
     playerName = window.prompt("Username:");
 }
 const connection = new window.WebSocket(`ws${window.location.protocol === "https:" ? "s" : ""}://${window.location.host}`);

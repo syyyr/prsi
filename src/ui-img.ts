@@ -129,7 +129,7 @@ export class ImgUI extends UI {
                 "img",
                 {
                     key: "drawButton",
-                    className: "cardback halo playfield-height",
+                    className: "cardback clickable halo playfield-height",
                     onClick: () => {
                         this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)));
                     },

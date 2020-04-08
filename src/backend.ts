@@ -540,6 +540,9 @@ export class Prsi {
         case Value.Sedmicka:
             this._currentGame.wantedAction = ActionType.DrawTwo;
             break;
+        case Value.Svrsek:
+            this._currentGame.wantedAction = this.changeColorToAction(this._currentGame.playedCards[0].color);
+            break;
         }
     }
 

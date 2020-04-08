@@ -93,16 +93,42 @@ export class ImgUI extends UI {
         )
     }
 
+    readonly drawButtonString = {
+        [ActionType.DrawTwo]: "Líznout 2",
+        [ActionType.DrawFour]: "Líznout 4",
+        [ActionType.DrawSix]: "Líznout 6",
+        [ActionType.DrawEight]: "Líznout 8",
+        [ActionType.SkipTurn]: "Stojím",
+        [ActionType.Shuffle]: "Zamíchat",
+    };
+
     renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode {
-        return React.createElement(
-            "img",
-            {
-                key: "drawButton",
-                className: "cardback halo playfield-height",
-                onClick: () => {
-                    this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)));
-                },
+        const tooltip = (() => {
+            if (this.props.thisName !== whoseTurn && wantedAction !== ActionType.Shuffle) {
+                return;
             }
-        );
+            switch (wantedAction) {
+                case ActionType.Play:
+                case ActionType.PlayKule:
+                case ActionType.PlayListy:
+                case ActionType.PlaySrdce:
+                case ActionType.PlayZaludy:
+                    return;
+            }
+            return React.createElement("div", {className: "absolute tooltip"}, this.drawButtonString[wantedAction]);
+            })();
+        return React.createElement("div", {className: "relative"}, [
+            tooltip,
+            React.createElement(
+                "img",
+                {
+                    key: "drawButton",
+                    className: "cardback halo playfield-height",
+                    onClick: () => {
+                        this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)));
+                    },
+                }
+            )
+        ]);
     }
 }

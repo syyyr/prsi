@@ -87,6 +87,28 @@ body {
     flex-wrap: wrap;
     margin: auto;
 }
+.absolute {
+    position: absolute;
+}
+.relative {
+    position: relative;
+}
+.tooltip {
+    z-index: 1;
+    pointer-events: none;
+    top: 50%;
+    bottom: 50%;
+    left: -50%;
+    right: -50%;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    background: radial-gradient(circle, rgba(0,128,0,1) 0%, rgba(0,64,0,1) 100%);
+    border: 0.1em black solid;
+    border-radius: 5px;
+    padding: 0.5em;
+    color: white;
+}
 #game {
     width: fit-content;
     margin: auto;

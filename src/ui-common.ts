@@ -278,7 +278,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         }
 
         playfield.push(React.createElement("img", {className: "playfield-logo"}, null));
-        elems.push(React.createElement("div", {className: "playfield"}, playfield));
+        elems.push(React.createElement("div", {className: `playfield${this.state.gameState.gameInfo.who === this.props.thisName ? " bigRedHalo" : ""}`}, playfield));
 
         if (this.state.picker !== null) {
             elems.push(React.createElement(

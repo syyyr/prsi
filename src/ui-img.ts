@@ -14,6 +14,12 @@ class Player extends React.Component<{name: string, shouldEmphasize: boolean}> {
     }
 }
 
+class CardBack extends React.Component {
+    render(): React.ReactNode {
+        return React.createElement("img", {className: "cardback cardBacks-container-height"}, null);
+    }
+}
+
 export class ImgUI extends UI {
     renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode {
         const options = {
@@ -41,7 +47,7 @@ export class ImgUI extends UI {
     }
 
     private renderCardBack(key: string): React.ReactNode {
-        return React.createElement("img", {key, className: "cardback cardBacks-container-height"}, null);
+        return React.createElement(CardBack, {key}, null);
     }
 
     private renderPlace(place: Place): React.ReactNode {

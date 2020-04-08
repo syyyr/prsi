@@ -77,4 +77,8 @@ export class TextUI extends UI {
                 })()
         );
     }
+
+    renderTitle(): React.ReactNode {
+        return React.createElement("h1", {className: "align-center"}, "Prší");
+    }
 }

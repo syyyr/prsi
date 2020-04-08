@@ -3,9 +3,9 @@ import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput}
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction, Place} from "./types";
 import {CARDS_GENITIVE} from "./card-strings"
 
-class Title extends React.Component {
-    render() {
-        return React.createElement("h1", {className: "align-center"}, "Prší");
+class Title extends React.Component<Renderer> {
+    render(): React.ReactNode {
+        return this.props.renderer();
     }
 }
 
@@ -94,6 +94,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
     abstract renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: number | Place}): React.ReactNode;
     abstract renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode;
+    abstract renderTitle(): React.ReactNode;
 
     constructor(props: {ws: any, thisName: string}) {
         super(props);
@@ -240,7 +241,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
 
     render() {
         const elems = [];
-        elems.push(React.createElement(Title, {key: "title"}, null));
+        elems.push(React.createElement(Title, {key: "title", renderer: this.renderTitle}, null));
         if (typeof this.state.gameState === "undefined") {
             return elems;
         }

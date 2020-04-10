@@ -21,14 +21,22 @@ class CardBack extends React.Component {
 }
 
 export class ImgUI extends UI {
-    renderCard(card: Card, options?: {halo?: "halo", onClick?: () => void}): React.ReactNode {
+    renderCard(card: Card, options?: {colorChange?: Color, halo?: "halo", onClick?: () => void}): React.ReactNode {
         const imgOptions = {
             onClick: options?.onClick,
-            className: `playfield-height${typeof options?.onClick !== "undefined" ? " clickable" : ""}${typeof options?.halo !== undefined ? " halo" : ""}`,
+            className: `playfield-height${typeof options?.onClick !== "undefined" ? " clickable" : ""}${options?.halo === "halo" ? " halo" : ""}`,
             src: images[card.color][card.value],
             draggable: false
         }
-        return React.createElement("img", {key: "card", ...imgOptions});
+        const children = [];
+        children.push(React.createElement("img", {key: "card", ...imgOptions}));
+        if (typeof options?.colorChange !== "undefined") {
+            children.push(React.createElement("img", {
+                className: "absolute centerInsideDiv colorChange",
+                src: colors[options.colorChange]
+            }));
+        }
+        return React.createElement("div", {className: "relative"}, children);
     }
     renderPicker(onClick: (color: Color) => void): React.ReactNode {
         return [
@@ -121,7 +129,7 @@ export class ImgUI extends UI {
                 case ActionType.PlayZaludy:
                     return;
             }
-            return React.createElement("div", {className: "absolute tooltip"}, this.drawButtonString[wantedAction]);
+            return React.createElement("div", {className: "absolute centerInsideDiv tooltip"}, this.drawButtonString[wantedAction]);
             })();
         return React.createElement("div", {className: "relative"}, [
             tooltip,

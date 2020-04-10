@@ -1,6 +1,6 @@
 import * as React from "react";
 import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput} from "./communication";
-import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction, Place} from "./types";
+import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction, Place, changeActionToColor} from "./types";
 import {CARDS_GENITIVE} from "./card-strings"
 
 class Title extends React.Component<Renderer> {
@@ -88,8 +88,20 @@ class InstructionStrings {
 
 const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
 
+const isColorChange = (action: ActionType) => {
+    switch (action) {
+    case ActionType.PlayListy:
+    case ActionType.PlayZaludy:
+    case ActionType.PlaySrdce:
+    case ActionType.PlayKule:
+        return true;
+    default:
+        return false;
+    }
+}
+
 export abstract class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
-    abstract renderCard(card: Card, options?: {halo?: "halo", onClick?: () => void}): React.ReactNode;
+    abstract renderCard(card: Card, options?: {colorChange?: Color, halo?: "halo", onClick?: () => void}): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
     abstract renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: number | Place}): React.ReactNode;
     abstract renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode;
@@ -270,7 +282,9 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
             }));
         }
 
-        topCard.push(this.renderCard(this.state.gameState.gameInfo.topCard));
+        topCard.push(this.renderCard(this.state.gameState.gameInfo.topCard, {
+            colorChange: isColorChange(this.state.gameState.gameInfo.wantedAction) ? changeActionToColor(this.state.gameState.gameInfo.wantedAction) : undefined
+        }));
         playfield.push(React.createElement("div", {className: "flex-row topCard-container"}, topCard));
 
         if (typeof this.state.gameState.gameInfo.hand !== "undefined") {

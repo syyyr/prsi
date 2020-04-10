@@ -108,8 +108,8 @@ const processMessage = (ws: any, message: string): void => {
             const state = prsi.state();
             if (state?.lastPlay?.didWin) {
                 const prevStats = stats[state.lastPlay.who];
-                const acquiredPts = state.players.length - state.players.find((player) => player.name === state.lastPlay?.who)!.place! + 1;
-                updateStats(prevStats, acquiredPts, state.players.length);
+                const acquiredPts = state.players.length - state.players.find((player) => player.name === state.lastPlay?.who)!.place!;
+                updateStats(prevStats, acquiredPts, state.players.length - 1);
                 if (state.wantedAction === ActionType.Shuffle) { // If shuffle, then the game is over - we have to recalculate last guy's stats
                     const prevStats = stats[state.whoseTurn];
                     updateStats(prevStats, 0, state.players.length);

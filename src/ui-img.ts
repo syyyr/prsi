@@ -94,8 +94,8 @@ export class ImgUI extends UI {
             [
                 ...players.map((player) => {
                     let playerInfoRender: undefined | React.ReactNode = undefined;
-                    if (typeof playerInfo !== "undefined") {
-                        if (typeof playerInfo[player].cards === "number") {
+                    if (typeof playerInfo !== "undefined" && typeof playerInfo[player] !== "undefined") {
+                        if (typeof playerInfo[player]!.cards === "number") {
                             playerInfoRender = React.createElement("div",
                                 {className: "flex-row cardBacks-container"},
                                 // I have no idea why Typescript complains without an `!`

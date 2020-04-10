@@ -4,19 +4,21 @@ import FileSync from "lowdb/adapters/FileSync";
 import path from "path";
 import ws from "express-ws";
 import Prsi from "./backend";
-import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame} from "./communication";
+import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats} from "./communication";
 import {ActionType, Status, PlayerAction, Place} from "./types";
 
 class Stats {
     acquiredPts: number = 0;
     possiblePts: number = 0;
     averagePts: number = 0;
+    gamesPlayed: number = 0;
 }
 
 const updateStats = (stats: Stats, acquiredPts: number, possiblePts: number) => {
     stats.acquiredPts += acquiredPts;
     stats.possiblePts += possiblePts;
     stats.averagePts = stats.acquiredPts / stats.possiblePts;
+    stats.gamesPlayed++;
 }
 
 let prsiLogger: (msg: string, ws?: any) => void;
@@ -49,7 +51,8 @@ const buildFrontendStateFor = (player: string): FrontendState => {
     return {
         players: prsi.players(),
         gameStarted: typeof state !== "undefined" ? "yes" : "no",
-        stats: Object.assign({}, ...prsi.players().map(player => ({[player]: stats[player].averagePts}))),
+        stats: Object.assign({}, ...prsi.players().map(player =>
+            ({[player]: new FrontendStats(stats[player].averagePts, stats[player].gamesPlayed)}))),
         gameInfo: typeof state !== "undefined" ? {
             wantedAction: state.wantedAction,
             status: state.status,

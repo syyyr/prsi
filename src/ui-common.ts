@@ -1,5 +1,5 @@
 import * as React from "react";
-import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput} from "./communication";
+import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, FrontendStats} from "./communication";
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction, Place, changeActionToColor} from "./types";
 import {CARDS_GENITIVE} from "./card-strings"
 
@@ -275,19 +275,21 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         return React.createElement(Prompt, {key: "instructions", instructions, lastPlay: lastPlayStr}, null);
     }
 
-    renderStats(stats: {[key in string]: number}): React.ReactNode {
+    renderStats(stats: {[key in string]: FrontendStats}): React.ReactNode {
         return React.createElement("table", {className: "statsTable"},
             [
                 React.createElement("thead", {className: "statsHeader"}, [
-                    React.createElement("th", {colSpan: "2"}, "Statistika"),
+                    React.createElement("th", {colSpan: "3"}, "Statistika"),
                     React.createElement("tr", null, [
                         React.createElement("td", {className: "statsDesc"}, "Jméno"),
-                        React.createElement("td", {className: "statsDesc"}, "Úspěšnost")
+                        React.createElement("td", {className: "statsDesc"}, "Úspěšnost"),
+                        React.createElement("td", {className: "statsDesc"}, "Odehráno")
                     ]
                 )]),
-                ...Object.entries(stats).map(([player, score]) => React.createElement("tr", null, [
+                ...Object.entries(stats).map(([player, stats]) => React.createElement("tr", null, [
                     React.createElement("td", null, player),
-                    React.createElement("td", null, `${Math.round(score * 100)} %`)
+                    React.createElement("td", null, `${Math.round(stats.successRate * 100)} %`),
+                    React.createElement("td", null, stats.gamesPlayed),
                 ]))
             ]);
     }

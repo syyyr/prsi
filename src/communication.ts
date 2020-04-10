@@ -66,11 +66,20 @@ export class FrontendInfo {
     }
 }
 
+export class FrontendStats {
+    successRate: number;
+    gamesPlayed: number;
+    constructor(successRate: number, gamesPlayed: number) {
+        this.successRate = successRate;
+        this.gamesPlayed = gamesPlayed;
+    }
+}
+
 export class FrontendState {
     gameStarted: "yes" | "no";
     players: string[];
     gameInfo?: FrontendInfo;
-    stats: {[key in string]: number} = {};
+    stats: {[key in string]: FrontendStats} = {};
     constructor(gameStarted: "yes" | "no", players: string[], frontendInfo?: FrontendInfo) {
         this.gameStarted = gameStarted;
         this.players = players;

@@ -11,11 +11,12 @@ class Stats {
     acquiredPts: number = 0;
     possiblePts: number = 0;
     averagePts: number = 0;
-    addPoints(acquiredPts: number, possiblePts: number) {
-        this.acquiredPts += acquiredPts;
-        this.possiblePts += possiblePts;
-        this.averagePts = this.acquiredPts / this.possiblePts;
-    }
+}
+
+const updateStats = (stats: Stats, acquiredPts: number, possiblePts: number) => {
+    stats.acquiredPts += acquiredPts;
+    stats.possiblePts += possiblePts;
+    stats.averagePts = stats.acquiredPts / stats.possiblePts;
 }
 
 let prsiLogger: (msg: string, ws?: any) => void;
@@ -94,7 +95,9 @@ const processMessage = (ws: any, message: string): void => {
         ws.__private_name = parsed.registerPlayer;
         prsi.registerPlayer(parsed.registerPlayer);
         prsiLogger(`Registered "${parsed.registerPlayer}".`, ws);
-        stats[parsed.registerPlayer] = new Stats();
+        if (typeof stats[parsed.registerPlayer] === "undefined") {
+            stats[parsed.registerPlayer] = new Stats();
+        }
         updateEveryone();
         return;
     }
@@ -106,10 +109,10 @@ const processMessage = (ws: any, message: string): void => {
             if (state?.lastPlay?.didWin) {
                 const prevStats = stats[state.lastPlay.who];
                 const acquiredPts = state.players.length - state.players.find((player) => player.name === state.lastPlay?.who)!.place! + 1;
-                prevStats.addPoints(acquiredPts, state.players.length);
+                updateStats(prevStats, acquiredPts, state.players.length);
                 if (state.wantedAction === ActionType.Shuffle) { // If shuffle, then the game is over - we have to recalculate last guy's stats
                     const prevStats = stats[state.whoseTurn];
-                    prevStats.addPoints(0, state.players.length);
+                    updateStats(prevStats, 0, state.players.length);
                 }
             }
             updateEveryone();

@@ -42,19 +42,27 @@ export class ImgUI extends UI {
         return React.createElement("div", {className: "relative"}, children);
     }
     renderPicker(onClick: (color: Color) => void): React.ReactNode {
-        return [
-            React.createElement("p", {key: "changeTo"}, "Měním na:"),
+        const dialogContent = React.createElement("div", {
+            className: "picker",
+            onClick: (event: MouseEvent) => {event.stopPropagation();}
+        }, [
             ...[Color.Kule, Color.Listy, Color.Srdce, Color.Zaludy].map((color) => React.createElement(
                 "img",
                 {
                     key: color,
-                    className: "clickable",
+                    className: "clickable halo",
                     onClick: () => onClick(color),
                     src: colors[color],
                     draggable: false
                 }
             ))
-        ];
+        ])  ;
+        return React.createElement("div", {
+            className: "dialog", onClick: (event: MouseEvent) => {
+                event.stopPropagation();
+                this.setState({picker: null});
+            }
+        }, dialogContent);
     }
 
     private renderCardBack(key: string): React.ReactNode {

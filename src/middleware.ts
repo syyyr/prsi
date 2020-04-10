@@ -48,6 +48,7 @@ const buildFrontendStateFor = (player: string): FrontendState => {
     return {
         players: prsi.players(),
         gameStarted: typeof state !== "undefined" ? "yes" : "no",
+        stats: Object.assign({}, ...prsi.players().map(player => ({[player]: stats[player].averagePts}))),
         gameInfo: typeof state !== "undefined" ? {
             wantedAction: state.wantedAction,
             status: state.status,

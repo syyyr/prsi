@@ -70,6 +70,7 @@ export class FrontendState {
     gameStarted: "yes" | "no";
     players: string[];
     gameInfo?: FrontendInfo;
+    stats: {[key in string]: number} = {};
     constructor(gameStarted: "yes" | "no", players: string[], frontendInfo?: FrontendInfo) {
         this.gameStarted = gameStarted;
         this.players = players;

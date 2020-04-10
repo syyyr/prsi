@@ -115,3 +115,14 @@ export enum Place {
     Fifth = "Fifth",
     Sixth = "Sixth"
 }
+
+export const changeActionToColor = (action: ActionType): Color => {
+        switch (action) {
+            case ActionType.PlaySrdce: return Color.Srdce;
+            case ActionType.PlayListy: return Color.Listy;
+            case ActionType.PlayKule: return Color.Kule;
+            case ActionType.PlayZaludy: return Color.Zaludy;
+        }
+
+        throw new Error(`Tried to change ${action} to a color.`);
+    }

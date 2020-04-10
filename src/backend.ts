@@ -1,4 +1,4 @@
-import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value, PlayerAction, LastPlay, LastAction, Place} from "./types"
+import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value, PlayerAction, LastPlay, LastAction, Place, changeActionToColor} from "./types"
 
 const sortedDeck = [
     new Card(Color.Zaludy, Value.Sedmicka),
@@ -298,17 +298,6 @@ export class Prsi {
         [ActionType.DrawEight, {next: ActionType.DrawEight, count: 8}]
     ]);
 
-    private changeActionToColor(action: ActionType): Color {
-        switch (action) {
-            case ActionType.PlaySrdce: return Color.Srdce;
-            case ActionType.PlayListy: return Color.Listy;
-            case ActionType.PlayKule: return Color.Kule;
-            case ActionType.PlayZaludy: return Color.Zaludy;
-        }
-
-        throw new Error("Internal error.");
-    }
-
     private changeColorToAction(color: Color): ActionType {
         switch (color) {
             case Color.Srdce: return ActionType.PlaySrdce;
@@ -337,7 +326,7 @@ export class Prsi {
         }
         // try here, because the helper function only works on Play* actions
         try {
-            if (color === this.changeActionToColor(this._currentGame.wantedAction)) {
+            if (color === changeActionToColor(this._currentGame.wantedAction)) {
                 return true;
             }
         } catch {}

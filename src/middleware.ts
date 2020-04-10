@@ -1,12 +1,30 @@
 import express from "express";
+import lowDb from "lowdb";
+import FileSync from "lowdb/adapters/FileSync";
 import path from "path";
 import ws from "express-ws";
 import Prsi from "./backend";
 import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame} from "./communication";
-import {Status, PlayerAction, Place} from "./types";
+import {ActionType, Status, PlayerAction, Place} from "./types";
+
+class Stats {
+    acquiredPts: number = 0;
+    possiblePts: number = 0;
+    averagePts: number = 0;
+    addPoints(acquiredPts: number, possiblePts: number) {
+        this.acquiredPts += acquiredPts;
+        this.possiblePts += possiblePts;
+        this.averagePts = this.acquiredPts / this.possiblePts;
+    }
+}
 
 let prsiLogger: (msg: string, ws?: any) => void;
 const prsi = new Prsi();
+
+const statsAccess = lowDb(new FileSync("stats.json"));
+statsAccess.defaults({stats: {}}).write();
+const stats: {[key in string]: Stats} = statsAccess.get("stats").value();
+setInterval(() => statsAccess.set("stats", stats).write(), 10000);
 
 type AugmentedSocket = (WebSocket & {
     __private_name: string
@@ -75,6 +93,7 @@ const processMessage = (ws: any, message: string): void => {
         ws.__private_name = parsed.registerPlayer;
         prsi.registerPlayer(parsed.registerPlayer);
         prsiLogger(`Registered "${parsed.registerPlayer}".`, ws);
+        stats[parsed.registerPlayer] = new Stats();
         updateEveryone();
         return;
     }
@@ -82,6 +101,16 @@ const processMessage = (ws: any, message: string): void => {
     if (isPlayerInput(parsed)) {
         prsi.resolveAction(new PlayerAction(parsed.playType, ws.__private_name, parsed.playDetails));
         if (prsi.state()!.status === Status.Ok) {
+            const state = prsi.state();
+            if (state?.lastPlay?.didWin) {
+                const prevStats = stats[state.lastPlay.who];
+                const acquiredPts = state.players.length - state.players.find((player) => player.name === state.lastPlay?.who)!.place! + 1;
+                prevStats.addPoints(acquiredPts, state.players.length);
+                if (state.wantedAction === ActionType.Shuffle) { // If shuffle, then the game is over - we have to recalculate last guy's stats
+                    const prevStats = stats[state.whoseTurn];
+                    prevStats.addPoints(0, state.players.length);
+                }
+            }
             updateEveryone();
         } else {
             updateOne(ws);

@@ -21,14 +21,14 @@ class CardBack extends React.Component {
 }
 
 export class ImgUI extends UI {
-    renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode {
-        const options = {
-            onClick,
-            className: `playfield-height${typeof onClick !== "undefined" ? " clickable" : ""}${halo ? " halo" : ""}`,
+    renderCard(card: Card, options?: {halo?: "halo", onClick?: () => void}): React.ReactNode {
+        const imgOptions = {
+            onClick: options?.onClick,
+            className: `playfield-height${typeof options?.onClick !== "undefined" ? " clickable" : ""}${typeof options?.halo !== undefined ? " halo" : ""}`,
             src: images[card.color][card.value],
             draggable: false
         }
-        return React.createElement("img", {key: "card", ...options});
+        return React.createElement("img", {key: "card", ...imgOptions});
     }
     renderPicker(onClick: (color: Color) => void): React.ReactNode {
         return [

@@ -89,8 +89,7 @@ class InstructionStrings {
 const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
 
 export abstract class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
-    // FIXME: change halo to enum, or something
-    abstract renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode;
+    abstract renderCard(card: Card, options?: {halo?: "halo", onClick?: () => void}): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
     abstract renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: number | Place}): React.ReactNode;
     abstract renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode;
@@ -132,7 +131,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
     renderHand(hand: Card[]): React.ReactNode {
         return React.createElement("div", {className: "flex-row hand-container"}, hand.map((card) => React.createElement(CardComponent, {
             key: `hand:${card.value}${card.color}`,
-            renderer: () => this.renderCard(card, true, () => {
+            renderer: () => this.renderCard(card, {halo: "halo", onClick: () => {
                 if (this.state.gameState!.gameInfo!.who === this.props.thisName && card.value === Value.Svrsek) {
                     this.setState({picker: card.color});
                     return;
@@ -141,7 +140,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
                     this.setState({picker: null});
                 }
                 this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card))));
-            })
+            }})
         })));
     }
 
@@ -271,7 +270,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
             }));
         }
 
-        topCard.push(this.renderCard(this.state.gameState.gameInfo.topCard, false));
+        topCard.push(this.renderCard(this.state.gameState.gameInfo.topCard));
         playfield.push(React.createElement("div", {className: "flex-row topCard-container"}, topCard));
 
         if (typeof this.state.gameState.gameInfo.hand !== "undefined") {

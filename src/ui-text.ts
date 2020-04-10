@@ -4,12 +4,12 @@ import {Card, Color, ActionType, PlayType} from "./types";
 import {PlayerInput} from "./communication";
 
 export class TextUI extends UI {
-    renderCard(card: Card, halo: boolean, onClick?: () => void): React.ReactNode {
-        const options = {
-            onClick,
-            className: `fit-content ${typeof onClick !== "undefined" ? "clickable" : ""}`
+    renderCard(card: Card, options?: {halo?: "halo", onClick?: () => void}): React.ReactNode {
+        const pOptions = {
+            onClick: options?.onClick,
+            className: `fit-content ${typeof options?.onClick !== "undefined" ? "clickable" : ""}`
         }
-        return React.createElement("p", {key: "card", ...options}, `${card.value}${card.color}`);
+        return React.createElement("p", {key: "card", ...pOptions}, `${card.value}${card.color}`);
     }
     renderPicker(onClick: (color: Color) => void): React.ReactNode {
         return [

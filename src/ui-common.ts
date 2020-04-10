@@ -275,6 +275,23 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         return React.createElement(Prompt, {key: "instructions", instructions, lastPlay: lastPlayStr}, null);
     }
 
+    renderStats(stats: {[key in string]: number}): React.ReactNode {
+        return React.createElement("table", {className: "statsTable"},
+            [
+                React.createElement("thead", {className: "statsHeader"}, [
+                    React.createElement("th", {colSpan: "2"}, "Statistika"),
+                    React.createElement("tr", null, [
+                        React.createElement("td", {className: "statsDesc"}, "Jméno"),
+                        React.createElement("td", {className: "statsDesc"}, "Úspěšnost")
+                    ]
+                )]),
+                ...Object.entries(stats).map(([player, score]) => React.createElement("tr", null, [
+                    React.createElement("td", null, player),
+                    React.createElement("td", null, `${Math.round(score * 100)} %`)
+                ]))
+            ]);
+    }
+
     render() {
         const elems = [];
         elems.push(React.createElement(Title, {key: "title", renderer: this.renderTitle}, null));
@@ -288,6 +305,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
 
         if (typeof this.state.gameState.gameInfo === "undefined") {
             elems.push(this.renderPrompt("Hra nezačala."));
+            elems.push(this.renderStats(this.state.gameState.stats));
             return elems;
         }
 
@@ -331,6 +349,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
 
         playfield.push(React.createElement("img", {className: "playfield-logo"}, null));
         elems.push(React.createElement("div", {className: `playfield${this.state.gameState.gameInfo.who === this.props.thisName ? " bigRedHalo" : ""}`}, playfield));
+        elems.push(this.renderStats(this.state.gameState.stats));
 
         if (this.state.picker !== null) {
             elems.push(React.createElement(

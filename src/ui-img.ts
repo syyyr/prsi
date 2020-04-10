@@ -1,5 +1,5 @@
 import * as React from "react";
-import {UI} from "./ui-common";
+import {UI, CardTooltip} from "./ui-common";
 import {Card, Color, Place, ActionType, PlayType} from "./types";
 import images from "./card-images";
 import colors from "./color-images";
@@ -21,7 +21,7 @@ class CardBack extends React.Component {
 }
 
 export class ImgUI extends UI {
-    renderCard(card: Card, options?: {colorChange?: Color, halo?: "halo", onClick?: () => void}): React.ReactNode {
+    renderCard(card: Card, options?: {colorChange?: Color, halo?: "halo", onClick?: () => void, tooltip?: CardTooltip}): React.ReactNode {
         const imgOptions = {
             onClick: options?.onClick,
             className: `playfield-height${typeof options?.onClick !== "undefined" ? " clickable" : ""}${options?.halo === "halo" ? " halo" : ""}`,
@@ -35,6 +35,9 @@ export class ImgUI extends UI {
                 className: "absolute centerInsideDiv colorChange",
                 src: colors[options.colorChange]
             }));
+        }
+        if (typeof options?.tooltip !== "undefined") {
+            children.push(React.createElement("div", {className: "absolute centerInsideDiv tooltip topCardTooltip"}, "❌"));
         }
         return React.createElement("div", {className: "relative"}, children);
     }

@@ -1,15 +1,15 @@
 import * as React from "react";
-import {UI} from "./ui-common";
+import {UI, CardTooltip} from "./ui-common";
 import {Card, Color, ActionType, PlayType} from "./types";
 import {PlayerInput} from "./communication";
 
 export class TextUI extends UI {
-    renderCard(card: Card, options?: {halo?: "halo", onClick?: () => void}): React.ReactNode {
+    renderCard(card: Card, options?: {colorChange?: Color, halo?: "halo", onClick?: () => void, tooltip?: CardTooltip}): React.ReactNode {
         const pOptions = {
             onClick: options?.onClick,
             className: `fit-content ${typeof options?.onClick !== "undefined" ? "clickable" : ""}`
         }
-        return React.createElement("p", {key: "card", ...pOptions}, `${card.value}${card.color}`);
+        return React.createElement("p", {key: "card", ...pOptions}, `${card.value}${card.color} ${typeof options?.tooltip !== "undefined" ? options.tooltip : ""}`);
     }
     renderPicker(onClick: (color: Color) => void): React.ReactNode {
         return [

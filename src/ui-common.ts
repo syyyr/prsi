@@ -100,8 +100,25 @@ const isColorChange = (action: ActionType) => {
     }
 }
 
+const isDrawX = (action: ActionType) => {
+    switch (action) {
+    case ActionType.DrawTwo:
+    case ActionType.DrawFour:
+    case ActionType.DrawSix:
+    case ActionType.DrawEight:
+        return true;
+    default:
+        return false;
+    }
+}
+
+export enum CardTooltip {
+    NoSkip = "(nestojíš)",
+    NoDraw = "(nelížeš)"
+}
+
 export abstract class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
-    abstract renderCard(card: Card, options?: {colorChange?: Color, halo?: "halo", onClick?: () => void}): React.ReactNode;
+    abstract renderCard(card: Card, options?: {colorChange?: Color, halo?: "halo", onClick?: () => void, tooltip?: CardTooltip}): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
     abstract renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: number | Place}): React.ReactNode;
     abstract renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode;
@@ -291,8 +308,21 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
         }
 
         topCard.push(this.renderCard(this.state.gameState.gameInfo.topCard, {
-            colorChange: isColorChange(this.state.gameState.gameInfo.wantedAction) ? changeActionToColor(this.state.gameState.gameInfo.wantedAction) : undefined
-        }));
+            colorChange: isColorChange(this.state.gameState.gameInfo.wantedAction) ? changeActionToColor(this.state.gameState.gameInfo.wantedAction) : undefined,
+            tooltip: (() => {
+                // FIXME: Refactor to method
+                if (this.state.gameState!.gameInfo!.who !== this.props.thisName) {
+                    return;
+                }
+                if (this.state.gameState!.gameInfo!.topCard.value === Value.Eso && this.state.gameState!.gameInfo!.wantedAction !== ActionType.SkipTurn) {
+                    return CardTooltip.NoSkip;
+                }
+                if (this.state.gameState!.gameInfo!.topCard.value === Value.Sedmicka && !isDrawX(this.state.gameState!.gameInfo!.wantedAction)) {
+                    return CardTooltip.NoDraw;
+                }
+            })()
+            }
+        ));
         playfield.push(React.createElement("div", {className: "flex-row topCard-container"}, topCard));
 
         if (typeof this.state.gameState.gameInfo.hand !== "undefined") {

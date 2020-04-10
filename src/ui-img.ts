@@ -88,19 +88,20 @@ export class ImgUI extends UI {
         })());
     }
 
-    renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: number | Place}): React.ReactNode {
+    renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: {cards?: number, place?: Place}}): React.ReactNode {
         console.log(playerInfo);
         return React.createElement("div", {key: "players", className: "flex-row"},
             [
                 ...players.map((player) => {
                     let playerInfoRender: undefined | React.ReactNode = undefined;
                     if (typeof playerInfo !== "undefined") {
-                        if (typeof playerInfo[player]! === "number") {
+                        if (typeof playerInfo[player].cards === "number") {
                             playerInfoRender = React.createElement("div",
                                 {className: "flex-row cardBacks-container"},
-                                Array.from({length: playerInfo[player] as number}).map((_value, index) => this.renderCardBack(`card:${player}${index}`)))
+                                // I have no idea why Typescript complains without an `!`
+                                Array.from({length: playerInfo[player].cards!}).map((_value, index) => this.renderCardBack(`card:${player}${index}`)))
                         } else {
-                            playerInfoRender = this.renderPlace(playerInfo[player] as Place);
+                            playerInfoRender = this.renderPlace(playerInfo[player].place!);
                         }
                     }
                     return [

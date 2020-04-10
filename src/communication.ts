@@ -52,11 +52,11 @@ export class FrontendInfo {
     wantedAction: ActionType;
     status: Status;
     who: string;
-    playerInfo: {[key in string]: number | Place};
+    playerInfo: {[key in string]: {cards?: number, place?: Place}};
     topCard: Card;
     hand?: Card[];
     lastPlay?: LastPlay;
-    constructor(wantedAction: ActionType, status: Status, who: string, topCard: Card, hand: Card[], playerInfo: {[key in string]: number | Place}) {
+    constructor(wantedAction: ActionType, status: Status, who: string, topCard: Card, hand: Card[], playerInfo: {[key in string]: {cards?: number, place?: Place}}) {
         this.wantedAction = wantedAction;
         this.status = status;
         this.who = who;

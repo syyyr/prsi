@@ -23,9 +23,9 @@ const idGen = (function*(): Generator {
 
 const buildFrontendStateFor = (player: string): FrontendState => {
     const state = prsi.state();
-    const playerInfo: {[key in string]: number | Place} = {};
+    const playerInfo: {[key in string]: {cards?: number, place?: Place}} = {};
     state?.players.forEach(
-        (playerState) => playerInfo[playerState.name] = playerState.place !== null ? playerState.place : state.hands.get(playerState.name)!.length
+        (playerState) => playerInfo[playerState.name] = playerState.place !== null ? {place: playerState.place} : {cards: state.hands.get(playerState.name)!.length}
     );
     return {
         players: prsi.players(),

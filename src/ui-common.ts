@@ -120,7 +120,7 @@ export enum CardTooltip {
 export abstract class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
     abstract renderCard(card: Card, options?: {colorChange?: Color, halo?: "halo", onClick?: () => void, tooltip?: CardTooltip}): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
-    abstract renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: number | Place}): React.ReactNode;
+    abstract renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: {cards?: number, place?: Place}}): React.ReactNode;
     abstract renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode;
     abstract renderTitle(): React.ReactNode;
 

@@ -108,12 +108,12 @@ export class PlayerAction {
 }
 
 export enum Place {
-    First = "First",
-    Second = "Second",
-    Third = "Third",
-    Fourth = "Fourth",
-    Fifth = "Fifth",
-    Sixth = "Sixth"
+    First = 1,
+    Second = 2,
+    Third = 3,
+    Fourth = 4,
+    Fifth = 5,
+    Sixth = 6
 }
 
 export const changeActionToColor = (action: ActionType): Color => {

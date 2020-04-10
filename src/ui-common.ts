@@ -145,8 +145,16 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
             key: `hand:${card.value}${card.color}`,
             renderer: () => this.renderCard(card, {halo: "halo", onClick: () => {
                 if (this.state.gameState!.gameInfo!.who === this.props.thisName && card.value === Value.Svrsek) {
-                    this.setState({picker: card.color});
-                    return;
+                    switch (this.state.gameState!.gameInfo!.wantedAction) {
+                    // FIXME: use isColorChange for this
+                    case ActionType.Play:
+                    case ActionType.PlayKule:
+                    case ActionType.PlayListy:
+                    case ActionType.PlayZaludy:
+                    case ActionType.PlaySrdce:
+                        this.setState({picker: card.color});
+                        return;
+                    }
                 }
                 if (this.state.picker !== null) {
                     this.setState({picker: null});

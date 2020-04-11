@@ -2,6 +2,7 @@ import * as React from "react";
 import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, FrontendStats} from "./communication";
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction, Place, changeActionToColor} from "./types";
 import {CARDS_GENITIVE} from "./card-strings"
+import {audio} from "./sounds";
 
 class Title extends React.Component<Renderer> {
     render(): React.ReactNode {
@@ -364,6 +365,15 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
                     })
                 }
             ));
+        }
+
+        if (this.state.gameState.gameInfo.status === Status.Ok) {
+            switch (this.state.gameState.gameInfo.lastPlay?.playerAction) {
+                case LastAction.DrawFour:
+                case LastAction.DrawSix:
+                case LastAction.DrawEight:
+                    new Audio(audio[this.state.gameState.gameInfo.lastPlay.playerAction]).play();
+            }
         }
 
         return React.createElement("div", {key: "root"}, [...elems]);

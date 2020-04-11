@@ -53,14 +53,14 @@ export class FrontendInfo {
     status: Status;
     who: string;
     playerInfo: {[key in string]: {cards?: number, place?: Place}};
-    topCard: Card;
+    topCards: Card[];
     hand?: Card[];
     lastPlay?: LastPlay;
-    constructor(wantedAction: ActionType, status: Status, who: string, topCard: Card, hand: Card[], playerInfo: {[key in string]: {cards?: number, place?: Place}}) {
+    constructor(wantedAction: ActionType, status: Status, who: string, topCards: Card[], hand: Card[], playerInfo: {[key in string]: {cards?: number, place?: Place}}) {
         this.wantedAction = wantedAction;
         this.status = status;
         this.who = who;
-        this.topCard = topCard;
+        this.topCards = topCards;
         this.hand = hand;
         this.playerInfo = playerInfo;
     }

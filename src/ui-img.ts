@@ -1,5 +1,5 @@
 import * as React from "react";
-import {UI, CardTooltip} from "./ui-common";
+import {UI, CardOptions} from "./ui-common";
 import {Card, Color, Place, ActionType, PlayType} from "./types";
 import images from "./card-images";
 import colors from "./color-images";
@@ -20,26 +20,38 @@ class CardBack extends React.Component {
     }
 }
 
-export class ImgUI extends UI {
-    renderCard(card: Card, options?: {colorChange?: Color, halo?: "halo", onClick?: () => void, tooltip?: CardTooltip}): React.ReactNode {
+class CardComponent extends React.Component<{card: Card, options?: CardOptions}> {
+    render(): React.ReactNode {
+        const options = this.props.options;
+        const card = this.props.card;
         const imgOptions = {
             onClick: options?.onClick,
             className: `playfield-height${typeof options?.onClick !== "undefined" ? " clickable" : ""}${options?.halo === "halo" ? " halo" : ""}`,
             src: images[card.color][card.value],
-            draggable: false
+            draggable: false,
+            key: options?.key
         }
         const children = [];
         children.push(React.createElement("img", {key: "card", ...imgOptions}));
         if (typeof options?.colorChange !== "undefined") {
             children.push(React.createElement("img", {
                 className: "absolute centerInsideDiv colorChange",
-                src: colors[options.colorChange]
+                src: colors[options.colorChange],
             }));
         }
         if (typeof options?.tooltip !== "undefined") {
             children.push(React.createElement("div", {className: "absolute centerInsideDiv tooltip topCardTooltip"}, "❌"));
         }
-        return React.createElement("div", {className: "relative"}, children);
+        return React.createElement("div", {
+            className: `${typeof options?.isBottomCard === "undefined" ? "centerInsideDiv absolute" : "relative"}`},
+            children
+        );
+    }
+}
+
+export class ImgUI extends UI {
+    renderCard(card: Card, options?: CardOptions): React.ReactNode {
+        return React.createElement(CardComponent, {key: options?.key, card, options});
     }
     renderPicker(onClick: (color: Color) => void): React.ReactNode {
         const dialogContent = React.createElement("div", {
@@ -142,7 +154,7 @@ export class ImgUI extends UI {
             }
             return React.createElement("div", {className: "absolute centerInsideDiv tooltip"}, this.drawButtonString[wantedAction]);
             })();
-        return React.createElement("div", {className: "relative"}, [
+        return React.createElement("div", {className: "relative drawButton-width"}, [
             tooltip,
             React.createElement(
                 "img",

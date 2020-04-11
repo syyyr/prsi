@@ -118,8 +118,17 @@ export enum CardTooltip {
     NoDraw = "(nelížeš)"
 }
 
+export interface CardOptions {
+    isBottomCard?: "bottom",
+    colorChange?: Color,
+    halo?: "halo",
+    onClick?: () => void,
+    tooltip?: CardTooltip,
+    key: string
+}
+
 export abstract class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
-    abstract renderCard(card: Card, options?: {colorChange?: Color, halo?: "halo", onClick?: () => void, tooltip?: CardTooltip}): React.ReactNode;
+    abstract renderCard(card: Card, options?: CardOptions): React.ReactNode;
     abstract renderPicker(onClick: (color: Color) => void): React.ReactNode;
     abstract renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: {cards?: number, place?: Place}}): React.ReactNode;
     abstract renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode;
@@ -159,9 +168,9 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
     }
 
     renderHand(hand: Card[]): React.ReactNode {
-        return React.createElement("div", {className: "flex-row hand-container"}, hand.map((card) => React.createElement(CardComponent, {
+        return React.createElement("div", {className: "flex-row hand-container"}, hand.map((card, index) => React.createElement(CardComponent, {
             key: `hand:${card.value}${card.color}`,
-            renderer: () => this.renderCard(card, {halo: "halo", onClick: () => {
+            renderer: () => this.renderCard(card, {key: `hand${index}`, isBottomCard: "bottom", halo: "halo", onClick: () => {
                 if (this.state.gameState!.gameInfo!.who === this.props.thisName && card.value === Value.Svrsek) {
                     switch (this.state.gameState!.gameInfo!.wantedAction) {
                     // FIXME: use isColorChange for this
@@ -316,7 +325,7 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
             this.state.gameState.gameInfo.status,
             this.props.thisName,
             this.state.gameState.gameInfo.who,
-            this.state.gameState.gameInfo.topCard,
+            this.state.gameState.gameInfo.topCards[this.state.gameState.gameInfo.topCards.length - 1],
             this.state.gameState.gameInfo.lastPlay));
 
         const playfield = [];
@@ -328,23 +337,35 @@ export abstract class UI extends React.Component<{ws: any, thisName: string}, {g
             }));
         }
 
-        topCard.push(this.renderCard(this.state.gameState.gameInfo.topCard, {
-            colorChange: isColorChange(this.state.gameState.gameInfo.wantedAction) ? changeActionToColor(this.state.gameState.gameInfo.wantedAction) : undefined,
-            tooltip: (() => {
-                // FIXME: Refactor to method
-                if (this.state.gameState!.gameInfo!.who !== this.props.thisName) {
-                    return;
-                }
-                if (this.state.gameState!.gameInfo!.topCard.value === Value.Eso && this.state.gameState!.gameInfo!.wantedAction !== ActionType.SkipTurn) {
-                    return CardTooltip.NoSkip;
-                }
-                if (this.state.gameState!.gameInfo!.topCard.value === Value.Sedmicka && !isDrawX(this.state.gameState!.gameInfo!.wantedAction)) {
-                    return CardTooltip.NoDraw;
-                }
-            })()
-            }
-        ));
         playfield.push(React.createElement("div", {className: "flex-row topCard-container"}, topCard));
+
+        topCard.push(React.createElement("div", {className: "relative"}, this.state.gameState.gameInfo.topCards.map((card, index, array) => {
+            const firstCardOptions: {isBottomCard?: "bottom"} = {
+                isBottomCard: index === 0 ? "bottom" : undefined
+            };
+            const lastCardOptions = index === array.length - 1 ? {
+                colorChange: isColorChange(this.state.gameState!.gameInfo!.wantedAction) ? changeActionToColor(this.state.gameState!.gameInfo!.wantedAction) : undefined,
+                tooltip: (() => {
+                    // FIXME: Refactor to method
+                    if (this.state.gameState!.gameInfo!.who !== this.props.thisName) {
+                        return;
+                    }
+                    if (card.value === Value.Eso && this.state.gameState!.gameInfo!.wantedAction !== ActionType.SkipTurn) {
+                        return CardTooltip.NoSkip;
+                    }
+                    if (card.value === Value.Sedmicka && !isDrawX(this.state.gameState!.gameInfo!.wantedAction)) {
+                        return CardTooltip.NoDraw;
+                    }
+                })()
+            } : {};
+
+
+            return this.renderCard(card, {
+                key: `topCard${index}`,
+                ...firstCardOptions,
+                ...lastCardOptions
+            });
+        })));
 
         if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
             playfield.push(this.renderHand(this.state.gameState.gameInfo.hand));

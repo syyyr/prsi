@@ -67,7 +67,7 @@ const buildFrontendStateFor = (player: string): FrontendState => {
             wantedAction: state.wantedAction,
             status: state.status,
             who: state.whoseTurn,
-            topCard: state.playedCards[state.playedCards.length - 1],
+            topCards: state.playedCards.slice(state.playedCards.length - Math.min(state.playedCards.length, 3)),
             hand: state.hands.get(player),
             playerInfo,
             lastPlay: state.lastPlay

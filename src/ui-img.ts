@@ -89,7 +89,6 @@ export class ImgUI extends UI {
     }
 
     renderPlayers(players: string[], whoseTurn?: string, playerInfo?: {[key in string]: {cards?: number, place?: Place}}): React.ReactNode {
-        console.log(playerInfo);
         return React.createElement("div", {key: "players", className: "flex-row"},
             [
                 ...players.map((player) => {

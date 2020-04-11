@@ -7,18 +7,28 @@ import Prsi from "./backend";
 import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats} from "./communication";
 import {ActionType, Status, PlayerAction, Place} from "./types";
 
-class Stats {
+class impl_Stats {
     acquiredPts: number = 0;
     possiblePts: number = 0;
     averagePts: number = 0;
     gamesPlayed: number = 0;
 }
 
+class Stats {
+    current: impl_Stats = new impl_Stats();
+    last: impl_Stats = new impl_Stats();
+}
+
 const updateStats = (stats: Stats, acquiredPts: number, possiblePts: number) => {
-    stats.acquiredPts += acquiredPts;
-    stats.possiblePts += possiblePts;
-    stats.averagePts = stats.acquiredPts / stats.possiblePts;
-    stats.gamesPlayed++;
+    stats.last = {...stats.current};
+    stats.current.acquiredPts += acquiredPts;
+    stats.current.possiblePts += possiblePts;
+    stats.current.averagePts = stats.current.acquiredPts / stats.current.possiblePts;
+    stats.current.gamesPlayed++;
+}
+
+const rollbackStats = (stats: Stats) => {
+    stats.current = {...stats.last};
 }
 
 let prsiLogger: (msg: string, ws?: any) => void;
@@ -52,7 +62,7 @@ const buildFrontendStateFor = (player: string): FrontendState => {
         players: prsi.players(),
         gameStarted: typeof state !== "undefined" ? "yes" : "no",
         stats: Object.assign({}, ...prsi.players().map(player =>
-            ({[player]: new FrontendStats(stats[player].averagePts, stats[player].gamesPlayed)}))),
+            ({[player]: new FrontendStats(stats[player].current.averagePts, stats[player].current.gamesPlayed)}))),
         gameInfo: typeof state !== "undefined" ? {
             wantedAction: state.wantedAction,
             status: state.status,
@@ -109,6 +119,15 @@ const processMessage = (ws: any, message: string): void => {
         prsi.resolveAction(new PlayerAction(parsed.playType, ws.__private_name, parsed.playDetails));
         if (prsi.state()!.status === Status.Ok) {
             const state = prsi.state();
+            if (typeof state?.lastPlay?.playDetails?.returned !== "undefined") {
+                rollbackStats(stats[state?.lastPlay?.playDetails?.returned]);
+                // Last guy returned another guy, when he was already supposed
+                // to be shuffling, his stats were already inceremented.  We
+                // need to rollback his stats too.
+                if (state.wantedAction === ActionType.Shuffle) {
+                    rollbackStats(stats[state.lastPlay.who]);
+                }
+            }
             if (state?.lastPlay?.didWin) {
                 const prevStats = stats[state.lastPlay.who];
                 const acquiredPts = state.players.length - state.players.find((player) => player.name === state.lastPlay?.who)!.place!;

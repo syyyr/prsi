@@ -1,8 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {PlayerRegistration} from "./communication";
-import {TextUI} from "./ui-text";
-import {ImgUI} from "./ui-img";
+import {UI} from "./ui";
 
 let playerName: null | string = null;
 while (playerName === null || playerName === "") {
@@ -20,6 +19,6 @@ connection.onclose = () => {
 }
 
 ReactDOM.render(
-    React.createElement(ImgUI, {ws: connection, thisName: playerName!}, null),
+    React.createElement(UI, {ws: connection, thisName: playerName!}, null),
     window.document.getElementById("game")
 );

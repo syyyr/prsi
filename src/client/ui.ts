@@ -333,6 +333,73 @@ class Hand extends React.Component<{hand: Card[], playCard: (card: Card) => void
     }
 }
 
+interface PlayFieldProps {
+    onTurn: boolean;
+    drawCard: () => void;
+    playCard: (card: Card) => void;
+    openPicker: (svrsekColor: Color) => void;
+    wantedAction: ActionType;
+    topCards: Card[];
+    hand?: Card[];
+}
+
+class PlayField extends React.Component<PlayFieldProps> {
+
+    render(): React.ReactNode {
+        const playfield = [];
+        const topCard = [];
+
+        // FIXME: look at this
+        if (typeof this.props.hand !== "undefined") {
+            topCard.push(React.createElement(DrawButton, {
+                callback: this.props.drawCard,
+                wantedAction: this.props.wantedAction,
+                // FIXME: Fix this, somehow
+                shouldDrawTooltip: !this.props.onTurn && this.props.wantedAction !== ActionType.Shuffle
+            }));
+        }
+
+        topCard.push(React.createElement("div", {className: "relative"}, this.props.topCards.map((card, index, array) => {
+            const firstCardOptions: {isBottomCard?: "bottom"} = {
+                isBottomCard: index === 0 ? "bottom" : undefined
+            };
+            const lastCardOptions = index === array.length - 1 ? {
+                colorChange: isColorChange(this.props.wantedAction) ? changeActionToColor(this.props.wantedAction) : undefined,
+                tooltip: (() => {
+                    // FIXME: Refactor to method
+                    if (!this.props.onTurn) {
+                        return;
+                    }
+                    if (card.value === Value.Eso && this.props.wantedAction !== ActionType.SkipTurn) {
+                        return CardTooltip.NoSkip;
+                    }
+                    if (card.value === Value.Sedmicka && !isDrawX(this.props.wantedAction)) {
+                        return CardTooltip.NoDraw;
+                    }
+                })()
+            } : {};
+
+
+            return renderCard(card, {
+                key: `topCard${index}`,
+                ...firstCardOptions,
+                ...lastCardOptions
+            });
+        })));
+        playfield.push(React.createElement("div", {className: "flex-row topCard-container"}, topCard));
+        if (typeof this.props.hand !== "undefined") {
+            playfield.push(React.createElement(Hand, {
+                hand: this.props.hand,
+                playCard: this.props.playCard,
+                openPicker: this.props.openPicker
+            }));
+        }
+
+        playfield.push(React.createElement("img", {className: "playfield-logo"}, null));
+        return React.createElement("div", {className: `playfield${this.props.onTurn ? " bigRedHalo" : ""}`}, playfield);
+    }
+}
+
 export class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
     constructor(props: {ws: any, thisName: string}) {
         super(props);
@@ -494,57 +561,17 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 this.state.gameState.gameInfo.lastPlay)
         }));
 
-        const playfield = [];
-        const topCard = [];
-
-        if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
-            topCard.push(React.createElement(DrawButton, {
-                callback: () => this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw))),
-                wantedAction: this.state.gameState.gameInfo.wantedAction,
-                shouldDrawTooltip: this.props.thisName !== this.state.gameState.gameInfo.who && this.state.gameState.gameInfo.wantedAction !== ActionType.Shuffle
-            }));
-        }
-
-        playfield.push(React.createElement("div", {className: "flex-row topCard-container"}, topCard));
-
-        topCard.push(React.createElement("div", {className: "relative"}, this.state.gameState.gameInfo.topCards.map((card, index, array) => {
-            const firstCardOptions: {isBottomCard?: "bottom"} = {
-                isBottomCard: index === 0 ? "bottom" : undefined
-            };
-            const lastCardOptions = index === array.length - 1 ? {
-                colorChange: isColorChange(this.state.gameState!.gameInfo!.wantedAction) ? changeActionToColor(this.state.gameState!.gameInfo!.wantedAction) : undefined,
-                tooltip: (() => {
-                    // FIXME: Refactor to method
-                    if (this.state.gameState!.gameInfo!.who !== this.props.thisName) {
-                        return;
-                    }
-                    if (card.value === Value.Eso && this.state.gameState!.gameInfo!.wantedAction !== ActionType.SkipTurn) {
-                        return CardTooltip.NoSkip;
-                    }
-                    if (card.value === Value.Sedmicka && !isDrawX(this.state.gameState!.gameInfo!.wantedAction)) {
-                        return CardTooltip.NoDraw;
-                    }
-                })()
-            } : {};
 
 
-            return renderCard(card, {
-                key: `topCard${index}`,
-                ...firstCardOptions,
-                ...lastCardOptions
-            });
-        })));
-
-        if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
-            playfield.push(React.createElement(Hand, {
-                hand: this.state.gameState.gameInfo.hand,
-                playCard: (card: Card) => this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card)))), // FIXME: Refactor to a function
-                openPicker: this.onTurn() && this.canPlaySvrsek() ? (svrsekColor: Color) => this.setState({picker: svrsekColor}) : () => {}
-            }));
-        }
-
-        playfield.push(React.createElement("img", {className: "playfield-logo"}, null));
-        elems.push(React.createElement("div", {className: `playfield${this.state.gameState.gameInfo.who === this.props.thisName ? " bigRedHalo" : ""}`}, playfield));
+        elems.push(React.createElement(PlayField, {
+            onTurn: this.onTurn(),
+            drawCard: () => this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw))),
+            playCard: (card: Card) => this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card)))), // FIXME: Refactor to a function
+            wantedAction: this.state.gameState.gameInfo.wantedAction,
+            topCards: this.state.gameState.gameInfo.topCards,
+            openPicker: this.onTurn() && this.canPlaySvrsek() ? (svrsekColor: Color) => this.setState({picker: svrsekColor}) : () => {},
+            hand: this.state.gameState.gameInfo.hand
+        }));
         elems.push(React.createElement(Stats, {stats: this.state.gameState.stats}));
 
         if (this.state.picker !== null) {

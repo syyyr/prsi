@@ -116,7 +116,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 ColorPicker,
                 {
                     key: "picker",
-                    callback: (color: Color) => {
+                    pickColor: (color: Color) => {
                         this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(new Card(this.state.picker!, Value.Svrsek), color))));
                         this.setState({picker: null});
                     }

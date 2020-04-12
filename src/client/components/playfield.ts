@@ -8,25 +8,13 @@ interface CardOptions {
     colorChange?: Color,
     halo?: "halo",
     onClick?: () => void,
-    tooltip?: CardTooltip,
-    key: string
+    tooltip?: CardTooltip
 }
 
 enum CardTooltip {
     NoSkip = "(nestojíš)",
     NoDraw = "(nelížeš)"
 }
-
-type Renderer = {renderer: () => React.ReactNode};
-class CardComponentBase extends React.Component<Renderer> {
-    render() {
-        return this.props.renderer();
-    }
-}
-
-const renderCard = (card: Card, options?: CardOptions): React.ReactNode => {
-    return React.createElement(CardComponent, {key: options?.key, card, options});
-};
 
 class CardComponent extends React.Component<{card: Card, options?: CardOptions}> {
     render(): React.ReactNode {
@@ -37,7 +25,6 @@ class CardComponent extends React.Component<{card: Card, options?: CardOptions}>
             className: `playfield-height${typeof options?.onClick !== "undefined" ? " clickable" : ""}${options?.halo === "halo" ? " halo" : ""}`,
             src: images[card.color][card.value],
             draggable: false,
-            key: options?.key
         }
         const children = [];
         children.push(React.createElement("img", {key: "card", ...imgOptions}));
@@ -59,15 +46,20 @@ class CardComponent extends React.Component<{card: Card, options?: CardOptions}>
 
 class Hand extends React.Component<{hand: Card[], playCard: (card: Card) => void, openPicker: (svrsekColor: Color) => void}> {
     render(): React.ReactNode {
-        return React.createElement("div", {className: "flex-row hand-container"}, this.props.hand.map((card, index) => React.createElement(CardComponentBase, {
-            key: `hand:${card.value}${card.color}`,
-            renderer: () => renderCard(card, {key: `hand${index}`, isBottomCard: "bottom", halo: "halo", onClick: () => {
-                if (card.value === Value.Svrsek) {
-                    this.props.openPicker(card.color);
-                    return;
+        return React.createElement("div", {className: "flex-row hand-container"}, this.props.hand.map((card, index) => React.createElement(CardComponent, {
+            key: `hand:${index}`,
+            card: card,
+            options: {
+                isBottomCard: "bottom",
+                halo: "halo",
+                onClick: () => {
+                    if (card.value === Value.Svrsek) {
+                        this.props.openPicker(card.color);
+                        return;
+                    }
+                    this.props.playCard(card);
                 }
-                this.props.playCard(card);
-            }})
+            }
         })));
     }
 }
@@ -182,10 +174,12 @@ export default class PlayField extends React.Component<PlayFieldProps> {
             } : {};
 
 
-            return renderCard(card, {
-                key: `topCard${index}`,
-                ...firstCardOptions,
-                ...lastCardOptions
+            return React.createElement(CardComponent, {
+                card: card,
+                options: {
+                    ...firstCardOptions,
+                    ...lastCardOptions
+                }
             });
         })));
         playfield.push(React.createElement("div", {className: "flex-row topCard-container"}, topCard));

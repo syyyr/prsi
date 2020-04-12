@@ -12,12 +12,13 @@ class Title extends React.Component {
     }
 }
 
-class Prompt extends React.Component<{instructions: string, lastPlay?: string}> {
+class Prompt extends React.Component<{instructions: string}> {
     render() {
         return React.createElement(
             "p",
             {key: "prompt", className: "flex-row align-center"},
-            `${typeof this.props.lastPlay !== "undefined" ? this.props.lastPlay  + " " : ""}${this.props.instructions}`);
+            this.props.instructions
+        );
     }
 }
 
@@ -404,7 +405,8 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
         [LastAction.Return]: {you: "Zahráls červenou sedmičku a vrátils @RETURN@ do hry!", other: "@PLAYERNAME@ zahrál červenou sedmičku a vrátil @RETURN@ do hry!"},
     };
 
-    renderInstructions(wantedAction: ActionType, status: Status, you: string, turn: string, topCard: Card, lastPlay?: LastPlay): React.ReactNode {
+    // FIXME: Check if this can be refactored inside the prompt
+    buildInstructions(wantedAction: ActionType, status: Status, you: string, turn: string, topCard: Card, lastPlay?: LastPlay): string {
         const lastPlayStr = status !== Status.Ok || typeof lastPlay === "undefined" ? undefined :
             this.lastPlayStrings[lastPlay.playerAction][you === lastPlay.who ? "you" : "other"]
             .replace("@PLAYERNAME@", lastPlay.who)
@@ -420,8 +422,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             .replace("@PLAYERNAME@", turn)
             .replace("@TOPCOLOR@", this.colorStrings[topCard.color])
             .replace("@TOPVALUE@", this.values[topCard.value]);
-
-        return React.createElement(Prompt, {key: "instructions", instructions, lastPlay: lastPlayStr}, null);
+        return `${typeof lastPlayStr !== "undefined" ? `${lastPlayStr} ` : ""}${instructions}`;
     }
 
     renderStats(stats: {[key in string]: FrontendStats}): React.ReactNode {
@@ -481,12 +482,14 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             return elems;
         }
 
-        elems.push(this.renderInstructions(this.state.gameState.gameInfo.wantedAction,
-            this.state.gameState.gameInfo.status,
-            this.props.thisName,
-            this.state.gameState.gameInfo.who,
-            this.state.gameState.gameInfo.topCards[this.state.gameState.gameInfo.topCards.length - 1],
-            this.state.gameState.gameInfo.lastPlay));
+        elems.push(React.createElement(Prompt, {
+            instructions: this.buildInstructions(this.state.gameState.gameInfo.wantedAction,
+                this.state.gameState.gameInfo.status,
+                this.props.thisName,
+                this.state.gameState.gameInfo.who,
+                this.state.gameState.gameInfo.topCards[this.state.gameState.gameInfo.topCards.length - 1],
+                this.state.gameState.gameInfo.lastPlay)
+        }));
 
         const playfield = [];
         const topCard = [];

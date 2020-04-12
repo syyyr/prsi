@@ -29,15 +29,14 @@ class CardComponentBase extends React.Component<Renderer> {
     }
 }
 
-class StartButton extends React.Component<{onClick: () => void}> {
+class StartButton extends React.Component<{callback: () => void}> {
     render() {
         return React.createElement(
             "button",
             {
-                onClick: this.props.onClick
+                onClick: this.props.callback
             },
             "Start");
-
     }
 }
 
@@ -316,16 +315,6 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
         };
     }
 
-    renderStartButton(): React.ReactNode {
-        return React.createElement(
-            StartButton,
-            {
-                key: "startButton",
-                onClick: () => startGame(this.props.ws)
-            },
-            "Start");
-    }
-
     renderHand(hand: Card[]): React.ReactNode {
         return React.createElement("div", {className: "flex-row hand-container"}, hand.map((card, index) => React.createElement(CardComponentBase, {
             key: `hand:${card.value}${card.color}`,
@@ -470,7 +459,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             return elems;
         }
         if (this.state.gameState.gameStarted === "no" && this.state.gameState.players.length >= 2) {
-            elems.push(this.renderStartButton());
+            elems.push(React.createElement(StartButton, {key: "startButton", callback: () => startGame(this.props.ws)}));
         }
         elems.push(React.createElement(PlayerBox, {
             thisName: this.props.thisName,

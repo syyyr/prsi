@@ -561,8 +561,6 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 this.state.gameState.gameInfo.lastPlay)
         }));
 
-
-
         elems.push(React.createElement(PlayField, {
             onTurn: this.onTurn(),
             drawCard: () => this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw))),
@@ -596,6 +594,6 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             }
         }
 
-        return React.createElement("div", {key: "root"}, [...elems]);
+        return elems;
     }
 }

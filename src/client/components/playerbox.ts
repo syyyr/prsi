@@ -4,10 +4,6 @@ import PlaceComponent from "./place";
 import Player from "./player";
 import {Place} from "../../common/types";
 
-const renderCardBack = (key: string): React.ReactNode => {
-    return React.createElement(CardBack, {key}, null);
-}
-
 interface PlayerBoxProps {
     thisName: string;
     players: string[];
@@ -29,7 +25,7 @@ export default class extends React.Component<PlayerBoxProps> {
                             playerInfoRender = React.createElement("div",
                                 {className: "flex-row cardBacks-container"},
                                 // I have no idea why Typescript complains without an `!`
-                                Array.from({length: playerInfo[player].cards!}).map((_value, index) => renderCardBack(`card:${player}${index}`)))
+                                Array.from({length: playerInfo[player].cards!}).map((_value, index) => React.createElement(CardBack, {key: `card:${player}${index}`})));
                         } else {
                             playerInfoRender = React.createElement(PlaceComponent, {place: playerInfo[player].place!});
                         }

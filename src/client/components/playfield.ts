@@ -157,7 +157,7 @@ export default class extends React.Component<PlayFieldProps> {
                 callback: this.props.drawCard,
                 wantedAction: this.props.wantedAction,
                 // FIXME: Fix this, somehow
-                shouldDrawTooltip: !this.props.onTurn && this.props.wantedAction !== ActionType.Shuffle
+                shouldDrawTooltip: this.props.onTurn && this.props.wantedAction !== ActionType.Shuffle
             }));
         }
 

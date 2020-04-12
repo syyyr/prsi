@@ -1,29 +1,11 @@
 import * as React from "react";
 import CardBack from "./cardback";
+import PlaceComponent from "./place";
 import Player from "./player";
 import {Place} from "../../common/types";
 
 const renderCardBack = (key: string): React.ReactNode => {
     return React.createElement(CardBack, {key}, null);
-}
-
-const renderPlace = (place: Place): React.ReactNode => {
-    return React.createElement("div", null, (() => {
-        switch (place) {
-            case Place.First:
-                return "První";
-            case Place.Second:
-                return "Druhej";
-            case Place.Third:
-                return "Třetí";
-            case Place.Fourth:
-                return "Čtvrtej";
-            case Place.Fifth:
-                return "Pátej";
-            case Place.Sixth:
-                return "Šeštej";
-        }
-    })());
 }
 
 interface PlayerBoxProps {
@@ -49,7 +31,7 @@ export default class extends React.Component<PlayerBoxProps> {
                                 // I have no idea why Typescript complains without an `!`
                                 Array.from({length: playerInfo[player].cards!}).map((_value, index) => renderCardBack(`card:${player}${index}`)))
                         } else {
-                            playerInfoRender = renderPlace(playerInfo[player].place!);
+                            playerInfoRender = React.createElement(PlaceComponent, {place: playerInfo[player].place!});
                         }
                     }
                     return [

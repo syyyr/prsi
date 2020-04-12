@@ -3,22 +3,13 @@ import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput}
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction} from "../common/types";
 import PlayField from "./components/playfield";
 import PlayerBox from "./components/playerbox";
+import Prompt from "./components/prompt";
 import StartButton from "./components/startbutton";
 import Stats from "./components/stats";
 import Title from "./components/title";
 import {CARDS_GENITIVE} from "./card-strings";
 import colors from "./components/color-images";
 import {audio} from "./sounds";
-
-class Prompt extends React.Component<{instructions: string}> {
-    render() {
-        return React.createElement(
-            "p",
-            {key: "prompt", className: "flex-row align-center"},
-            this.props.instructions
-        );
-    }
-}
 
 interface YouOther {
     you: string;

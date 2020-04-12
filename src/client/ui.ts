@@ -292,6 +292,28 @@ class DrawButton extends React.Component<{callback: () => void, wantedAction: Ac
     }
 }
 
+class Stats extends React.Component<{stats: {[key in string]: FrontendStats}}> {
+    render(): React.ReactNode {
+        // FIXME: fix table structure
+        return React.createElement("table", {className: "statsTable"},
+            [
+                React.createElement("thead", {className: "statsHeader"}, [
+                    React.createElement("th", {colSpan: "3"}, "Statistika"),
+                    React.createElement("tr", null, [
+                        React.createElement("td", {className: "statsDesc"}, "Jméno"),
+                        React.createElement("td", {className: "statsDesc"}, "Úspěšnost"),
+                        React.createElement("td", {className: "statsDesc"}, "Odehráno")
+                    ]
+                )]),
+                ...Object.entries(this.props.stats).map(([player, stats]) => React.createElement("tr", null, [
+                    React.createElement("td", null, player),
+                    React.createElement("td", null, `${Math.round(stats.successRate * 100)} %`),
+                    React.createElement("td", null, stats.gamesPlayed),
+                ]))
+            ]);
+    }
+}
+
 const renderCard = (card: Card, options?: CardOptions): React.ReactNode => {
     return React.createElement(CardComponent, {key: options?.key, card, options});
 };
@@ -425,25 +447,6 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
         return `${typeof lastPlayStr !== "undefined" ? `${lastPlayStr} ` : ""}${instructions}`;
     }
 
-    renderStats(stats: {[key in string]: FrontendStats}): React.ReactNode {
-        return React.createElement("table", {className: "statsTable"},
-            [
-                React.createElement("thead", {className: "statsHeader"}, [
-                    React.createElement("th", {colSpan: "3"}, "Statistika"),
-                    React.createElement("tr", null, [
-                        React.createElement("td", {className: "statsDesc"}, "Jméno"),
-                        React.createElement("td", {className: "statsDesc"}, "Úspěšnost"),
-                        React.createElement("td", {className: "statsDesc"}, "Odehráno")
-                    ]
-                )]),
-                ...Object.entries(stats).map(([player, stats]) => React.createElement("tr", null, [
-                    React.createElement("td", null, player),
-                    React.createElement("td", null, `${Math.round(stats.successRate * 100)} %`),
-                    React.createElement("td", null, stats.gamesPlayed),
-                ]))
-            ]);
-    }
-
     private onTurn(): boolean {
         return this.state.gameState!.gameInfo!.who === this.props.thisName;
     }
@@ -478,7 +481,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
 
         if (typeof this.state.gameState.gameInfo === "undefined") {
             elems.push(React.createElement(Prompt, {key: "prompt", instructions: "Hra nezačala."}));
-            elems.push(this.renderStats(this.state.gameState.stats));
+            elems.push(React.createElement(Stats, {stats: this.state.gameState.stats}));
             return elems;
         }
 
@@ -542,7 +545,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
 
         playfield.push(React.createElement("img", {className: "playfield-logo"}, null));
         elems.push(React.createElement("div", {className: `playfield${this.state.gameState.gameInfo.who === this.props.thisName ? " bigRedHalo" : ""}`}, playfield));
-        elems.push(this.renderStats(this.state.gameState.stats));
+        elems.push(React.createElement(Stats, {stats: this.state.gameState.stats}));
 
         if (this.state.picker !== null) {
             elems.push(React.createElement(

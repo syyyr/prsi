@@ -291,11 +291,26 @@ class DrawButton extends React.Component<{callback: () => void, wantedAction: Ac
     }
 }
 
-export class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
-    renderCard(card: Card, options?: CardOptions): React.ReactNode {
-        return React.createElement(CardComponent, {key: options?.key, card, options});
-    }
+const renderCard = (card: Card, options?: CardOptions): React.ReactNode => {
+    return React.createElement(CardComponent, {key: options?.key, card, options});
+};
 
+class Hand extends React.Component<{hand: Card[], playCard: (card: Card) => void, openPicker: (svrsekColor: Color) => void}> {
+    render(): React.ReactNode {
+        return React.createElement("div", {className: "flex-row hand-container"}, this.props.hand.map((card, index) => React.createElement(CardComponentBase, {
+            key: `hand:${card.value}${card.color}`,
+            renderer: () => renderCard(card, {key: `hand${index}`, isBottomCard: "bottom", halo: "halo", onClick: () => {
+                if (card.value === Value.Svrsek) {
+                    this.props.openPicker(card.color);
+                    return;
+                }
+                this.props.playCard(card);
+            }})
+        })));
+    }
+}
+
+export class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
     constructor(props: {ws: any, thisName: string}) {
         super(props);
         // FIXME: look for a better solution for picker (don't save color of the played guy)
@@ -313,30 +328,6 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 this.setState({gameState: parsed, picker: null});
             }
         };
-    }
-
-    renderHand(hand: Card[]): React.ReactNode {
-        return React.createElement("div", {className: "flex-row hand-container"}, hand.map((card, index) => React.createElement(CardComponentBase, {
-            key: `hand:${card.value}${card.color}`,
-            renderer: () => this.renderCard(card, {key: `hand${index}`, isBottomCard: "bottom", halo: "halo", onClick: () => {
-                if (this.state.gameState!.gameInfo!.who === this.props.thisName && card.value === Value.Svrsek) {
-                    switch (this.state.gameState!.gameInfo!.wantedAction) {
-                    // FIXME: use isColorChange for this
-                    case ActionType.Play:
-                    case ActionType.PlayKule:
-                    case ActionType.PlayListy:
-                    case ActionType.PlayZaludy:
-                    case ActionType.PlaySrdce:
-                        this.setState({picker: card.color});
-                        return;
-                    }
-                }
-                if (this.state.picker !== null) {
-                    this.setState({picker: null});
-                }
-                this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card))));
-            }})
-        })));
     }
 
     readonly colorStrings = {
@@ -452,6 +443,23 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             ]);
     }
 
+    private onTurn(): boolean {
+        return this.state.gameState!.gameInfo!.who === this.props.thisName;
+    }
+
+    private canPlaySvrsek(): boolean {
+        switch (this.state.gameState!.gameInfo!.wantedAction) {
+            case ActionType.Play:
+            case ActionType.PlayKule:
+            case ActionType.PlayListy:
+            case ActionType.PlayZaludy:
+            case ActionType.PlaySrdce:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     render() {
         const elems = [];
         elems.push(React.createElement(Title, {key: "title"}, null));
@@ -514,7 +522,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             } : {};
 
 
-            return this.renderCard(card, {
+            return renderCard(card, {
                 key: `topCard${index}`,
                 ...firstCardOptions,
                 ...lastCardOptions
@@ -522,7 +530,11 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
         })));
 
         if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
-            playfield.push(this.renderHand(this.state.gameState.gameInfo.hand));
+            playfield.push(React.createElement(Hand, {
+                hand: this.state.gameState.gameInfo.hand,
+                playCard: (card: Card) => this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card)))), // FIXME: Refactor to a function
+                openPicker: this.onTurn() && this.canPlaySvrsek() ? (svrsekColor: Color) => this.setState({picker: svrsekColor}) : () => {}
+            }));
         }
 
         playfield.push(React.createElement("img", {className: "playfield-logo"}, null));

@@ -1,6 +1,7 @@
 import * as React from "react";
 import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput} from "../common/communication";
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction} from "../common/types";
+import ColorPicker from "./components/colorpicker";
 import PlayField from "./components/playfield";
 import PlayerBox from "./components/playerbox";
 import Prompt from "./components/prompt";
@@ -8,7 +9,6 @@ import StartButton from "./components/startbutton";
 import Stats from "./components/stats";
 import Title from "./components/title";
 import {CARDS_GENITIVE} from "./card-strings";
-import colors from "./components/color-images";
 import {audio} from "./sounds";
 
 interface YouOther {
@@ -48,32 +48,6 @@ class InstructionStrings {
 }
 
 const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
-
-class ColorPicker extends React.Component<{callback: (color: Color) => void}> {
-    render(): React.ReactNode {
-        const dialogContent = React.createElement("div", {
-            className: "picker",
-            onClick: (event: MouseEvent) => {event.stopPropagation();}
-        }, [
-            ...[Color.Kule, Color.Listy, Color.Srdce, Color.Zaludy].map((color) => React.createElement(
-                "img",
-                {
-                    key: color,
-                    className: "clickable halo",
-                    onClick: () => this.props.callback(color),
-                    src: colors[color],
-                    draggable: false
-                }
-            ))
-        ])  ;
-        return React.createElement("div", {
-            className: "dialog", onClick: (event: MouseEvent) => {
-                event.stopPropagation();
-                this.setState({picker: null});
-            }
-        }, dialogContent);
-    }
-}
 
 export class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
     constructor(props: {ws: any, thisName: string}) {

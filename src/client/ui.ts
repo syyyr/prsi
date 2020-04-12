@@ -1,14 +1,14 @@
 import * as React from "react";
 import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, FrontendStats} from "../common/communication";
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction, Place, changeActionToColor} from "../common/types";
-import {CARDS_GENITIVE} from "./card-strings"
+import {CARDS_GENITIVE} from "./card-strings";
 import images from "./card-images";
 import colors from "./color-images";
 import {audio} from "./sounds";
 
-class Title extends React.Component<Renderer> {
+class Title extends React.Component {
     render(): React.ReactNode {
-        return this.props.renderer();
+        return React.createElement("img", {className: "logo align-center playfield-logo"});
     }
 }
 
@@ -297,10 +297,6 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
         return React.createElement(CardComponent, {key: options?.key, card, options});
     }
 
-    renderTitle(): React.ReactNode {
-        return React.createElement("img", {className: "logo align-center playfield-logo"});
-    }
-
     constructor(props: {ws: any, thisName: string}) {
         super(props);
         // FIXME: look for a better solution for picker (don't save color of the played guy)
@@ -469,7 +465,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
 
     render() {
         const elems = [];
-        elems.push(React.createElement(Title, {key: "title", renderer: this.renderTitle}, null));
+        elems.push(React.createElement(Title, {key: "title"}, null));
         if (typeof this.state.gameState === "undefined") {
             return elems;
         }

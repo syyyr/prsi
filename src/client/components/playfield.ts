@@ -1,7 +1,7 @@
 import * as React from "react";
 import DrawButton from "./drawbutton";
 import {Card, Color, Value, ActionType, changeActionToColor} from "../../common/types";
-import {CardTooltip} from "../strings";
+import {CardTooltip, drawButtonString} from "../strings";
 import CardComponent from "./card";
 
 class Hand extends React.Component<{hand: Card[], playCard: (card: Card) => void, openPicker: (svrsekColor: Color) => void}> {

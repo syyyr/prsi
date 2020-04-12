@@ -41,12 +41,6 @@ class StartButton extends React.Component<{onClick: () => void}> {
     }
 }
 
-class DrawButton extends React.Component<Renderer> {
-    render() {
-        return this.props.renderer();
-    }
-}
-
 const renderPlace = (place: Place): React.ReactNode => {
     return React.createElement("div", null, (() => {
         switch (place) {
@@ -258,26 +252,22 @@ class ColorPicker extends React.Component<{callback: (color: Color) => void}> {
     }
 }
 
-export class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
-    renderCard(card: Card, options?: CardOptions): React.ReactNode {
-        return React.createElement(CardComponent, {key: options?.key, card, options});
-    }
+const drawButtonString = {
+    [ActionType.DrawTwo]: "Líznout 2",
+    [ActionType.DrawFour]: "Líznout 4",
+    [ActionType.DrawSix]: "Líznout 6",
+    [ActionType.DrawEight]: "Líznout 8",
+    [ActionType.SkipTurn]: "Stojím",
+    [ActionType.Shuffle]: "Zamíchat",
+};
 
-    readonly drawButtonString = {
-        [ActionType.DrawTwo]: "Líznout 2",
-        [ActionType.DrawFour]: "Líznout 4",
-        [ActionType.DrawSix]: "Líznout 6",
-        [ActionType.DrawEight]: "Líznout 8",
-        [ActionType.SkipTurn]: "Stojím",
-        [ActionType.Shuffle]: "Zamíchat",
-    };
-
-    renderDrawButton(wantedAction: ActionType, whoseTurn: string): React.ReactNode {
+class DrawButton extends React.Component<{callback: () => void, wantedAction: ActionType, shouldDrawTooltip: boolean}> {
+    render(): React.ReactNode {
         const tooltip = (() => {
-            if (this.props.thisName !== whoseTurn && wantedAction !== ActionType.Shuffle) {
+            if (!this.props.shouldDrawTooltip) {
                 return;
             }
-            switch (wantedAction) {
+            switch (this.props.wantedAction) {
                 case ActionType.Play:
                 case ActionType.PlayKule:
                 case ActionType.PlayListy:
@@ -285,8 +275,8 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 case ActionType.PlayZaludy:
                     return;
             }
-            return React.createElement("div", {className: "absolute centerInsideDiv tooltip"}, this.drawButtonString[wantedAction]);
-            })();
+            return React.createElement("div", {className: "absolute centerInsideDiv tooltip"}, drawButtonString[this.props.wantedAction]);
+        })();
         return React.createElement("div", {className: "relative drawButton-width"}, [
             tooltip,
             React.createElement(
@@ -294,12 +284,17 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 {
                     key: "drawButton",
                     className: "cardback clickable halo playfield-height",
-                    onClick: () => {
-                        this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)));
-                    },
+                    onClick: this.props.callback
                 }
             )
         ]);
+
+    }
+}
+
+export class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
+    renderCard(card: Card, options?: CardOptions): React.ReactNode {
+        return React.createElement(CardComponent, {key: options?.key, card, options});
     }
 
     renderTitle(): React.ReactNode {
@@ -505,7 +500,9 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
 
         if (typeof this.state.gameState.gameInfo.hand !== "undefined") {
             topCard.push(React.createElement(DrawButton, {
-                renderer: () => this.renderDrawButton(this.state.gameState!.gameInfo!.wantedAction, this.state.gameState!.gameInfo!.who)
+                callback: () => this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw))),
+                wantedAction: this.state.gameState.gameInfo.wantedAction,
+                shouldDrawTooltip: this.props.thisName !== this.state.gameState.gameInfo.who && this.state.gameState.gameInfo.wantedAction !== ActionType.Shuffle
             }));
         }
 

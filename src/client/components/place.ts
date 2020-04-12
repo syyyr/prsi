@@ -6,17 +6,17 @@ export default class extends React.Component<{place: Place}> {
         return React.createElement("div", null, (() => {
             switch (this.props.place) {
                 case Place.First:
-                    return "První";
+                    return "1️⃣";
                 case Place.Second:
-                    return "Druhej";
+                    return "2️⃣";
                 case Place.Third:
-                    return "Třetí";
+                    return "3️⃣";
                 case Place.Fourth:
-                    return "Čtvrtej";
+                    return "4️⃣";
                 case Place.Fifth:
-                    return "Pátej";
+                    return "5️⃣";
                 case Place.Sixth:
-                    return "Šeštej";
+                    return "6️⃣";
             }
         })());
     }

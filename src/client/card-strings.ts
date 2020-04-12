@@ -1,4 +1,4 @@
-import {Color, Value} from "./common/types"
+import {Color, Value} from "../common/types"
 
 export const CARDS_GENITIVE: {[key in keyof typeof Color]: {[key2 in keyof typeof Value]: string}} = {
     [Color.Kule]: {

@@ -1,4 +1,4 @@
-import {Prsi} from "./backend"
+import {Prsi} from "./server/backend"
 import {Color, PlayType, PlayDetails, Status, PlayerAction} from "./common/types"
 
 const prsi = new Prsi();

@@ -3,9 +3,9 @@ import lowDb from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import path from "path";
 import ws from "express-ws";
-import Prsi from "./backend";
-import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats} from "./common/communication";
-import {ActionType, Status, PlayerAction, Place} from "./common/types";
+import Prsi from "../server/backend";
+import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats} from "../common/communication";
+import {ActionType, Status, PlayerAction, Place} from "../common/types";
 
 class impl_Stats {
     acquiredPts: number = 0;
@@ -168,7 +168,8 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
             logger(msg);
         }
     };
-    wsEnabledRouter.use(prefix, express.static(path.join(__dirname + "/../dist"), {
+
+    wsEnabledRouter.use(prefix, express.static(path.join(__dirname, "../../dist"), {
         dotfiles: "ignore",
     }));
 

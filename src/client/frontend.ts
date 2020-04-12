@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import {PlayerRegistration} from "./common/communication";
+import {PlayerRegistration} from "../common/communication";
 import {UI} from "./ui";
 
 let playerName: null | string = null;

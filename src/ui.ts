@@ -1,6 +1,6 @@
 import * as React from "react";
-import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, FrontendStats} from "./communication";
-import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction, Place, changeActionToColor} from "./types";
+import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, FrontendStats} from "./common/communication";
+import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction, Place, changeActionToColor} from "./common/types";
 import {CARDS_GENITIVE} from "./card-strings"
 import images from "./card-images";
 import colors from "./color-images";

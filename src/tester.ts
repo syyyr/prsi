@@ -1,5 +1,5 @@
 import {Prsi} from "./backend"
-import {Color, PlayType, PlayDetails, Status, PlayerAction} from "./types"
+import {Color, PlayType, PlayDetails, Status, PlayerAction} from "./common/types"
 
 const prsi = new Prsi();
 prsi.registerPlayer("Typek");

@@ -4,8 +4,8 @@ import FileSync from "lowdb/adapters/FileSync";
 import path from "path";
 import ws from "express-ws";
 import Prsi from "./backend";
-import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats} from "./communication";
-import {ActionType, Status, PlayerAction, Place} from "./types";
+import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats} from "./common/communication";
+import {ActionType, Status, PlayerAction, Place} from "./common/types";
 
 class impl_Stats {
     acquiredPts: number = 0;

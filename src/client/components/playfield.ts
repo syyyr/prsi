@@ -1,4 +1,5 @@
 import * as React from "react";
+import DrawButton from "./drawbutton";
 import images from "./card-images";
 import colors from "./color-images";
 import {Card, Color, Value, ActionType, changeActionToColor} from "../../common/types";
@@ -85,46 +86,6 @@ const isDrawX = (action: ActionType) => {
         return true;
     default:
         return false;
-    }
-}
-
-const drawButtonString = {
-    [ActionType.DrawTwo]: "Líznout 2",
-    [ActionType.DrawFour]: "Líznout 4",
-    [ActionType.DrawSix]: "Líznout 6",
-    [ActionType.DrawEight]: "Líznout 8",
-    [ActionType.SkipTurn]: "Stojím",
-    [ActionType.Shuffle]: "Zamíchat",
-};
-
-class DrawButton extends React.Component<{callback: () => void, wantedAction: ActionType, shouldDrawTooltip: boolean}> {
-    render(): React.ReactNode {
-        const tooltip = (() => {
-            if (!this.props.shouldDrawTooltip) {
-                return;
-            }
-            switch (this.props.wantedAction) {
-                case ActionType.Play:
-                case ActionType.PlayKule:
-                case ActionType.PlayListy:
-                case ActionType.PlaySrdce:
-                case ActionType.PlayZaludy:
-                    return;
-            }
-            return React.createElement("div", {className: "absolute centerInsideDiv tooltip"}, drawButtonString[this.props.wantedAction]);
-        })();
-        return React.createElement("div", {className: "relative drawButton-width"}, [
-            tooltip,
-            React.createElement(
-                "img",
-                {
-                    key: "drawButton",
-                    className: "cardback clickable halo playfield-height",
-                    onClick: this.props.callback
-                }
-            )
-        ]);
-
     }
 }
 

@@ -110,6 +110,15 @@ type InstructionOverride = {
     [key in keyof typeof Status]?: {you?: string, other?: string};
 }
 
+export const drawButtonString = {
+    [ActionType.DrawTwo]: "Líznout 2",
+    [ActionType.DrawFour]: "Líznout 4",
+    [ActionType.DrawSix]: "Líznout 6",
+    [ActionType.DrawEight]: "Líznout 8",
+    [ActionType.SkipTurn]: "Stojím",
+    [ActionType.Shuffle]: "Zamíchat",
+};
+
 export const cardsGenitive: {[key in keyof typeof Color]: {[key2 in keyof typeof Value]: string}} = {
     [Color.Kule]: {
         [Value.Sedmicka]: "kulou sedmu",

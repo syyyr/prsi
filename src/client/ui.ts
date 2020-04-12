@@ -337,11 +337,6 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             "Start");
     }
 
-
-    renderPrompt(text: string): React.ReactNode {
-        return React.createElement(Prompt, {key: "prompt", instructions: text});
-    }
-
     renderHand(hand: Card[]): React.ReactNode {
         return React.createElement("div", {className: "flex-row hand-container"}, hand.map((card, index) => React.createElement(CardComponentBase, {
             key: `hand:${card.value}${card.color}`,
@@ -495,7 +490,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
         }));
 
         if (typeof this.state.gameState.gameInfo === "undefined") {
-            elems.push(this.renderPrompt("Hra nezačala."));
+            elems.push(React.createElement(Prompt, {key: "prompt", instructions: "Hra nezačala."}));
             elems.push(this.renderStats(this.state.gameState.stats));
             return elems;
         }

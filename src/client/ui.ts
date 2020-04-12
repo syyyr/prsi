@@ -1,9 +1,10 @@
 import * as React from "react";
 import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput} from "../common/communication";
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction} from "../common/types";
-import PlayField from "./components/playfield"
-import PlayerBox from "./components/playerbox"
-import Stats from "./components/stats"
+import PlayField from "./components/playfield";
+import PlayerBox from "./components/playerbox";
+import StartButton from "./components/startbutton";
+import Stats from "./components/stats";
 import {CARDS_GENITIVE} from "./card-strings";
 import colors from "./components/color-images";
 import {audio} from "./sounds";
@@ -21,17 +22,6 @@ class Prompt extends React.Component<{instructions: string}> {
             {key: "prompt", className: "flex-row align-center"},
             this.props.instructions
         );
-    }
-}
-
-class StartButton extends React.Component<{callback: () => void}> {
-    render() {
-        return React.createElement(
-            "button",
-            {
-                onClick: this.props.callback
-            },
-            "Start");
     }
 }
 

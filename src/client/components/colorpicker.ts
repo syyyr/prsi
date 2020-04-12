@@ -2,6 +2,15 @@ import * as React from "react";
 import {Color} from "../../common/types";
 import colors from "./color-images";
 
+class Dialog extends React.Component<{onClick: (event: MouseEvent) => void}> {
+    render(): React.ReactNode {
+        return React.createElement("div", {
+            className: "dialog",
+            onClick: this.props.onClick
+        }, this.props.children);
+    }
+}
+
 export default class ColorPicker extends React.Component<{callback: (color: Color) => void}> {
     render(): React.ReactNode {
         const dialogContent = React.createElement("div", {
@@ -19,8 +28,8 @@ export default class ColorPicker extends React.Component<{callback: (color: Colo
                 }
             ))
         ])  ;
-        return React.createElement("div", {
-            className: "dialog", onClick: (event: MouseEvent) => {
+        return React.createElement(Dialog, {
+            onClick: (event: MouseEvent) => {
                 event.stopPropagation();
                 this.setState({picker: null});
             }

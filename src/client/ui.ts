@@ -5,15 +5,10 @@ import PlayField from "./components/playfield";
 import PlayerBox from "./components/playerbox";
 import StartButton from "./components/startbutton";
 import Stats from "./components/stats";
+import Title from "./components/title";
 import {CARDS_GENITIVE} from "./card-strings";
 import colors from "./components/color-images";
 import {audio} from "./sounds";
-
-class Title extends React.Component {
-    render(): React.ReactNode {
-        return React.createElement("img", {className: "logo align-center playfield-logo"});
-    }
-}
 
 class Prompt extends React.Component<{instructions: string}> {
     render() {

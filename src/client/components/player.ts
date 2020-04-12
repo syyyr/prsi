@@ -27,7 +27,7 @@ interface PlayerProps {
     place?: Place;
 }
 
-export default class extends React.Component<PlayerProps> {
+export default class Player extends React.Component<PlayerProps> {
     render(): React.ReactNode {
         const playerInfoRender =
             typeof this.props.cards !== "undefined" ? React.createElement(PlayerCards, {cards: this.props.cards})

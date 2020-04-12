@@ -1,7 +1,7 @@
 import * as React from "react";
 import {FrontendStats} from "../../common/communication";
 
-export default class extends React.Component<{stats: {[key in string]: FrontendStats}}> {
+export default class Stats extends React.Component<{stats: {[key in string]: FrontendStats}}> {
     render(): React.ReactNode {
         return React.createElement("table", {className: "statsTable"},
             [

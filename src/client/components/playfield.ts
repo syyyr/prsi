@@ -146,7 +146,7 @@ interface PlayFieldProps {
     hand?: Card[];
 }
 
-export default class extends React.Component<PlayFieldProps> {
+export default class PlayField extends React.Component<PlayFieldProps> {
     render(): React.ReactNode {
         const playfield = [];
         const topCard = [];

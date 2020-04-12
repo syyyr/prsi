@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export default class extends React.Component<{startGame: () => void}> {
+export default class StartButton extends React.Component<{startGame: () => void}> {
     render() {
         return React.createElement(
             "button",

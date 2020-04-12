@@ -1,21 +1,21 @@
 import * as React from "react";
-import {Place} from "../../common/types";
+import {Place as PlaceType} from "../../common/types";
 
-export default class extends React.Component<{place: Place}> {
+export default class Place extends React.Component<{place: PlaceType}> {
     render() {
         return React.createElement("div", null, (() => {
             switch (this.props.place) {
-                case Place.First:
+                case PlaceType.First:
                     return "1️⃣";
-                case Place.Second:
+                case PlaceType.Second:
                     return "2️⃣";
-                case Place.Third:
+                case PlaceType.Third:
                     return "3️⃣";
-                case Place.Fourth:
+                case PlaceType.Fourth:
                     return "4️⃣";
-                case Place.Fifth:
+                case PlaceType.Fifth:
                     return "5️⃣";
-                case Place.Sixth:
+                case PlaceType.Sixth:
                     return "6️⃣";
             }
         })());

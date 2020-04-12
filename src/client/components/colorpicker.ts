@@ -2,7 +2,7 @@ import * as React from "react";
 import {Color} from "../../common/types";
 import colors from "./color-images";
 
-export default class extends React.Component<{callback: (color: Color) => void}> {
+export default class ColorPicker extends React.Component<{callback: (color: Color) => void}> {
     render(): React.ReactNode {
         const dialogContent = React.createElement("div", {
             className: "picker",

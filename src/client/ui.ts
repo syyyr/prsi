@@ -8,7 +8,7 @@ import Prompt from "./components/prompt";
 import StartButton from "./components/startbutton";
 import Stats from "./components/stats";
 import Title from "./components/title";
-import {CARDS_GENITIVE} from "./card-strings";
+import {CARDS_GENITIVE} from "./strings";
 import {audio} from "./sounds";
 
 interface YouOther {

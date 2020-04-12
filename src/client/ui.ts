@@ -1,8 +1,9 @@
 import * as React from "react";
-import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, FrontendStats} from "../common/communication";
+import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput} from "../common/communication";
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction} from "../common/types";
 import PlayField from "./components/playfield"
 import PlayerBox from "./components/playerbox"
+import Stats from "./components/stats"
 import {CARDS_GENITIVE} from "./card-strings";
 import colors from "./components/color-images";
 import {audio} from "./sounds";
@@ -95,28 +96,6 @@ class ColorPicker extends React.Component<{callback: (color: Color) => void}> {
                 this.setState({picker: null});
             }
         }, dialogContent);
-    }
-}
-
-class Stats extends React.Component<{stats: {[key in string]: FrontendStats}}> {
-    render(): React.ReactNode {
-        // FIXME: fix table structure
-        return React.createElement("table", {className: "statsTable"},
-            [
-                React.createElement("thead", {className: "statsHeader"}, [
-                    React.createElement("th", {colSpan: "3"}, "Statistika"),
-                    React.createElement("tr", null, [
-                        React.createElement("td", {className: "statsDesc"}, "Jméno"),
-                        React.createElement("td", {className: "statsDesc"}, "Úspěšnost"),
-                        React.createElement("td", {className: "statsDesc"}, "Odehráno")
-                    ]
-                )]),
-                ...Object.entries(this.props.stats).map(([player, stats]) => React.createElement("tr", null, [
-                    React.createElement("td", null, player),
-                    React.createElement("td", null, `${Math.round(stats.successRate * 100)} %`),
-                    React.createElement("td", null, stats.gamesPlayed),
-                ]))
-            ]);
     }
 }
 

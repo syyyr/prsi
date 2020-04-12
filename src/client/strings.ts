@@ -161,3 +161,8 @@ export const cardsGenitive: {[key in keyof typeof Color]: {[key2 in keyof typeof
         [Value.Eso]: "srdcový eso",
     }
 }
+
+export enum CardTooltip {
+    NoSkip = "(nestojíš)",
+    NoDraw = "(nelížeš)"
+}

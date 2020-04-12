@@ -29,12 +29,6 @@ class CardComponentBase extends React.Component<Renderer> {
     }
 }
 
-class ColorPicker extends React.Component<Renderer> {
-    render() {
-        return this.props.renderer();
-    }
-}
-
 class StartButton extends React.Component<{onClick: () => void}> {
     render() {
         return React.createElement(
@@ -238,11 +232,8 @@ class CardComponent extends React.Component<{card: Card, options?: CardOptions}>
     }
 }
 
-export class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
-    renderCard(card: Card, options?: CardOptions): React.ReactNode {
-        return React.createElement(CardComponent, {key: options?.key, card, options});
-    }
-    renderPicker(onClick: (color: Color) => void): React.ReactNode {
+class ColorPicker extends React.Component<{callback: (color: Color) => void}> {
+    render(): React.ReactNode {
         const dialogContent = React.createElement("div", {
             className: "picker",
             onClick: (event: MouseEvent) => {event.stopPropagation();}
@@ -252,7 +243,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 {
                     key: color,
                     className: "clickable halo",
-                    onClick: () => onClick(color),
+                    onClick: () => this.props.callback(color),
                     src: colors[color],
                     draggable: false
                 }
@@ -264,6 +255,12 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 this.setState({picker: null});
             }
         }, dialogContent);
+    }
+}
+
+export class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
+    renderCard(card: Card, options?: CardOptions): React.ReactNode {
+        return React.createElement(CardComponent, {key: options?.key, card, options});
     }
 
     readonly drawButtonString = {
@@ -311,6 +308,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
 
     constructor(props: {ws: any, thisName: string}) {
         super(props);
+        // FIXME: look for a better solution for picker (don't save color of the played guy)
         this.state = {picker: null};
         this.props.ws.onmessage = (message: any) => {
             const parsed = JSON.parse(message.data);
@@ -554,10 +552,10 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 ColorPicker,
                 {
                     key: "picker",
-                    renderer: () => this.renderPicker((color: Color) => {
+                    callback: () => (color: Color) => {
                         this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(new Card(this.state.picker!, Value.Svrsek), color))));
                         this.setState({picker: null});
-                    })
+                    }
                 }
             ));
         }

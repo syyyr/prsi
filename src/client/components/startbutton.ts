@@ -1,11 +1,11 @@
 import * as React from "react";
 
-export default class extends React.Component<{callback: () => void}> {
+export default class extends React.Component<{startGame: () => void}> {
     render() {
         return React.createElement(
             "button",
             {
-                onClick: this.props.callback
+                onClick: this.props.startGame
             },
             "Start");
     }

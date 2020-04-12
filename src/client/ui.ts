@@ -77,7 +77,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             return elems;
         }
         if (this.state.gameState.gameStarted === "no" && this.state.gameState.players.length >= 2) {
-            elems.push(React.createElement(StartButton, {key: "startButton", callback: () => startGame(this.props.ws)}));
+            elems.push(React.createElement(StartButton, {key: "startButton", startGame: () => startGame(this.props.ws)}));
         }
         elems.push(React.createElement(PlayerBox, {
             thisName: this.props.thisName,

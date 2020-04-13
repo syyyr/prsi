@@ -5,7 +5,7 @@ export default class Stats extends React.Component<{stats: {[key in string]: Fro
     render(): React.ReactNode {
         return React.createElement("table", {className: "statsTable"},
             [
-                React.createElement("thead", {key: "statsTable"}, [
+                React.createElement("thead", {key: "statsTable", className: "statsHeader"}, [
                     React.createElement("tr", {key: "statsHeader"},
                         React.createElement("th", {colSpan: "3"}, "Statistika")
                     ),
@@ -15,7 +15,7 @@ export default class Stats extends React.Component<{stats: {[key in string]: Fro
                         React.createElement("td", {key: "statsDescPlayed", className: "statsDesc"}, "Odehráno")
                     ])
                 ]),
-                React.createElement("tbody", {key: "statsMain", className: "statsHeader"}, [
+                React.createElement("tbody", {key: "statsMain"}, [
                     ...Object.entries(this.props.stats).map(([player, stats]) => React.createElement("tr", {key: `stats:${player}`}, [
                         React.createElement("td", {key: `stats:${player}:name`}, player),
                         React.createElement("td", {key: `stats:${player}:success`}, `${Math.round(stats.successRate * 100)} %`),

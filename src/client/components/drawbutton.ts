@@ -1,4 +1,5 @@
 import * as React from "react";
+import image from "./cardback-image";
 import {drawButtonString} from "../strings"
 import {ActionType} from "../../common/types";
 
@@ -36,7 +37,8 @@ export default class DrawButton extends React.Component<{callback: () => void, w
                 "img",
                 {
                     key: "drawButton",
-                    className: "cardback clickable halo playfield-height",
+                    src: image,
+                    className: "clickable halo playfield-height",
                     onClick: this.props.callback
                 }
             )

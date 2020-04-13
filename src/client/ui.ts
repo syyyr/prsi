@@ -68,7 +68,8 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
             key: "playerbox",
             thisName: this.props.thisName,
             players: this.state.gameState.players,
-            playerInfo: this.state.gameState.gameInfo?.playerInfo
+            playerInfo: this.state.gameState.gameInfo?.playerInfo,
+            whoseTurn: this.state.gameState.gameInfo?.who
         }));
 
         if (typeof this.state.gameState.gameInfo === "undefined") {

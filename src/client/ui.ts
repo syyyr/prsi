@@ -29,6 +29,15 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             if (isFrontendState(parsed)) {
                 console.log("new state ", parsed);
                 this.setState({gameState: parsed, picker: null});
+
+                if (parsed.gameInfo?.status === Status.Ok) {
+                    switch (parsed.gameInfo.lastPlay?.playerAction) {
+                        case LastAction.DrawFour:
+                        case LastAction.DrawSix:
+                        case LastAction.DrawEight:
+                            new Audio(audio[parsed.gameInfo.lastPlay.playerAction]).play();
+                    }
+                }
             }
         };
     }
@@ -130,15 +139,6 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                     }
                 }
             ));
-        }
-
-        if (this.state.gameState.gameInfo.status === Status.Ok) {
-            switch (this.state.gameState.gameInfo.lastPlay?.playerAction) {
-                case LastAction.DrawFour:
-                case LastAction.DrawSix:
-                case LastAction.DrawEight:
-                    new Audio(audio[this.state.gameState.gameInfo.lastPlay.playerAction]).play();
-            }
         }
 
         return elems;

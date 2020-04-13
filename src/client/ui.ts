@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FrontendState, FrontendStats} from "../common/communication";
+import {FrontendState, FrontendStats, ErrorResponse} from "../common/communication";
 import {Card, Value, Color, ActionType, Status, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
 import Game from "./components/game";
@@ -28,6 +28,10 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
                 }
             }
         };
+        this.props.io.onError = (err: ErrorResponse) => {
+            // FIXME: allow some sort of a recovery
+            window.alert(err.error);
+        }
     }
 
     private onTurn(): boolean {

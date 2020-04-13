@@ -4,6 +4,7 @@ import {Card, Color, Value, ActionType, changeActionToColor} from "../../common/
 import Hand from "./hand";
 import PlayedCards from "./playedcards";
 import {CardTooltip} from "../strings";
+import Logo from "./logo";
 
 const isColorChange = (action: ActionType) => {
     switch (action) {
@@ -103,7 +104,7 @@ export default class PlayField extends React.Component<PlayFieldProps> {
             }));
         }
 
-        playfield.push(React.createElement("img", {className: "playfield-logo"}, null));
+        playfield.push(React.createElement(Logo, {center: false}));
         return React.createElement("div", {className: `playfield${this.props.onTurn ? " bigRedHalo" : ""}`}, playfield);
     }
 }

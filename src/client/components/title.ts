@@ -1,7 +1,8 @@
 import * as React from "react";
+import Logo from "./logo";
 
 export default class Title extends React.Component {
     render(): React.ReactNode {
-        return React.createElement("img", {className: "logo align-center playfield-logo"});
+        return React.createElement(Logo, {center: true});
     }
 }

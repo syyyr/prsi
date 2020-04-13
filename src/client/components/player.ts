@@ -37,7 +37,7 @@ export default class Player extends React.Component<PlayerProps> {
         return React.createElement("div", {className: "flex-column player-container"}, [
             React.createElement(PlayerDetails, {
                 key: `${this.props.name}:detail`,
-                name: this.props.onTurn ? `${this.props.name} (ty)` : this.props.name,
+                name: this.props.name,
                 shouldEmphasize: this.props.onTurn
             }),
             playerInfoRender

@@ -25,7 +25,7 @@ class ColorComponent extends React.Component<{color: Color, pickColor: (color: C
     }
 }
 
-export default class ColorPicker extends React.Component<{pickColor: (color: Color) => void}> {
+export default class ColorPicker extends React.Component<{pickColor: (color: Color) => void, closePicker: (event: MouseEvent) => void}> {
     render(): React.ReactNode {
         const dialogContent = React.createElement("div", {
             className: "picker",
@@ -40,10 +40,7 @@ export default class ColorPicker extends React.Component<{pickColor: (color: Col
             )
         ]);
         return React.createElement(Dialog, {
-            onClick: (event: MouseEvent) => {
-                event.stopPropagation();
-                this.setState({picker: null});
-            }
+            onClick: this.props.closePicker
         }, dialogContent);
     }
 }

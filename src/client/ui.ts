@@ -123,6 +123,10 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                     pickColor: (color: Color) => {
                         this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(new Card(this.state.picker!, Value.Svrsek), color))));
                         this.setState({picker: null});
+                    },
+                    closePicker: (event: MouseEvent) => {
+                        event.stopPropagation();
+                        this.setState({picker: null});
                     }
                 }
             ));

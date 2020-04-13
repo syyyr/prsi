@@ -1,9 +1,9 @@
 import * as React from "react";
 import DrawButton from "./drawbutton";
 import {Card, Color, Value, ActionType, changeActionToColor} from "../../common/types";
-import {CardTooltip} from "../strings";
-import CardComponent from "./card";
 import Hand from "./hand";
+import PlayedCards from "./playedcards";
+import {CardTooltip} from "../strings";
 
 const isColorChange = (action: ActionType) => {
     switch (action) {
@@ -39,14 +39,34 @@ interface PlayFieldProps {
     hand?: Card[];
 }
 
-export default class PlayField extends React.Component<PlayFieldProps> {
+interface CoreGameProps {
+    onTurn: boolean;
+    topCards: Card[];
+    wantedAction: ActionType;
+    shouldDrawDrawButton: boolean;
+    drawCard: () => void;
+}
+
+class CoreGame extends React.Component<CoreGameProps> {
+    private genTooltip() {
+        const card = this.props.topCards[this.props.topCards.length - 1];
+        if (!this.props.onTurn) {
+            return;
+        }
+        if (card.value === Value.Eso && this.props.wantedAction !== ActionType.SkipTurn) {
+            return CardTooltip.NoSkip;
+        }
+        if (card.value === Value.Sedmicka && !isDrawX(this.props.wantedAction)) {
+            return CardTooltip.NoDraw;
+        }
+    }
+
     render(): React.ReactNode {
-        const playfield = [];
-        const topCard = [];
+        const res = [];
 
         // FIXME: look at this
-        if (typeof this.props.hand !== "undefined") {
-            topCard.push(React.createElement(DrawButton, {
+        if (this.props.shouldDrawDrawButton) {
+            res.push(React.createElement(DrawButton, {
                 callback: this.props.drawCard,
                 wantedAction: this.props.wantedAction,
                 // FIXME: Fix this, somehow
@@ -54,35 +74,27 @@ export default class PlayField extends React.Component<PlayFieldProps> {
             }));
         }
 
-        topCard.push(React.createElement("div", {className: "relative"}, this.props.topCards.map((card, index, array) => {
-            const firstCardOptions: {isBottomCard?: "bottom"} = {
-                isBottomCard: index === 0 ? "bottom" : undefined
-            };
-            const lastCardOptions = index === array.length - 1 ? {
-                colorChange: isColorChange(this.props.wantedAction) ? changeActionToColor(this.props.wantedAction) : undefined,
-                tooltip: (() => {
-                    // FIXME: Refactor to method
-                    if (!this.props.onTurn) {
-                        return;
-                    }
-                    if (card.value === Value.Eso && this.props.wantedAction !== ActionType.SkipTurn) {
-                        return CardTooltip.NoSkip;
-                    }
-                    if (card.value === Value.Sedmicka && !isDrawX(this.props.wantedAction)) {
-                        return CardTooltip.NoDraw;
-                    }
-                })()
-            } : {};
+        res.push(React.createElement(PlayedCards, {
+            cards: this.props.topCards,
+            colorChange: isColorChange(this.props.wantedAction) ? changeActionToColor(this.props.wantedAction) : undefined,
+            tooltip: this.genTooltip()
+        }));
+        return React.createElement("div", {className: "topCard-container flex-row"}, res);
+    }
+}
 
+export default class PlayField extends React.Component<PlayFieldProps> {
 
-            return React.createElement(CardComponent, {
-                card: card,
-                options: {
-                ...firstCardOptions,
-                ...lastCardOptions
-            }});
-        })));
-        playfield.push(React.createElement("div", {className: "flex-row topCard-container"}, topCard));
+    render(): React.ReactNode {
+        const playfield = [];
+        playfield.push(React.createElement(CoreGame, {
+            onTurn: this.props.onTurn,
+            topCards: this.props.topCards,
+            wantedAction: this.props.wantedAction,
+            shouldDrawDrawButton: typeof this.props.hand !== "undefined",
+            drawCard: this.props.drawCard
+        }));
+
         if (typeof this.props.hand !== "undefined") {
             playfield.push(React.createElement(Hand, {
                 hand: this.props.hand,

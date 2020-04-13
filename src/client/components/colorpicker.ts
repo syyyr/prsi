@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Color} from "../../common/types";
-import colors from "./color-images";
+import colors from "../images/color-images";
 
 class Dialog extends React.Component<{onClick: (event: MouseEvent) => void}> {
     render(): React.ReactNode {

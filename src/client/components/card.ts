@@ -1,8 +1,8 @@
 import * as React from "react";
 import {Card as CardType, Color, Transformation} from "../../common/types";
 import {CardTooltip as CardTooltipString} from "../strings";
-import images from "./card-images";
-import colors from "./color-images";
+import images from "../images/card-images";
+import colors from "../images/color-images";
 
 interface CardProps {
     card: CardType;

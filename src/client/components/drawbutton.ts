@@ -1,5 +1,5 @@
 import * as React from "react";
-import image from "./cardback-image";
+import image from "../images/cardback-image";
 import {drawButtonString} from "../strings"
 import {ActionType} from "../../common/types";
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import image from "./cardback-image";
+import image from "../images/cardback-image";
 
 export default class CardBack extends React.Component {
     render(): React.ReactNode {

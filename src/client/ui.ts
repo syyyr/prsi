@@ -1,5 +1,5 @@
 import * as React from "react";
-import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput} from "../common/communication";
+import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, FrontendStats} from "../common/communication";
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
 import Game from "./components/game";
@@ -81,6 +81,10 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
         }
     }
 
+    createStats(stats: { [x: string]: FrontendStats; }): React.ReactNode {
+        return React.createElement(Stats, {key: "stats", stats});
+    }
+
     render(): React.ReactNode {
         const elems = [];
         elems.push(React.createElement(Title, {key: "title"}, null));
@@ -99,8 +103,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
 
         if (typeof this.state.gameState.gameInfo === "undefined") {
             elems.push(React.createElement(Prompt, {key: "prompt", instructions: "Hra nezačala."}));
-            // FIXME: standardize this somehow (don't have two creators of Stats)
-            elems.push(React.createElement(Stats, {key: "stats", stats: this.state.gameState.stats}));
+            elems.push(this.createStats(this.state.gameState.stats));
             return elems;
         }
 
@@ -124,7 +127,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             openPicker: this.onTurn() && this.canPlaySvrsek() ? (svrsekColor: Color) => this.setState({picker: svrsekColor}) : () => {},
             hand: this.state.gameState.gameInfo.hand
         }));
-        elems.push(React.createElement(Stats, {key: "stats", stats: this.state.gameState.stats}));
+        elems.push(this.createStats(this.state.gameState.stats));
 
         if (this.state.picker !== null) {
             elems.push(React.createElement(

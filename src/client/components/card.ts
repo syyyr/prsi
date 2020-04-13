@@ -1,11 +1,12 @@
 import * as React from "react";
-import {Card as CardType, Color} from "../../common/types";
+import {Card as CardType, Color, Transformation} from "../../common/types";
 import {CardTooltip as CardTooltipString} from "../strings";
 import images from "./card-images";
 import colors from "./color-images";
 
 interface CardProps {
     card: CardType;
+    transform?: Transformation;
     isBottomCard?: "bottom";
     colorChange?: Color;
     halo?: "halo";
@@ -32,13 +33,25 @@ class ColorChange extends React.Component<{color: Color}> {
     }
 }
 
-class CardImage extends React.Component<{onClick?: () => void, card: CardType, halo: boolean}> {
+interface CardImageProps {
+    onClick?: () => void;
+    card: CardType;
+    halo: boolean;
+    transform?: Transformation;
+}
+
+class CardImage extends React.Component<CardImageProps> {
     render(): React.ReactNode {
         const imgOptions = {
             onClick: this.props.onClick,
             className: `playfield-height${typeof this.props?.onClick !== "undefined" ? " clickable" : ""}${this.props.halo ? " halo" : ""}`,
             src: images[this.props.card.color][this.props.card.value],
             draggable: false,
+            style: {
+                transform: typeof this.props.transform !== "undefined" ?
+                `rotate(${this.props.transform.rotation}deg) translateX(${this.props.transform.translateX}px) translateY(${this.props.transform.translateY}px)`
+                : undefined
+            }
         }
         return React.createElement("img", {key: "card", ...imgOptions});
     }
@@ -50,7 +63,8 @@ export default class Card extends React.Component<CardProps> {
         children.push(React.createElement(CardImage, {
             onClick: this.props.onClick,
             card: this.props.card,
-            halo: this.props.halo === "halo"
+            halo: this.props.halo === "halo",
+            transform: this.props.transform
         }));
         if (typeof this.props?.colorChange !== "undefined") {
             children.push(React.createElement(ColorChange, {color: this.props.colorChange}));

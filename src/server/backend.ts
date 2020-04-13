@@ -1,4 +1,4 @@
-import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value, PlayerAction, LastPlay, LastAction, Place, changeActionToColor} from "../common/types"
+import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value, PlayerAction, LastPlay, LastAction, Place, changeActionToColor, sameCards} from "../common/types"
 
 const sortedDeck = [
     new Card(Color.Zaludy, Value.Sedmicka),
@@ -57,8 +57,6 @@ class PlayerState {
         this.name = name;
     }
 }
-
-const sameCards = (a: Card, b: Card) => a.color === b.color && a.value === b.value;
 
 const compatibleCards = (a: Card, b: Card) => a.color === b.color || a.value === b.value;
 

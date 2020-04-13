@@ -29,6 +29,19 @@ export class Card {
     }
 }
 
+export class Transformation {
+    rotation: number;
+    translateX: number;
+    translateY: number;
+    constructor(rotation: number, translateX: number, translateY: number) {
+        this.rotation = rotation;
+        this.translateX = translateX;
+        this.translateY = translateY;
+    }
+}
+
+export const sameCards = (a: Card, b: Card) => a.color === b.color && a.value === b.value;
+
 export enum Status {
     Ok = "Ok",
     ActionMismatch = "ActionMismatch",

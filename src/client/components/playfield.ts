@@ -78,7 +78,7 @@ class CoreGame extends React.Component<CoreGameProps> {
         }
 
         res.push(React.createElement(PlayedCards, {
-            key: "playedCards", // TODO: think of a better key
+            key: "topCards",
             cards: this.props.topCards,
             colorChange: isColorChange(this.props.wantedAction) ? changeActionToColor(this.props.wantedAction) : undefined,
             tooltip: this.genTooltip()

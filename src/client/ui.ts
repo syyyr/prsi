@@ -11,7 +11,9 @@ import Title from "./components/title";
 import {cardsGenitive, instructionStrings, lastPlayStrings, colorStrings, values} from "./strings";
 import {audio} from "./sounds";
 
+const drawCard = (ws: any) => ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)))
 const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
+const playCard = (ws: any, card: Card) => ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card))));
 
 export class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
     constructor(props: {ws: any, thisName: string}) {
@@ -115,8 +117,8 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
         elems.push(React.createElement(Game, {
             key: "playfield",
             onTurn: this.onTurn(),
-            drawCard: () => this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw))),
-            playCard: (card: Card) => this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card)))), // FIXME: Refactor to a function
+            drawCard: () => drawCard(this.props.ws),
+            playCard: (card: Card) => playCard(this.props.ws, card),
             wantedAction: this.state.gameState.gameInfo.wantedAction,
             topCards: this.state.gameState.gameInfo.topCards,
             openPicker: this.onTurn() && this.canPlaySvrsek() ? (svrsekColor: Color) => this.setState({picker: svrsekColor}) : () => {},

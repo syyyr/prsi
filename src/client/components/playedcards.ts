@@ -11,11 +11,9 @@ export default class PlayedCards extends React.Component<{cards: Card[], colorCh
                 return React.createElement(CardComponent, {
                     key: `playedCards:${index}`, // TODO: think of better name for this
                     card: card,
-                    options: {
-                        isBottomCard: index === 0 ? "bottom" : undefined,
-                        colorChange: index === array.length - 1 ? this.props.colorChange : undefined,
-                        tooltip: index === array.length - 1 ? this.props.tooltip : undefined,
-                    }
+                    isBottomCard: index === 0 ? "bottom" : undefined,
+                    colorChange: index === array.length - 1 ? this.props.colorChange : undefined,
+                    tooltip: index === array.length - 1 ? this.props.tooltip : undefined,
                 });
             })
         );

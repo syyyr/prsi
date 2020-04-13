@@ -4,39 +4,38 @@ import {CardTooltip} from "../strings";
 import images from "./card-images";
 import colors from "./color-images";
 
-interface CardOptions {
-    isBottomCard?: "bottom",
-    colorChange?: Color,
-    halo?: "halo",
-    onClick?: () => void,
-    tooltip?: CardTooltip
+interface CardProps {
+    card: CardType;
+    isBottomCard?: "bottom";
+    colorChange?: Color;
+    halo?: "halo";
+    onClick?: () => void;
+    tooltip?: CardTooltip;
 }
 
-export default class Card extends React.Component<{card: CardType, options?: CardOptions}> {
+export default class Card extends React.Component<CardProps> {
     render(): React.ReactNode {
-        const options = this.props.options;
-        const card = this.props.card;
         const imgOptions = {
-            onClick: options?.onClick,
-            className: `playfield-height${typeof options?.onClick !== "undefined" ? " clickable" : ""}${options?.halo === "halo" ? " halo" : ""}`,
-            src: images[card.color][card.value],
+            onClick: this.props.onClick,
+            className: `playfield-height${typeof this.props?.onClick !== "undefined" ? " clickable" : ""}${this.props?.halo === "halo" ? " halo" : ""}`,
+            src: images[this.props.card.color][this.props.card.value],
             draggable: false,
         }
         const children = [];
         children.push(React.createElement("img", {key: "card", ...imgOptions}));
-        if (typeof options?.colorChange !== "undefined") {
+        if (typeof this.props?.colorChange !== "undefined") {
             // FIXME: refactor to a component
             children.push(React.createElement("img", {
                 key: "colorChange",
                 className: "absolute centerInsideDiv colorChange",
-                src: colors[options.colorChange],
+                src: colors[this.props.colorChange],
             }));
         }
-        if (typeof options?.tooltip !== "undefined") {
+        if (typeof this.props?.tooltip !== "undefined") {
             children.push(React.createElement("div", {key: "cardTooltip", className: "absolute centerInsideDiv tooltip topCardTooltip"}, "❌"));
         }
         return React.createElement("div", {
-            className: `${typeof options?.isBottomCard === "undefined" ? "centerInsideDiv absolute" : "relative"}`},
+            className: `${typeof this.props?.isBottomCard === "undefined" ? "centerInsideDiv absolute" : "relative"}`},
             children
         );
     }

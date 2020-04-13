@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Card as CardType, Color} from "../../common/types";
-import {CardTooltip} from "../strings";
+import {CardTooltip as CardTooltipString} from "../strings";
 import images from "./card-images";
 import colors from "./color-images";
 
@@ -10,7 +10,16 @@ interface CardProps {
     colorChange?: Color;
     halo?: "halo";
     onClick?: () => void;
-    tooltip?: CardTooltip;
+    tooltip?: CardTooltipString;
+}
+
+class CardTooltip extends React.Component<{tooltip: CardTooltipString}> {
+    render(): React.ReactNode {
+        return React.createElement("div", {
+            key: "cardTooltip", className: "absolute centerInsideDiv tooltip topCardTooltip"},
+            "❌"
+        );
+    }
 }
 
 export default class Card extends React.Component<CardProps> {
@@ -32,7 +41,7 @@ export default class Card extends React.Component<CardProps> {
             }));
         }
         if (typeof this.props?.tooltip !== "undefined") {
-            children.push(React.createElement("div", {key: "cardTooltip", className: "absolute centerInsideDiv tooltip topCardTooltip"}, "❌"));
+            children.push(React.createElement(CardTooltip, {tooltip: this.props.tooltip}));
         }
         return React.createElement("div", {
             className: `${typeof this.props?.isBottomCard === "undefined" ? "centerInsideDiv absolute" : "relative"}`},

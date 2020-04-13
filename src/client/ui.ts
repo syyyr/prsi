@@ -1,6 +1,6 @@
 import * as React from "react";
-import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, FrontendStats} from "../common/communication";
-import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastAction} from "../common/types";
+import {FrontendState, FrontendStats} from "../common/communication";
+import {Card, Value, Color, ActionType, Status, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
 import Game from "./components/game";
 import PlayerBox from "./components/playerbox";
@@ -10,35 +10,21 @@ import Stats from "./components/stats";
 import Title from "./components/title";
 import {audio} from "./sounds";
 import Instructions from "./components/instructions";
+import PlayerInputOutput from "./io";
 
-const drawCard = (ws: any) => ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)))
-const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
-const playCard = (ws: any, card: Card) => ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card))));
-
-export class UI extends React.Component<{ws: any, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
-    constructor(props: {ws: any, thisName: string}) {
+export class UI extends React.Component<{io: PlayerInputOutput, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
+    constructor(props: {io: any, thisName: string}) {
         super(props);
         // FIXME: look for a better solution for picker (don't save color of the played guy)
         this.state = {picker: null};
-        this.props.ws.onmessage = (message: any) => {
-            const parsed = JSON.parse(message.data);
-
-            if (isErrorResponse(parsed)) {
-                console.log(parsed.error);
-                return;
-            }
-
-            if (isFrontendState(parsed)) {
-                console.log("new state ", parsed);
-                this.setState({gameState: parsed, picker: null});
-
-                if (parsed.gameInfo?.status === Status.Ok) {
-                    switch (parsed.gameInfo.lastPlay?.playerAction) {
-                        case LastAction.DrawFour:
-                        case LastAction.DrawSix:
-                        case LastAction.DrawEight:
-                            new Audio(audio[parsed.gameInfo.lastPlay.playerAction]).play();
-                    }
+        this.props.io.onState = (state: FrontendState) => {
+            this.setState({gameState: state, picker: null});
+            if (state.gameInfo?.status === Status.Ok) {
+                switch (state.gameInfo.lastPlay?.playerAction) {
+                    case LastAction.DrawFour:
+                    case LastAction.DrawSix:
+                    case LastAction.DrawEight:
+                        new Audio(audio[state.gameInfo.lastPlay.playerAction]).play();
                 }
             }
         };
@@ -72,7 +58,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             return elems;
         }
         if (this.state.gameState.gameStarted === "no" && this.state.gameState.players.length >= 2) {
-            elems.push(React.createElement(StartButton, {key: "startButton", startGame: () => startGame(this.props.ws)}));
+            elems.push(React.createElement(StartButton, {key: "startButton", startGame: this.props.io.startGame}));
         }
         elems.push(React.createElement(PlayerBox, {
             key: "playerbox",
@@ -100,8 +86,8 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
         elems.push(React.createElement(Game, {
             key: "playfield",
             onTurn: this.onTurn(),
-            drawCard: () => drawCard(this.props.ws),
-            playCard: (card: Card) => playCard(this.props.ws, card),
+            drawCard: this.props.io.drawCard,
+            playCard: this.props.io.playCard,
             wantedAction: this.state.gameState.gameInfo.wantedAction,
             topCards: this.state.gameState.gameInfo.topCards,
             openPicker: this.onTurn() && this.canPlaySvrsek() ? (svrsekColor: Color) => this.setState({picker: svrsekColor}) : () => {},
@@ -115,7 +101,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 {
                     key: "picker",
                     pickColor: (color: Color) => {
-                        this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(new Card(this.state.picker!, Value.Svrsek), color))));
+                        this.props.io.playCard(new Card(this.state.picker!, Value.Svrsek), color);
                         this.setState({picker: null});
                     },
                     closePicker: (event: MouseEvent) => {

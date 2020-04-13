@@ -16,7 +16,6 @@ class ColorComponent extends React.Component<{color: Color, pickColor: (color: C
         return React.createElement(
             "img",
             {
-                key: this.props.color,
                 className: "clickable halo",
                 onClick: () => this.props.pickColor(this.props.color),
                 src: colors[this.props.color],
@@ -33,7 +32,11 @@ export default class ColorPicker extends React.Component<{pickColor: (color: Col
             onClick: (event: MouseEvent) => {event.stopPropagation();}
         }, [
             ...[Color.Kule, Color.Listy, Color.Srdce, Color.Zaludy].map(
-                (color) => React.createElement(ColorComponent, {color, pickColor: this.props.pickColor})
+                (color) => React.createElement(ColorComponent, {
+                    key: color,
+                    color: color,
+                    pickColor: this.props.pickColor
+                })
             )
         ]);
         return React.createElement(Dialog, {

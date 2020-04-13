@@ -16,7 +16,8 @@ export default class DrawButton extends React.Component<{callback: () => void, w
                 case ActionType.PlayZaludy:
                     return;
             }
-            return React.createElement("div", {className: "absolute centerInsideDiv tooltip"}, drawButtonString[this.props.wantedAction]);
+            // FIXME: refactor to a component
+            return React.createElement("div", {key: "tooltip", className: "absolute centerInsideDiv tooltip"}, drawButtonString[this.props.wantedAction]);
         })();
         return React.createElement("div", {className: "relative drawButton-width"}, [
             tooltip,

@@ -9,6 +9,7 @@ export default class PlayedCards extends React.Component<{cards: Card[], colorCh
         return React.createElement("div", {className: "flex-row topCard-container relative"},
             this.props.cards.map((card, index, array) => {
                 return React.createElement(CardComponent, {
+                    key: `playedCards:${index}`, // TODO: think of better name for this
                     card: card,
                     options: {
                         isBottomCard: index === 0 ? "bottom" : undefined,

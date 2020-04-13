@@ -48,6 +48,7 @@ interface CoreGameProps {
     drawCard: () => void;
 }
 
+// TODO: think of a better name for this
 class CoreGame extends React.Component<CoreGameProps> {
     private genTooltip() {
         const card = this.props.topCards[this.props.topCards.length - 1];
@@ -68,6 +69,7 @@ class CoreGame extends React.Component<CoreGameProps> {
         // FIXME: look at this
         if (this.props.shouldDrawDrawButton) {
             res.push(React.createElement(DrawButton, {
+                key: "drawButton",
                 callback: this.props.drawCard,
                 wantedAction: this.props.wantedAction,
                 // FIXME: Fix this, somehow
@@ -76,6 +78,7 @@ class CoreGame extends React.Component<CoreGameProps> {
         }
 
         res.push(React.createElement(PlayedCards, {
+            key: "playedCards", // TODO: think of a better key
             cards: this.props.topCards,
             colorChange: isColorChange(this.props.wantedAction) ? changeActionToColor(this.props.wantedAction) : undefined,
             tooltip: this.genTooltip()
@@ -85,10 +88,10 @@ class CoreGame extends React.Component<CoreGameProps> {
 }
 
 export default class PlayField extends React.Component<PlayFieldProps> {
-
     render(): React.ReactNode {
         const playfield = [];
         playfield.push(React.createElement(CoreGame, {
+            key: "topPlayfield",
             onTurn: this.props.onTurn,
             topCards: this.props.topCards,
             wantedAction: this.props.wantedAction,
@@ -98,13 +101,14 @@ export default class PlayField extends React.Component<PlayFieldProps> {
 
         if (typeof this.props.hand !== "undefined") {
             playfield.push(React.createElement(Hand, {
+                key: "hand",
                 hand: this.props.hand,
                 playCard: this.props.playCard,
                 openPicker: this.props.openPicker
             }));
         }
 
-        playfield.push(React.createElement(Logo, {center: false}));
+        playfield.push(React.createElement(Logo, {key: "logo", center: false}));
         return React.createElement("div", {className: `playfield${this.props.onTurn ? " bigRedHalo" : ""}`}, playfield);
     }
 }

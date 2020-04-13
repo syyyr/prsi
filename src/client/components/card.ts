@@ -25,13 +25,15 @@ export default class Card extends React.Component<{card: CardType, options?: Car
         const children = [];
         children.push(React.createElement("img", {key: "card", ...imgOptions}));
         if (typeof options?.colorChange !== "undefined") {
+            // FIXME: refactor to a component
             children.push(React.createElement("img", {
+                key: "colorChange",
                 className: "absolute centerInsideDiv colorChange",
                 src: colors[options.colorChange],
             }));
         }
         if (typeof options?.tooltip !== "undefined") {
-            children.push(React.createElement("div", {className: "absolute centerInsideDiv tooltip topCardTooltip"}, "❌"));
+            children.push(React.createElement("div", {key: "cardTooltip", className: "absolute centerInsideDiv tooltip topCardTooltip"}, "❌"));
         }
         return React.createElement("div", {
             className: `${typeof options?.isBottomCard === "undefined" ? "centerInsideDiv absolute" : "relative"}`},

@@ -16,6 +16,7 @@ export default class PlayerBox extends React.Component<PlayerBoxProps> {
             [
                 ...this.props.players.map((player) => {
                     return React.createElement(Player, ({
+                        key: player,
                         name: player,
                         onTurn: this.props.whoseTurn === name,
                         cards: playerInfo?.[player].cards,

@@ -2,7 +2,7 @@ import * as React from "react";
 import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput} from "../common/communication";
 import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
-import PlayField from "./components/playfield";
+import Game from "./components/game";
 import PlayerBox from "./components/playerbox";
 import Prompt from "./components/prompt";
 import StartButton from "./components/startbutton";
@@ -112,7 +112,7 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 this.state.gameState.gameInfo.lastPlay)
         }));
 
-        elems.push(React.createElement(PlayField, {
+        elems.push(React.createElement(Game, {
             key: "playfield",
             onTurn: this.onTurn(),
             drawCard: () => this.props.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw))),

@@ -20,14 +20,7 @@ class InstructionStrings {
         }
 
         Object.keys(overrides).forEach((key: string) => {
-            const actualKey = key as Status; // TODO: check if Object.keys can return the enum
-            const override = overrides[actualKey]!;
-            if (typeof override.you !== "undefined") {
-                this[actualKey].you = override.you;
-            }
-            if (typeof override.other !== "undefined") {
-                this[actualKey].other = override.other;
-            }
+            Object.assign(this[key as Status], overrides[key as Status]);
         });
     }
 }

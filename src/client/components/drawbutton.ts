@@ -2,6 +2,18 @@ import * as React from "react";
 import {drawButtonString} from "../strings"
 import {ActionType} from "../../common/types";
 
+class DrawButtonTooltip extends React.Component<{tooltip: string}> {
+    render(): React.ReactNode {
+        return React.createElement("div",
+            {
+                key: "tooltip",
+                className: "absolute centerInsideDiv tooltip"
+            },
+            this.props.tooltip
+        );
+    }
+}
+
 export default class DrawButton extends React.Component<{callback: () => void, wantedAction: ActionType, shouldDrawTooltip: boolean}> {
     render(): React.ReactNode {
         const tooltip = (() => {
@@ -16,8 +28,7 @@ export default class DrawButton extends React.Component<{callback: () => void, w
                 case ActionType.PlayZaludy:
                     return;
             }
-            // FIXME: refactor to a component
-            return React.createElement("div", {key: "tooltip", className: "absolute centerInsideDiv tooltip"}, drawButtonString[this.props.wantedAction]);
+            return React.createElement(DrawButtonTooltip, {tooltip: drawButtonString[this.props.wantedAction]});
         })();
         return React.createElement("div", {className: "relative drawButton-width"}, [
             tooltip,

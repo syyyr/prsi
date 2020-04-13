@@ -32,16 +32,26 @@ class ColorChange extends React.Component<{color: Color}> {
     }
 }
 
-export default class Card extends React.Component<CardProps> {
+class CardImage extends React.Component<{onClick?: () => void, card: CardType, halo: boolean}> {
     render(): React.ReactNode {
         const imgOptions = {
             onClick: this.props.onClick,
-            className: `playfield-height${typeof this.props?.onClick !== "undefined" ? " clickable" : ""}${this.props?.halo === "halo" ? " halo" : ""}`,
+            className: `playfield-height${typeof this.props?.onClick !== "undefined" ? " clickable" : ""}${this.props.halo ? " halo" : ""}`,
             src: images[this.props.card.color][this.props.card.value],
             draggable: false,
         }
+        return React.createElement("img", {key: "card", ...imgOptions});
+    }
+}
+
+export default class Card extends React.Component<CardProps> {
+    render(): React.ReactNode {
         const children = [];
-        children.push(React.createElement("img", {key: "card", ...imgOptions}));
+        children.push(React.createElement(CardImage, {
+            onClick: this.props.onClick,
+            card: this.props.card,
+            halo: this.props.halo === "halo"
+        }));
         if (typeof this.props?.colorChange !== "undefined") {
             children.push(React.createElement(ColorChange, {color: this.props.colorChange}));
         }

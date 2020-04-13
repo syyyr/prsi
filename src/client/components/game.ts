@@ -65,7 +65,6 @@ class PlayField extends React.Component<CoreGameProps> {
     render(): React.ReactNode {
         const res = [];
 
-        // FIXME: look at this
         if (this.props.shouldDrawDrawButton) {
             res.push(React.createElement(DrawButton, {
                 key: "drawButton",

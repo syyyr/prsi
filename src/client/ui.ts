@@ -1,6 +1,6 @@
 import * as React from "react";
 import {isErrorResponse, isFrontendState, FrontendState, StartGame, PlayerInput, FrontendStats} from "../common/communication";
-import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastPlay, LastAction} from "../common/types";
+import {Card, PlayDetails, PlayType, Value, Color, ActionType, Status, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
 import Game from "./components/game";
 import PlayerBox from "./components/playerbox";
@@ -8,8 +8,8 @@ import Prompt from "./components/prompt";
 import StartButton from "./components/startbutton";
 import Stats from "./components/stats";
 import Title from "./components/title";
-import {cardsGenitive, instructionStrings, lastPlayStrings, colorStrings, values} from "./strings";
 import {audio} from "./sounds";
+import Instructions from "./components/instructions";
 
 const drawCard = (ws: any) => ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)))
 const startGame = (ws: any) => ws.send(JSON.stringify(new StartGame()));
@@ -42,26 +42,6 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
                 }
             }
         };
-    }
-
-    // FIXME: Check if this can be refactored inside the prompt
-    buildInstructions(wantedAction: ActionType, status: Status, you: string, turn: string, topCard: Card, lastPlay?: LastPlay): string {
-        const lastPlayStr = status !== Status.Ok || typeof lastPlay === "undefined" ? undefined :
-            lastPlayStrings[lastPlay.playerAction][you === lastPlay.who ? "you" : "other"]
-            .replace("@PLAYERNAME@", lastPlay.who)
-            .replace("@COLORCHANGE@", typeof lastPlay.playDetails === "undefined" ? "PLAYDETAILS unavailable" :
-                typeof lastPlay.playDetails.colorChange === "undefined" ? "COLORCHANGE unavailable" :
-                colorStrings[lastPlay.playDetails.colorChange])
-            .replace("@CARDS_GENITIVE@", typeof lastPlay.playDetails === "undefined"? "CARD unavailable" :
-                cardsGenitive[lastPlay.playDetails.card.color][lastPlay.playDetails.card.value])
-            .replace("@RETURN@", typeof lastPlay.playDetails === "undefined" || typeof lastPlay.playDetails.returned === "undefined" ? "RETURN unavailable" :
-                lastPlay.playDetails.returned)
-            .replace(/\.$/, !lastPlay.didWin ? "." : lastPlay.who === you ? " a vyhráls." : " a vyhrál.");
-        const instructions = instructionStrings[wantedAction][status][you === turn ? "you" : "other"]
-            .replace("@PLAYERNAME@", turn)
-            .replace("@TOPCOLOR@", colorStrings[topCard.color])
-            .replace("@TOPVALUE@", values[topCard.value]);
-        return `${typeof lastPlayStr !== "undefined" ? `${lastPlayStr} ` : ""}${instructions}`;
     }
 
     private onTurn(): boolean {
@@ -107,14 +87,14 @@ export class UI extends React.Component<{ws: any, thisName: string}, {gameState?
             return elems;
         }
 
-        elems.push(React.createElement(Prompt, {
-            key: "prompt",
-            instructions: this.buildInstructions(this.state.gameState.gameInfo.wantedAction,
-                this.state.gameState.gameInfo.status,
-                this.props.thisName,
-                this.state.gameState.gameInfo.who,
-                this.state.gameState.gameInfo.topCards[this.state.gameState.gameInfo.topCards.length - 1],
-                this.state.gameState.gameInfo.lastPlay)
+        elems.push(React.createElement(Instructions, {
+            key: "instructions",
+            wantedAction: this.state.gameState.gameInfo.wantedAction,
+            status: this.state.gameState.gameInfo.status,
+            you: this.props.thisName,
+            whoseTurn: this.state.gameState.gameInfo.who,
+            topCard: this.state.gameState.gameInfo.topCards[this.state.gameState.gameInfo.topCards.length - 1],
+            lastPlay: this.state.gameState.gameInfo.lastPlay
         }));
 
         elems.push(React.createElement(Game, {

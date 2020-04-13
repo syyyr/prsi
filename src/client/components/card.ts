@@ -17,7 +17,7 @@ interface CardProps {
 class CardTooltip extends React.Component<{tooltip: CardTooltipString}> {
     render(): React.ReactNode {
         return React.createElement("div", {
-            key: "cardTooltip", className: "absolute centerInsideDiv tooltip topCardTooltip"},
+            className: "absolute centerInsideDiv tooltip topCardTooltip"},
             "❌"
         );
     }
@@ -26,7 +26,6 @@ class CardTooltip extends React.Component<{tooltip: CardTooltipString}> {
 class ColorChange extends React.Component<{color: Color}> {
     render(): React.ReactNode {
         return React.createElement("img", {
-            key: "colorChange",
             className: "absolute centerInsideDiv colorChange",
             src: colors[this.props.color]
         });
@@ -61,16 +60,17 @@ export default class Card extends React.Component<CardProps> {
     render(): React.ReactNode {
         const children = [];
         children.push(React.createElement(CardImage, {
+            key: "cardImage",
             onClick: this.props.onClick,
             card: this.props.card,
             halo: this.props.halo === "halo",
             transform: this.props.transform
         }));
         if (typeof this.props?.colorChange !== "undefined") {
-            children.push(React.createElement(ColorChange, {color: this.props.colorChange}));
+            children.push(React.createElement(ColorChange, {key: "colorChange", color: this.props.colorChange}));
         }
         if (typeof this.props?.tooltip !== "undefined") {
-            children.push(React.createElement(CardTooltip, {tooltip: this.props.tooltip}));
+            children.push(React.createElement(CardTooltip, {key: "cardTooltip", tooltip: this.props.tooltip}));
         }
         return React.createElement("div", {
             className: `${typeof this.props?.isBottomCard === "undefined" ? "centerInsideDiv absolute" : "relative"}`},

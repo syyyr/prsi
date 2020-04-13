@@ -70,7 +70,6 @@ class PlayField extends React.Component<CoreGameProps> {
                 key: "drawButton",
                 callback: this.props.drawCard,
                 wantedAction: this.props.wantedAction,
-                // FIXME: Fix this, somehow
                 shouldDrawTooltip: this.props.onTurn || this.props.wantedAction === ActionType.Shuffle
             }));
         }

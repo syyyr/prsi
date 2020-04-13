@@ -22,6 +22,16 @@ class CardTooltip extends React.Component<{tooltip: CardTooltipString}> {
     }
 }
 
+class ColorChange extends React.Component<{color: Color}> {
+    render(): React.ReactNode {
+        return React.createElement("img", {
+            key: "colorChange",
+            className: "absolute centerInsideDiv colorChange",
+            src: colors[this.props.color]
+        });
+    }
+}
+
 export default class Card extends React.Component<CardProps> {
     render(): React.ReactNode {
         const imgOptions = {
@@ -33,12 +43,7 @@ export default class Card extends React.Component<CardProps> {
         const children = [];
         children.push(React.createElement("img", {key: "card", ...imgOptions}));
         if (typeof this.props?.colorChange !== "undefined") {
-            // FIXME: refactor to a component
-            children.push(React.createElement("img", {
-                key: "colorChange",
-                className: "absolute centerInsideDiv colorChange",
-                src: colors[this.props.colorChange],
-            }));
+            children.push(React.createElement(ColorChange, {color: this.props.colorChange}));
         }
         if (typeof this.props?.tooltip !== "undefined") {
             children.push(React.createElement(CardTooltip, {tooltip: this.props.tooltip}));

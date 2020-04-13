@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "private": true,
-  "main": "build/middleware.js",
+  "main": "build/server/middleware.js",
   "scripts": {
     "clean": "rm -rf build/ node_modules/",
     "build-tsc": "npx tsc",

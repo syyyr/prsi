@@ -173,6 +173,10 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
         dotfiles: "ignore",
     }));
 
+    wsEnabledRouter.use(prefix, express.static(path.join(__dirname, "../../public"), {
+        dotfiles: "ignore",
+    }));
+
     prsiLogger("Initializing prsi...");
 
     wsEnabledRouter.ws(prefix, (ws) => {

@@ -13,6 +13,9 @@ import Instructions from "./components/instructions";
 import PlayerInputOutput from "./io";
 
 export class UI extends React.Component<{io: PlayerInputOutput, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
+    private playReminderTimeout?: NodeJS.Timeout;
+    private audioHandle?: HTMLAudioElement;
+
     constructor(props: {io: any, thisName: string}) {
         super(props);
         // FIXME: look for a better solution for picker (don't save color of the played guy)
@@ -55,7 +58,39 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
         return React.createElement(Stats, {key: "stats", stats});
     }
 
+    clearEffectTimeout() {
+        if (typeof this.playReminderTimeout !== "undefined") {
+            clearTimeout(this.playReminderTimeout);
+            this.playReminderTimeout = undefined;
+        }
+
+        // Only clear if status is ok, that way the user can't just press random cards to stop the sound.
+        if (typeof this.audioHandle !== "undefined" && this.state.gameState?.gameInfo?.status === Status.Ok) {
+            this.audioHandle.pause();
+            this.audioHandle = undefined;
+        }
+    }
+
+    setEffectTimeout() {
+        this.clearEffectTimeout();
+
+        if (this.state.gameState?.gameInfo?.status === Status.Ok && this.state.gameState?.gameInfo?.who === this.props.thisName) {
+            if (this.state.gameState.gameInfo.wantedAction === ActionType.Shuffle) {
+                this.playReminderTimeout = setTimeout(() => {
+                    window.alert("Mícháš.");
+                }, 60000);
+            } else {
+                this.playReminderTimeout = setTimeout(() => {
+                    this.audioHandle = new Audio(audio.playReminder);
+                    this.audioHandle.play();
+                }, 10000);
+            }
+        }
+    }
+
     render(): React.ReactNode {
+        this.clearEffectTimeout();
+
         const elems = [];
         elems.push(React.createElement(Title, {key: "title"}, null));
         if (typeof this.state.gameState === "undefined") {
@@ -132,6 +167,8 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
                 }
             ));
         }
+
+        this.setEffectTimeout();
 
         return elems;
     }

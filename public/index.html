@@ -13,7 +13,7 @@ p {
 }
 body {
     font-family: 'Roboto', sans-serif;
-    width: 90%;
+    width: 100%;
     margin: auto;
     background-color: rgb(238, 238, 238);
 }
@@ -55,17 +55,14 @@ body {
     align-items: center;
 }
 .flex-row {
+    width: 100%;
+    flex-wrap: wrap;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
 }
-.align-center {
-    text-align: center;
-}
 .player-container {
-    width: 20em;
     height: 8em;
-    flex-wrap: wrap;
 }
 .hand-container {
     justify-content: center;
@@ -74,14 +71,15 @@ body {
     margin-top: 2em;
 }
 .topCard-container {
-    margin-top: 2em;
-    justify-content: center;
+    padding-top: 2em;
+    max-width: 30em;
+    margin: auto;
+    justify-content: space-evenly;
 }
 .cardBacks-container-height {
     max-height: 1.5em;
 }
 .cardBacks-container {
-    width: 20em;
     justify-content: center;
     flex-wrap: wrap;
     margin: auto;
@@ -166,11 +164,7 @@ body {
 .statsDesc {
     min-width: 6em;
 }
-.drawButton-width {
-    margin-right: 5em;
-}
 #game {
-    width: fit-content;
     margin: auto;
 }
         </style>

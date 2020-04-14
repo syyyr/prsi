@@ -105,7 +105,7 @@ export default class Game extends React.Component<PlayFieldProps> {
             }));
         }
 
-        playfield.push(React.createElement(Logo, {key: "logo", center: false}));
+        playfield.push(React.createElement(Logo, {key: "logo", center: true}));
         return React.createElement("div", {className: `playfield${this.props.onTurn ? " bigRedHalo" : ""}`}, playfield);
     }
 }

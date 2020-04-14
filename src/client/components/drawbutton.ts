@@ -31,7 +31,7 @@ export default class DrawButton extends React.Component<{callback: () => void, w
             }
             return React.createElement(DrawButtonTooltip, {key: "drawButtonTooltip", tooltip: drawButtonString[this.props.wantedAction]});
         })();
-        return React.createElement("div", {className: "relative drawButton-width"}, [
+        return React.createElement("div", {className: "relative"}, [
             tooltip,
             React.createElement(
                 "img",

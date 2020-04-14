@@ -28,7 +28,7 @@ export default class TopCards extends React.PureComponent<{cards: Card[], colorC
         }
 
         this.lastTopCard = this.props.cards[this.props.cards.length - 1];
-        return React.createElement("div", {className: "flex-row relative"},
+        return React.createElement("div", {className: "relative"},
             this.props.cards.map((card, index, array) => {
                 return React.createElement(CardComponent, {
                     key: `topCard:${index}`,

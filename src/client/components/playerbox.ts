@@ -5,6 +5,7 @@ import {Place} from "../../common/types";
 interface PlayerBoxProps {
     thisName: string;
     players: string[];
+    lastPlace?: string;
     whoseTurn?: string;
     playerInfo?: {[key in string]: {cards?: number, place?: Place}};
 }
@@ -20,7 +21,8 @@ export default class PlayerBox extends React.Component<PlayerBoxProps> {
                         name: this.props.thisName === player ? `${player} (ty)` : player,
                         onTurn: this.props.whoseTurn === player,
                         cards: playerInfo?.[player].cards,
-                        place: playerInfo?.[player].place
+                        place: playerInfo?.[player].place,
+                        lastPlace: player === this.props.lastPlace
                     }));
                 }),
             ]

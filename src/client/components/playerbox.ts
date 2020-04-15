@@ -20,8 +20,8 @@ export default class PlayerBox extends React.Component<PlayerBoxProps> {
                         key: player,
                         name: this.props.thisName === player ? `${player} (ty)` : player,
                         onTurn: this.props.whoseTurn === player,
-                        cards: playerInfo?.[player].cards,
-                        place: playerInfo?.[player].place,
+                        cards: playerInfo?.[player]?.cards,
+                        place: playerInfo?.[player]?.place,
                         lastPlace: player === this.props.lastPlace
                     }));
                 }),

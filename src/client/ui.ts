@@ -165,7 +165,9 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
             playCard: this.props.io.playCard,
             wantedAction: this.state.gameState.gameInfo.wantedAction,
             topCards: this.state.gameState.gameInfo.topCards,
-            openPicker: this.onTurn() && this.canPlaySvrsek() ? (svrsekColor: Color) => this.setState({picker: svrsekColor}) : () => {},
+            openPicker: this.onTurn() && this.canPlaySvrsek() ?
+                (svrsekColor: Color) => this.setState({picker: svrsekColor}) :
+                (svrsekColor: Color) => this.props.io.playCard(new Card(this.state.picker!, Value.Svrsek), svrsekColor),
             hand: this.state.gameState.gameInfo.hand,
             forceHalo: this.state.errorHighlight
         }));

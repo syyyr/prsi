@@ -76,11 +76,11 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
 
         if (this.state.gameState?.gameInfo?.status === Status.Ok && this.state.gameState?.gameInfo?.who === this.props.thisName) {
             if (this.state.gameState.gameInfo.wantedAction === ActionType.Shuffle) {
-                this.playReminderTimeout = setTimeout(() => {
+                this.playReminderTimeout = global.setTimeout(() => {
                     window.alert("Mícháš.");
                 }, 60000);
             } else {
-                this.playReminderTimeout = setTimeout(() => {
+                this.playReminderTimeout = global.setTimeout(() => {
                     this.audioHandle = new Audio(audio.playReminder);
                     this.audioHandle.play();
                 }, 10000);

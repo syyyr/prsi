@@ -38,7 +38,7 @@ export default class DrawButton extends React.Component<{callback: () => void, w
                 {
                     key: "drawButton",
                     src: image,
-                    className: "clickable halo playfield-height",
+                    className: "clickable halo card",
                     onClick: this.props.callback
                 }
             )

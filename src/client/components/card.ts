@@ -43,7 +43,7 @@ class CardImage extends React.Component<CardImageProps> {
     render(): React.ReactNode {
         const imgOptions = {
             onClick: this.props.onClick,
-            className: `playfield-height${typeof this.props?.onClick !== "undefined" ? " clickable" : ""}${this.props.halo ? " halo" : ""}`,
+            className: `card${typeof this.props?.onClick !== "undefined" ? " clickable" : ""}${this.props.halo ? " halo" : ""}`,
             src: images[this.props.card.color][this.props.card.value],
             draggable: false,
             style: {

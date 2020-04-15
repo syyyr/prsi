@@ -12,16 +12,20 @@ import {audio} from "./sounds";
 import Instructions from "./components/instructions";
 import PlayerInputOutput from "./io";
 
-export class UI extends React.Component<{io: PlayerInputOutput, thisName: string}, {gameState?: FrontendState, picker: null | Color}> {
+export class UI extends React.Component<{io: PlayerInputOutput, thisName: string}, {gameState?: FrontendState, picker: null | Color, errorHighlight: boolean}> {
     private playReminderTimeout?: NodeJS.Timeout;
     private audioHandle?: HTMLAudioElement;
+    private highlightTimeout?: NodeJS.Timeout;
 
     constructor(props: {io: any, thisName: string}) {
         super(props);
         // FIXME: look for a better solution for picker (don't save color of the played guy)
-        this.state = {picker: null};
+        this.state = {picker: null, errorHighlight: false};
         this.props.io.onState = (state: FrontendState) => {
-            this.setState({gameState: state, picker: null});
+            if (typeof this.highlightTimeout !== "undefined") {
+                clearTimeout(this.highlightTimeout);
+            }
+            this.setState({gameState: state, picker: null, errorHighlight: false});
             if (state.gameInfo?.status === Status.Ok) {
                 switch (state.gameInfo.lastPlay?.playerAction) {
                     case LastAction.DrawFour:
@@ -29,12 +33,27 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
                     case LastAction.DrawEight:
                         new Audio(audio[state.gameInfo.lastPlay.playerAction]).play();
                 }
+            } else {
+                this.blink();
             }
         };
         this.props.io.onError = (err: ErrorResponse) => {
             // FIXME: allow some sort of a recovery
             window.alert(err.error);
         }
+    }
+
+    private blink(): void {
+        this.setState({errorHighlight: true});
+        const blinkingSpeed = 250;
+        const blinker = (iterations: number) => {
+            this.setState({errorHighlight: !this.state.errorHighlight});
+            if (iterations < 2) {
+                this.highlightTimeout = global.setTimeout(blinker, blinkingSpeed, iterations + 1);
+            }
+        };
+
+        this.highlightTimeout = global.setTimeout(blinker, blinkingSpeed, 0);
     }
 
     private onTurn(): boolean {
@@ -147,7 +166,8 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
             wantedAction: this.state.gameState.gameInfo.wantedAction,
             topCards: this.state.gameState.gameInfo.topCards,
             openPicker: this.onTurn() && this.canPlaySvrsek() ? (svrsekColor: Color) => this.setState({picker: svrsekColor}) : () => {},
-            hand: this.state.gameState.gameInfo.hand
+            hand: this.state.gameState.gameInfo.hand,
+            forceHalo: this.state.errorHighlight
         }));
         elems.push(this.createStats(this.state.gameState.stats));
 

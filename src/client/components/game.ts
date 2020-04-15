@@ -38,6 +38,7 @@ interface PlayFieldProps {
     wantedAction: ActionType;
     topCards: Card[];
     hand?: Card[];
+    forceHalo: boolean;
 }
 
 interface CoreGameProps {
@@ -107,6 +108,6 @@ export default class Game extends React.Component<PlayFieldProps> {
             }));
         }
 
-        return React.createElement("div", {className: `playfield${this.props.onTurn ? " bigRedHalo" : ""}`}, playfield);
+        return React.createElement("div", {className: `playfield${this.props.onTurn || this.props.forceHalo ? " bigRedHalo" : ""}`}, playfield);
     }
 }

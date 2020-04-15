@@ -12,7 +12,7 @@ import {audio} from "./sounds";
 import Instructions from "./components/instructions";
 import PlayerInputOutput from "./io";
 
-export class UI extends React.Component<{io: PlayerInputOutput, thisName: string}, {gameState?: FrontendState, picker: null | Color, errorHighlight: boolean}> {
+export class UI extends React.Component<{io: PlayerInputOutput, thisName: string}, {gameState?: FrontendState, picker: null | Color, errorHighlight: boolean | null}> {
     private playReminderTimeout?: NodeJS.Timeout;
     private audioHandle?: HTMLAudioElement;
     private highlightTimeout?: NodeJS.Timeout;
@@ -25,7 +25,7 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
             if (typeof this.highlightTimeout !== "undefined") {
                 clearTimeout(this.highlightTimeout);
             }
-            this.setState({gameState: state, picker: null, errorHighlight: false});
+            this.setState({gameState: state, picker: null, errorHighlight: null});
             if (state.gameInfo?.status === Status.Ok) {
                 switch (state.gameInfo.lastPlay?.playerAction) {
                     case LastAction.DrawFour:
@@ -169,7 +169,7 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
                 (svrsekColor: Color) => this.setState({picker: svrsekColor}) :
                 (svrsekColor: Color) => this.props.io.playCard(new Card(this.state.picker!, Value.Svrsek), svrsekColor),
             hand: this.state.gameState.gameInfo.hand,
-            forceHalo: this.state.errorHighlight
+            forceHalo: this.state.errorHighlight !== null ? this.state.errorHighlight : undefined
         }));
         elems.push(this.createStats(this.state.gameState.stats));
 

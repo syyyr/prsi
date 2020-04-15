@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+p {
+    font-size: 1em;
+}
+body {
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    margin: auto;
+}
+.card {
+    max-height: 10em;
+    filter: drop-shadow(0.2em 0.2em 0.4em black);
+}
+.noselect {
+    /* https://stackoverflow.com/a/9314458/12263846 */
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                          supported by Chrome and Opera */
+}
+.clickable {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.bold {
+    font-weight: bold;
+}
+.halo:hover {
+    filter: drop-shadow(0 0 1em white);
+}
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.flex-row {
+    width: 100%;
+    flex-wrap: wrap;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+.player-container {
+    height: 8em;
+}
+.hand-container {
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-bottom: 2em;
+}
+.topCard-container {
+    padding-top: 2em;
+    max-width: 30em;
+    margin: auto;
+    justify-content: space-evenly;
+}
+.cardBacks-container-height {
+    max-height: 1.5em;
+}
+.cardBacks-container {
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.absolute {
+    position: absolute;
+}
+.relative {
+    position: relative;
+}
+.centerInsideDiv {
+    z-index: 1;
+    top: 50%;
+    bottom: 50%;
+    left: -50%;
+    right: -50%;
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+}
+.topCardTooltip {
+    bottom: initial;
+    top: 10%;
+    left: 0%;
+    font-size: 0.4em;
+}
+.tooltip {
+    pointer-events: none;
+    border: 0.1em black solid;
+    border-radius: 5px;
+    background-color: rgba(192, 192, 192, 0.8);
+    padding: 0.5em;
+    color: white;
+    box-shadow: 0 0 1em black;
+}
+.colorChange {
+    border: 0.1em black solid;
+    background-color: rgba(128, 128, 128, 0.5);
+    border-radius: 5px;
+    box-shadow: 0 0 1em black;
+    width: 3em;
+    height: 3em;
+}
+.bigRedHalo {
+    filter: drop-shadow(0 0 1em red);
+}
+.logo {
+    margin-top: 2em;
+    margin-bottom: 2em;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+.dialog {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+.picker {
+    display: flex;
+    margin: auto;
+    background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(0,224,0,1) 100%);
+    border-radius: 1em;
+    align-items: flex-start;
+    padding: 1em;
+    box-shadow: 1em 1em 1em black;
+    border: 0.2em solid darkgreen;
+}
+.statsTable {
+    margin: 1em auto;
+    border-collapse: collapse;
+    text-align: center;
+}
+.statsHeader {
+    border-bottom: 0.1em solid black;
+}
+.statsDesc {
+    min-width: 6em;
+}
+#game {
+    margin: auto;
+}

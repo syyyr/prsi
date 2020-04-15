@@ -39,11 +39,12 @@ statsAccess.defaults({stats: {}}).write();
 const stats: {[key in string]: Stats} = statsAccess.get("stats").value();
 setInterval(() => statsAccess.set("stats", stats).write(), 10000);
 
-type AugmentedSocket = (WebSocket & {
-    __private_name: string
-});
+interface SocketInfo {
+    ws: WebSocket;
+    name?: string;
+}
 
-const openSockets: AugmentedSocket[] = [];
+const openSockets: SocketInfo[] = [];
 
 const idGen = (function*(): Generator {
     let id = 1;
@@ -52,7 +53,7 @@ const idGen = (function*(): Generator {
     }
 }());
 
-const buildFrontendStateFor = (player: string): FrontendState => {
+const buildFrontendStateFor = (player?: string): FrontendState => {
     const state = prsi.state();
     const playerInfo: {[key in string]: {cards?: number, place?: Place}} = {};
     state?.players.forEach(
@@ -68,7 +69,7 @@ const buildFrontendStateFor = (player: string): FrontendState => {
             status: state.status,
             who: state.whoseTurn,
             topCards: state.playedCards.slice(state.playedCards.length - Math.min(state.playedCards.length, 3)),
-            hand: state.hands.get(player),
+            hand: typeof player !== "undefined" ? state.hands.get(player) : undefined,
             playerInfo,
             lastPlay: state.lastPlay
         } : undefined
@@ -76,36 +77,40 @@ const buildFrontendStateFor = (player: string): FrontendState => {
 };
 
 const updateEveryone = () => {
-    openSockets.forEach((socket) => socket.send(JSON.stringify(buildFrontendStateFor(socket.__private_name))));
+    openSockets.forEach((socketInfo) => socketInfo.ws.send(JSON.stringify(buildFrontendStateFor(socketInfo.name))));
 };
 
-const updateOne = (ws: any) => {
-    ws.send(JSON.stringify(buildFrontendStateFor(ws.__private_name)));
+const updateOne = (id: number) => {
+    openSockets[id].ws.send(JSON.stringify(buildFrontendStateFor(openSockets[id].name)));
 };
 
-const sendError = (ws: any, error: ErrorResponse) => {
-    ws.send(JSON.stringify(error));
+const sendError = (id: number, error: ErrorResponse) => {
+    openSockets[id].ws.send(JSON.stringify(error));
 }
 
-const processMessage = (ws: any, message: string): void => {
+const processMessage = (id: number, message: string): void => {
     let parsed: any;
 
     try {
         parsed = JSON.parse(message);
     } catch (err) {
-        sendError(ws, new ErrorResponse("Invalid request."));
+        sendError(id, new ErrorResponse("Invalid request."));
         return;
     }
 
     if (isPlayerRegistration(parsed)) {
-        openSockets.push(ws);
-        if (openSockets.some((socket) => socket.__private_name === parsed.registerPlayer)) {
+        if (openSockets.some((socketInfo) => socketInfo.name === parsed.registerPlayer)) {
             prsiLogger(`"${parsed.registerPlayer}" already belongs to someone else.`, ws);
-            sendError(ws, new ErrorResponse("Someone else owns this username."));
+            sendError(id, new ErrorResponse("Someone else owns this username."));
             return;
         }
 
-        ws.__private_name = parsed.registerPlayer;
+        const socket = openSockets[id];
+        if (typeof socket === "undefined") {
+            prsiLogger(`Tried to assign a name, but this WebSocket doesn't exist in openSockets.`, id);
+            return;
+        }
+        socket.name = parsed.registerPlayer;
         prsi.registerPlayer(parsed.registerPlayer);
         prsiLogger(`Registered "${parsed.registerPlayer}".`, ws);
         if (typeof stats[parsed.registerPlayer] === "undefined") {
@@ -116,7 +121,12 @@ const processMessage = (ws: any, message: string): void => {
     }
 
     if (isPlayerInput(parsed)) {
-        prsi.resolveAction(new PlayerAction(parsed.playType, ws.__private_name, parsed.playDetails));
+        const name = openSockets[id].name
+        if (typeof name === "undefined") {
+            prsiLogger(`Got input, but this socket doesn't have a name assigned.`, id);
+            return;
+        }
+        prsi.resolveAction(new PlayerAction(parsed.playType, name, parsed.playDetails));
         if (prsi.state()!.status === Status.Ok) {
             const state = prsi.state();
             if (typeof state?.lastPlay?.playDetails?.returned !== "undefined") {
@@ -139,7 +149,7 @@ const processMessage = (ws: any, message: string): void => {
             }
             updateEveryone();
         } else {
-            updateOne(ws);
+            updateOne(id);
         }
         return;
     }
@@ -150,18 +160,19 @@ const processMessage = (ws: any, message: string): void => {
         return;
     }
 
-    sendError(ws, new ErrorResponse("Invalid request."));
+    sendError(id, new ErrorResponse("Invalid request."));
+    prsiLogger(`Invalid request`, id);
 };
 
 const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: string, _req?: express.Request) => console.log(msg)) => {
-    prsiLogger = (msg: string, ws?: any) => {
+    prsiLogger = (msg: string, id?: number) => {
         // Manually inject the ws id. I know using `any` isn't the cleanest
         // solution, but then again, the whole express-ws thing isn't very
         // clean.
         if (typeof ws !== "undefined") {
             logger(msg, {
                 session: {
-                    myId: `ws/${ws.__private_id}`
+                    myId: `ws/${id}`
                 }
             } as any);
         } else {
@@ -179,31 +190,35 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
 
     prsiLogger("Initializing prsi...");
 
-    wsEnabledRouter.ws(prefix, (ws) => {
-        (ws as any).__private_id = idGen.next().value;
+    // FIXME: find the proper type of the WebSocket and use that instead of any
+    wsEnabledRouter.ws(prefix, (ws: any) => {
+        const id = idGen.next().value;
+        openSockets[id] = ({ws});
         prsiLogger("New websocket.", ws);
-        ws.on("message", (message) => {
-            processMessage(ws, message.toString());
+        updateOne(id);
+
+        ws.on("message", (message: any) => {
+            processMessage(id, message.toString());
         });
 
         ws.on("close", () => {
             // Using Object here, because I want to compare references
-            const closed = openSockets.findIndex((socket) => socket === ws as Object);
-            if (closed === -1) {
+            const closed = openSockets[id];
+            if (typeof closed === "undefined") {
                 prsiLogger("A socket we had no idea about closed.");
                 return;
             }
 
             let name = "<unknown>";
             // Have to check whether the closing socket was already registered
-            if (typeof openSockets[closed].__private_name !== "undefined") {
-                name = openSockets[closed].__private_name;
-                prsi.unregisterPlayer(openSockets[closed].__private_name);
+            if (typeof closed.name !== "undefined") {
+                name = closed.name;
+                prsi.unregisterPlayer(name);
             }
 
             prsiLogger(`${name} disconnected.`, ws);
 
-            openSockets.splice(closed, 1);
+            openSockets.splice(id, 1);
             updateEveryone();
         });
     });

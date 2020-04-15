@@ -12,16 +12,23 @@ import {audio} from "./sounds";
 import Instructions from "./components/instructions";
 import PlayerInputOutput from "./io";
 
-export class UI extends React.Component<{io: PlayerInputOutput, thisName: string}, {gameState?: FrontendState, picker: null | Color, errorHighlight: boolean | null}> {
+export class UI extends React.Component<{}, {gameState?: FrontendState, picker: null | Color, errorHighlight: boolean | null}> {
     private playReminderTimeout?: NodeJS.Timeout;
     private audioHandle?: HTMLAudioElement;
     private highlightTimeout?: NodeJS.Timeout;
+    private io: PlayerInputOutput;
+    private thisName: string;
 
-    constructor(props: {io: any, thisName: string}) {
+    constructor(props: {}) {
         super(props);
-        // FIXME: look for a better solution for picker (don't save color of the played guy)
-        this.state = {picker: null, errorHighlight: false};
-        this.props.io.onState = (state: FrontendState) => {
+        let playerName: null | string = null;
+        while (playerName === null || playerName === "") {
+            playerName = window.prompt("Username:");
+        }
+        this.thisName = playerName;
+
+        this.io = new PlayerInputOutput(this.thisName);
+        this.io.onState = (state: FrontendState) => {
             if (typeof this.highlightTimeout !== "undefined") {
                 clearTimeout(this.highlightTimeout);
             }
@@ -37,10 +44,12 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
                 this.blink();
             }
         };
-        this.props.io.onError = (err: ErrorResponse) => {
+        this.io.onError = (err: ErrorResponse) => {
             // FIXME: allow some sort of a recovery
             window.alert(err.error);
         }
+        // FIXME: look for a better solution for picker (don't save color of the played guy)
+        this.state = {picker: null, errorHighlight: false};
     }
 
     private blink(): void {
@@ -57,7 +66,7 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
     }
 
     private onTurn(): boolean {
-        return this.state.gameState!.gameInfo!.who === this.props.thisName;
+        return this.state.gameState!.gameInfo!.who === this.thisName;
     }
 
     private canPlaySvrsek(): boolean {
@@ -93,7 +102,7 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
     setEffectTimeout() {
         this.clearEffectTimeout();
 
-        if (this.state.gameState?.gameInfo?.status === Status.Ok && this.state.gameState?.gameInfo?.who === this.props.thisName) {
+        if (this.state.gameState?.gameInfo?.status === Status.Ok && this.state.gameState?.gameInfo?.who === this.thisName) {
             if (this.state.gameState.gameInfo.wantedAction === ActionType.Shuffle) {
                 this.playReminderTimeout = global.setTimeout(() => {
                     window.alert("Mícháš.");
@@ -116,7 +125,7 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
             return elems;
         }
         if (this.state.gameState.gameStarted === "no" && this.state.gameState.players.length >= 2) {
-            elems.push(React.createElement(StartButton, {key: "startButton", startGame: this.props.io.startGame}));
+            elems.push(React.createElement(StartButton, {key: "startButton", startGame: this.io.startGame}));
         }
 
         // FIXME: This algorithm feels a bit clunky, I think it can be improved
@@ -135,7 +144,7 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
 
         elems.push(React.createElement(PlayerBox, {
             key: "playerbox",
-            thisName: this.props.thisName,
+            thisName: this.thisName,
             players: this.state.gameState.players,
             playerInfo: this.state.gameState.gameInfo?.playerInfo,
             whoseTurn: this.state.gameState.gameInfo?.who,
@@ -152,7 +161,7 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
             key: "instructions",
             wantedAction: this.state.gameState.gameInfo.wantedAction,
             status: this.state.gameState.gameInfo.status,
-            you: this.props.thisName,
+            you: this.thisName,
             whoseTurn: this.state.gameState.gameInfo.who,
             topCard: this.state.gameState.gameInfo.topCards[this.state.gameState.gameInfo.topCards.length - 1],
             lastPlay: this.state.gameState.gameInfo.lastPlay
@@ -161,13 +170,13 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
         elems.push(React.createElement(Game, {
             key: "playfield",
             onTurn: this.onTurn(),
-            drawCard: this.props.io.drawCard,
-            playCard: this.props.io.playCard,
+            drawCard: this.io.drawCard,
+            playCard: this.io.playCard,
             wantedAction: this.state.gameState.gameInfo.wantedAction,
             topCards: this.state.gameState.gameInfo.topCards,
             openPicker: this.onTurn() && this.canPlaySvrsek() ?
                 (svrsekColor: Color) => this.setState({picker: svrsekColor}) :
-                (svrsekColor: Color) => this.props.io.playCard(new Card(this.state.picker!, Value.Svrsek), svrsekColor),
+                (svrsekColor: Color) => this.io.playCard(new Card(this.state.picker!, Value.Svrsek), svrsekColor),
             hand: this.state.gameState.gameInfo.hand,
             forceHalo: this.state.errorHighlight !== null ? this.state.errorHighlight : undefined
         }));
@@ -179,7 +188,7 @@ export class UI extends React.Component<{io: PlayerInputOutput, thisName: string
                 {
                     key: "picker",
                     pickColor: (color: Color) => {
-                        this.props.io.playCard(new Card(this.state.picker!, Value.Svrsek), color);
+                        this.io.playCard(new Card(this.state.picker!, Value.Svrsek), color);
                         this.setState({picker: null});
                     },
                     closePicker: (event: MouseEvent) => {

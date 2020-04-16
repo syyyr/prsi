@@ -14,6 +14,11 @@ export default class NameDialog extends React.Component<{closeDialog: () => void
         }, [
             React.createElement("input", {
                 onChange: (event: Event) => {this.setState({value: (<HTMLInputElement>event.target).value})},
+                onKeyUp: (event: KeyboardEvent) => {
+                    if (event.keyCode === 13 && this.state.value !== "") {
+                        this.props.confirmName(this.state.value);
+                    }
+                },
                 className: "nameInput",
                 placeholder: "Jméno...",
                 value: this.state.value

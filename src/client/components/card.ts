@@ -23,11 +23,20 @@ class CardTooltip extends React.Component<{tooltip: CardTooltipString}> {
     }
 }
 
-class ColorChange extends React.Component<{color: Color}> {
+const transformationToString = (transformation: Transformation) => {
+    return `rotate(${transformation.rotation}deg) translateX(${transformation.translateX}px) translateY(${transformation.translateY}px)`
+};
+
+class ColorChange extends React.Component<{color: Color, transform?: Transformation}> {
     render(): React.ReactNode {
         return React.createElement("img", {
             className: "absolute centerInsideDiv colorChange",
-            src: colors[this.props.color]
+            src: colors[this.props.color],
+            style: {
+                transform: typeof this.props.transform !== "undefined" ?
+                transformationToString(this.props.transform)
+                : undefined
+            }
         });
     }
 }
@@ -48,7 +57,7 @@ class CardImage extends React.Component<CardImageProps> {
             draggable: false,
             style: {
                 transform: typeof this.props.transform !== "undefined" ?
-                `rotate(${this.props.transform.rotation}deg) translateX(${this.props.transform.translateX}px) translateY(${this.props.transform.translateY}px)`
+                transformationToString(this.props.transform)
                 : undefined
             }
         }
@@ -67,7 +76,13 @@ export default class Card extends React.Component<CardProps> {
             transform: this.props.transform
         }));
         if (typeof this.props?.colorChange !== "undefined") {
-            children.push(React.createElement(ColorChange, {key: "colorChange", color: this.props.colorChange}));
+            children.push(React.createElement(ColorChange, {
+                key: "colorChange",
+                color: this.props.colorChange,
+                transform: typeof this.props.transform !== "undefined" ?
+                    new Transformation(0, this.props.transform.translateX, this.props.transform.translateY)
+                    : undefined
+            }));
         }
         if (typeof this.props?.tooltip !== "undefined") {
             children.push(React.createElement(CardTooltip, {key: "cardTooltip", tooltip: this.props.tooltip}));

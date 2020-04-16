@@ -8,8 +8,9 @@ body {
     margin: auto;
 }
 .card {
-    max-height: 10em;
     filter: drop-shadow(0.2em 0.2em 0.4em black);
+    max-height: 10em;
+    transform-origin: center;
 }
 .noselect {
     /* https://stackoverflow.com/a/9314458/12263846 */

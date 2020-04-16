@@ -41,10 +41,16 @@ export class StartGame {
     startGame: null = null;
 }
 
+export enum ErrorCode {
+    NameAlreadyUsed
+}
+
 export class ErrorResponse {
     error: string;
-    constructor(error: string) {
+    code?: ErrorCode;
+    constructor(error: string, code?: ErrorCode) {
         this.error = error;
+        this.code = code;
     }
 }
 

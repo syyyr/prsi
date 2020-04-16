@@ -4,7 +4,7 @@ import FileSync from "lowdb/adapters/FileSync";
 import path from "path";
 import ws from "express-ws";
 import Prsi from "../server/backend";
-import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats} from "../common/communication";
+import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode} from "../common/communication";
 import {ActionType, Status, PlayerAction, Place} from "../common/types";
 
 class impl_Stats {
@@ -101,7 +101,7 @@ const processMessage = (id: number, message: string): void => {
     if (isPlayerRegistration(parsed)) {
         if (openSockets.some((socketInfo) => socketInfo.name === parsed.registerPlayer)) {
             prsiLogger(`"${parsed.registerPlayer}" already belongs to someone else.`, ws);
-            sendError(id, new ErrorResponse("Someone else owns this username."));
+            sendError(id, new ErrorResponse("Someone else owns this username.", ErrorCode.NameAlreadyUsed));
             return;
         }
 

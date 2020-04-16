@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FrontendState, FrontendStats, ErrorResponse} from "../common/communication";
+import {FrontendState, FrontendStats, ErrorResponse, ErrorCode} from "../common/communication";
 import {Card, Value, Color, ActionType, Status, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
 import Game from "./components/game";
@@ -42,7 +42,10 @@ export class UI extends React.Component<{}, {nameDialog: boolean, gameState?: Fr
             }
         };
         this.io.onError = (err: ErrorResponse) => {
-            // FIXME: allow some sort of a recovery
+            if (err.code === ErrorCode.NameAlreadyUsed) {
+                this.thisName = undefined;
+                this.setState({nameDialog: true});
+            }
             window.alert(err.error);
         }
         // FIXME: look for a better solution for picker (don't save color of the played guy)

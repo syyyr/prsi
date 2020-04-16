@@ -20,7 +20,7 @@ export default class NameDialog extends React.Component<NameDialogProps, {value:
             className: "nameDialog",
             onClick: (event: MouseEvent) => {event.stopPropagation();}
         }, [
-            React.createElement("div", {className: "relative"}, [
+            React.createElement("div", {key: "inputHolder", className: "relative"}, [
                 React.createElement("div", {className: "absolute nameInputText", key: "nameInputText"}, "name"),
                 React.createElement("input", {
                     key: "nameInputBox",

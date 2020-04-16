@@ -53,12 +53,14 @@ export class UI extends React.Component<{}, {nameDialog: boolean, gameState?: Fr
     }
 
     private blink(): void {
-        this.setState({errorHighlight: true});
+        this.setState({errorHighlight: this.onTurn() ? false : true});
         const blinkingSpeed = 250;
         const blinker = (iterations: number) => {
             this.setState({errorHighlight: !this.state.errorHighlight});
             if (iterations < 2) {
                 this.highlightTimeout = global.setTimeout(blinker, blinkingSpeed, iterations + 1);
+            } else {
+                this.highlightTimeout = global.setTimeout(() => this.setState({errorHighlight: null}), blinkingSpeed);
             }
         };
 

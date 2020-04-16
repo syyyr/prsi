@@ -6,11 +6,10 @@ export default class PlayerInputOutput {
     onError: (message: ErrorResponse) => void = () => {};
     onState: (message: FrontendState) => void = () => {};
     self: PlayerInputOutput = this;
-    constructor(playerName: string) {
+    constructor() {
         this.ws = new window.WebSocket(`ws${window.location.protocol === "https:" ? "s" : ""}://${window.location.host}`);
         this.ws.onopen = () => {
             console.log("ws opened");
-            this.ws.send(JSON.stringify(new PlayerRegistration(playerName!)));
         };
 
         this.ws.onmessage = (message: any) => {
@@ -33,6 +32,10 @@ export default class PlayerInputOutput {
     }
 
     // These have to be specified as properties, otherwise they lose the meaning of `this`.
+    readonly registerPlayer = (name: string): void => {
+        this.ws.send(JSON.stringify(new PlayerRegistration(name)));
+    };
+
     readonly drawCard = (): void => {
         this.ws.send(JSON.stringify(new PlayerInput(PlayType.Draw)));
     };

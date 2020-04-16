@@ -8,26 +8,23 @@ import Prompt from "./components/prompt";
 import StartButton from "./components/startbutton";
 import Stats from "./components/stats";
 import Title from "./components/title";
-import {audio} from "./sounds";
 import Instructions from "./components/instructions";
+import JoinButton from "./components/joinbutton";
+import {audio} from "./sounds";
 import PlayerInputOutput from "./io";
+import NameDialog from "./components/namedialog";
 
-export class UI extends React.Component<{}, {gameState?: FrontendState, picker: null | Color, errorHighlight: boolean | null}> {
+export class UI extends React.Component<{}, {nameDialog: boolean, gameState?: FrontendState, picker: null | Color, errorHighlight: boolean | null}> {
+    // FIXME: use browser setTimeout
     private playReminderTimeout?: NodeJS.Timeout;
     private audioHandle?: HTMLAudioElement;
     private highlightTimeout?: NodeJS.Timeout;
     private io: PlayerInputOutput;
-    private thisName: string;
+    private thisName?: string;
 
     constructor(props: {}) {
         super(props);
-        let playerName: null | string = null;
-        while (playerName === null || playerName === "") {
-            playerName = window.prompt("Username:");
-        }
-        this.thisName = playerName;
-
-        this.io = new PlayerInputOutput(this.thisName);
+        this.io = new PlayerInputOutput();
         this.io.onState = (state: FrontendState) => {
             if (typeof this.highlightTimeout !== "undefined") {
                 clearTimeout(this.highlightTimeout);
@@ -49,7 +46,7 @@ export class UI extends React.Component<{}, {gameState?: FrontendState, picker: 
             window.alert(err.error);
         }
         // FIXME: look for a better solution for picker (don't save color of the played guy)
-        this.state = {picker: null, errorHighlight: false};
+        this.state = {picker: null, errorHighlight: false, nameDialog: false};
     }
 
     private blink(): void {
@@ -124,8 +121,13 @@ export class UI extends React.Component<{}, {gameState?: FrontendState, picker: 
         if (typeof this.state.gameState === "undefined") {
             return elems;
         }
+
         if (this.state.gameState.gameStarted === "no" && this.state.gameState.players.length >= 2) {
             elems.push(React.createElement(StartButton, {key: "startButton", startGame: this.io.startGame}));
+        }
+
+        if (typeof this.thisName === "undefined") {
+            elems.push(React.createElement(JoinButton, {key: "joinButton", openDialog: () => this.setState({nameDialog: true})}));
         }
 
         // FIXME: This algorithm feels a bit clunky, I think it can be improved
@@ -150,6 +152,15 @@ export class UI extends React.Component<{}, {gameState?: FrontendState, picker: 
             whoseTurn: this.state.gameState.gameInfo?.who,
             lastPlace: lastPlace
         }));
+
+        if (this.state.nameDialog) {
+            const confirmName = (name: string) => {
+                this.setState({nameDialog: false});
+                this.io.registerPlayer(name);
+                this.thisName = name;
+            };
+            elems.push(React.createElement(NameDialog, {confirmName, closeDialog: () => this.setState({nameDialog: false})}));
+        }
 
         if (typeof this.state.gameState.gameInfo === "undefined") {
             elems.push(React.createElement(Prompt, {key: "prompt", instructions: "Hra nezačala."}));

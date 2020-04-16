@@ -134,6 +134,46 @@ body {
     box-shadow: 1em 1em 1em black;
     border: 0.2em solid darkgreen;
 }
+.nameDialog {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(0,224,0,1) 100%);
+    border-radius: 1em;
+    align-items: center;
+    padding: 1em;
+    box-shadow: 1em 1em 1em black;
+    border: 0.2em solid darkgreen;
+    position: absolute;
+    top: 25%;
+    left: -50%;
+    right: -50%;
+    width: fit-content;
+}
+.nameInput:focus {
+    outline: none;
+}
+.nameInput {
+    border-radius: 5em;
+    border: 0.2em solid slategray;
+    font-family: 'Roboto', sans-serif;
+    margin-bottom: 1em;
+    padding: 1em;
+}
+.nameButton:focus {
+    outline: none;
+}
+.nameButton:active {
+    filter: drop-shadow(0 0.2em 0.1em black);
+    transform: translateY(0.2em);
+}
+.nameButton {
+    border-radius: 5em;
+    border: 0.2em solid slategray;
+    filter: drop-shadow(0 0.4em 0.3em black);
+    font-family: 'Roboto', sans-serif;
+    padding: 0.5em;
+}
 .statsTable {
     margin: 1em auto;
     border-collapse: collapse;

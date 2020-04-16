@@ -3,7 +3,7 @@ import Player from "./player";
 import {Place} from "../../common/types";
 
 interface PlayerBoxProps {
-    thisName: string;
+    thisName?: string;
     players: string[];
     lastPlace?: string;
     whoseTurn?: string;

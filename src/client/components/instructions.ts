@@ -6,7 +6,7 @@ import Prompt from "./prompt";
 interface InstructionsProps {
     wantedAction: ActionType;
     status: Status;
-    you: string;
+    you?: string;
     whoseTurn: string;
     topCard: Card;
     lastPlay?: LastPlay;

@@ -131,7 +131,7 @@ export class Prsi {
                 this._currentGame.status = Status.MustShuffle;
                 return;
             case PlayType.Draw:
-                this.newGame();
+                this.newGame(playerAction.who);
                 return;
             }
 
@@ -498,14 +498,14 @@ export class Prsi {
         return this._currentGame.hands.get(player)!.some(sameCards.bind(null, cardToCheck));
     }
 
-    public newGame(): void {
+    public newGame(shuffler?: string): void {
         if (this._players.length < 2) {
             throw new Error("Tried to start a game with one player.");
         }
         if (typeof this._currentGame !== "undefined") {
             this._history.push(this._currentGame);
         }
-        this._currentGame = this.newState();
+        this._currentGame = this.newState(shuffler);
         this.dealCards();
     }
 

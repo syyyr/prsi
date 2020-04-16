@@ -21,6 +21,7 @@ export default class NameDialog extends React.Component<{closeDialog: () => void
                 },
                 className: "nameInput",
                 placeholder: "Jméno...",
+                autoFocus: true,
                 value: this.state.value
             }),
             React.createElement("button", {

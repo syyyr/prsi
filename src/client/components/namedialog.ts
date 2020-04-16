@@ -1,10 +1,18 @@
 import * as React from "react";
 import Dialog from "./dialog";
 
-export default class NameDialog extends React.Component<{closeDialog: () => void, confirmName: (name: string) => void}, {value: string}> {
+interface NameDialogProps {
+    closeDialog: () => void;
+    confirmName: (name: string) => void;
+    initialValue?: string;
+}
+
+export default class NameDialog extends React.Component<NameDialogProps, {value: string}> {
     constructor(props: {closeDialog: () => void, confirmName: (name: string) => void}) {
         super(props);
-        this.state = {value: ""};
+        this.state = {
+            value: typeof this.props.initialValue !== "undefined" ? this.props.initialValue : ""
+        };
     }
 
     render(): React.ReactNode {

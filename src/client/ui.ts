@@ -160,9 +160,16 @@ export class UI extends React.Component<{}, {nameDialog: boolean, gameState?: Fr
             const confirmName = (name: string) => {
                 this.setState({nameDialog: false});
                 this.io.registerPlayer(name);
+                window.localStorage.setItem("name", name);
                 this.thisName = name;
             };
-            elems.push(React.createElement(NameDialog, {confirmName, closeDialog: () => this.setState({nameDialog: false})}));
+
+            const lastName = window.localStorage.getItem("name") || undefined;
+            elems.push(React.createElement(NameDialog, {
+                confirmName,
+                closeDialog: () => this.setState({nameDialog: false}),
+                initialValue: lastName
+            }));
         }
 
         if (typeof this.state.gameState.gameInfo === "undefined") {

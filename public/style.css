@@ -157,7 +157,7 @@ body {
     border-radius: 5em;
     border: 0.2em solid slategray;
     font-family: 'Roboto', sans-serif;
-    margin-bottom: 1em;
+    font-size: 1em;
     padding: 1em;
 }
 .nameButton:focus {
@@ -172,7 +172,18 @@ body {
     border: 0.2em solid slategray;
     filter: drop-shadow(0 0.4em 0.3em black);
     font-family: 'Roboto', sans-serif;
+    margin-top: 1em;
     padding: 0.5em;
+}
+.nameInputText {
+    bottom: 0%;
+    color: darkgrey;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.8em;
+    font-style: italic;
+    margin-bottom: 1px;
+    padding-right: 1em;
+    right: 6%;
 }
 .statsTable {
     margin: 1em auto;

@@ -20,23 +20,28 @@ export default class NameDialog extends React.Component<NameDialogProps, {value:
             className: "nameDialog",
             onClick: (event: MouseEvent) => {event.stopPropagation();}
         }, [
-            React.createElement("input", {
-                onChange: (event: Event) => {this.setState({value: (<HTMLInputElement>event.target).value})},
-                onKeyUp: (event: KeyboardEvent) => {
-                    if (event.keyCode === 13) {
-                        if (this.state.value !== "") {
-                            this.props.confirmName(this.state.value);
-                        } else {
-                            window.alert("Zadals prázdný jméno. To nejde. Nebo jako sice to teoreticky jde, ale dej si neprázdný jméno.");
+            React.createElement("div", {className: "relative"}, [
+                React.createElement("div", {className: "absolute nameInputText", key: "nameInputText"}, "name"),
+                React.createElement("input", {
+                    key: "nameInputBox",
+                    onChange: (event: Event) => {this.setState({value: (<HTMLInputElement>event.target).value})},
+                    onKeyUp: (event: KeyboardEvent) => {
+                        if (event.keyCode === 13) {
+                            if (this.state.value !== "") {
+                                this.props.confirmName(this.state.value);
+                            } else {
+                                window.alert("Zadals prázdný jméno. To nejde. Nebo jako sice to teoreticky jde, ale dej si neprázdný jméno.");
+                            }
                         }
-                    }
-                },
-                className: "nameInput",
-                placeholder: "Jméno...",
-                autoFocus: true,
-                value: this.state.value
-            }),
+                    },
+                    className: "nameInput",
+                    placeholder: "Jméno...",
+                    autoFocus: true,
+                    value: this.state.value
+                })
+            ]),
             React.createElement("button", {
+                key: "nameInputButton",
                 onClick: () => {if (this.state.value !== "") this.props.confirmName(this.state.value)},
                 className: "nameButton"
             }, "Potvrdit")

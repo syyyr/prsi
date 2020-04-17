@@ -5,7 +5,7 @@
   "private": true,
   "main": "build/server/middleware.js",
   "scripts": {
-    "clean": "rm -rf build/ node_modules/",
+    "clean": "rm -rf build/ node_modules/ dist/ tsconfig.tsbuildinfo",
     "build-tsc": "npx tsc",
     "build-webpack": "npx webpack",
     "build": "npm run build-tsc && npm run build-webpack",

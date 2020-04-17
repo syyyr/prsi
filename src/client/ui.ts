@@ -13,8 +13,20 @@ import JoinButton from "./components/joinbutton";
 import {audio} from "./sounds";
 import PlayerInputOutput from "./io";
 import NameDialog from "./components/namedialog";
+import ErrorDialog from "./components/errordialog";
 
-export class UI extends React.Component<{}, {nameDialog: boolean, gameState?: FrontendState, picker: null | Color, errorHighlight: boolean | null}> {
+interface UIState {
+    nameDialog: boolean;
+    gameState?: FrontendState;
+    picker: null | Color;
+    errorHighlight: boolean | null;
+    error: {
+        message: string;
+        fatal: boolean;
+    } | null;
+}
+
+export class UI extends React.Component<{}, UIState> {
     // FIXME: use browser setTimeout
     private playReminderTimeout?: NodeJS.Timeout;
     private audioHandle?: HTMLAudioElement;
@@ -46,10 +58,10 @@ export class UI extends React.Component<{}, {nameDialog: boolean, gameState?: Fr
                 this.thisName = undefined;
                 this.setState({nameDialog: true});
             }
-            window.alert(err.error);
+            this.setState({error: {message: err.error, fatal: false}});
         }
         // FIXME: look for a better solution for picker (don't save color of the played guy)
-        this.state = {picker: null, errorHighlight: false, nameDialog: false};
+        this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false};
     }
 
     private blink(): void {
@@ -171,6 +183,13 @@ export class UI extends React.Component<{}, {nameDialog: boolean, gameState?: Fr
                 closeDialog: () => this.setState({nameDialog: false}),
                 initialValue: lastName
             }));
+        }
+
+        if (this.state.error !== null) {
+            elems.push(React.createElement(ErrorDialog, {
+                error: this.state.error.message,
+                closeDialog: !this.state.error.fatal ? () => this.setState({error: null}) : undefined
+            }))
         }
 
         if (typeof this.state.gameState.gameInfo === "undefined") {

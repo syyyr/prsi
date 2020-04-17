@@ -96,8 +96,10 @@ export class UI extends React.Component<{}, UIState> {
         }
     }
 
-    createStats(stats: { [x: string]: FrontendStats; }): React.ReactNode {
-        return React.createElement(Stats, {key: "stats", stats});
+    createStats(stats: { [x: string]: FrontendStats; }): React.ReactNode | undefined {
+        if (this.state.gameState?.players.length !== 0) {
+            return React.createElement(Stats, {key: "stats", stats});
+        }
     }
 
     clearEffectTimeout() {

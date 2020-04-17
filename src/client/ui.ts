@@ -195,7 +195,10 @@ export class UI extends React.Component<{}, UIState> {
         }
 
         if (typeof this.state.gameState.gameInfo === "undefined") {
-            elems.push(React.createElement(Prompt, {key: "prompt", instructions: "Hra nezačala."}));
+            elems.push(React.createElement(Prompt, {
+                key: "prompt",
+                instructions: this.state.gameState.players.length < 2 ? "Čeká se alespoň na dva hráče." : "Stisknutím Start se spustí hra."
+            }));
             elems.push(this.createStats(this.state.gameState.stats));
             return elems;
         }

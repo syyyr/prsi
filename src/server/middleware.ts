@@ -155,6 +155,10 @@ const processMessage = (id: number, message: string): void => {
     }
 
     if (isStartGame(parsed)) {
+        if (typeof openSockets[id].name === "undefined") {
+            sendError(id, new ErrorResponse("Nemůžeš začít hru, když nehraješ? (jax to udělal?)."));
+            prsiLogger(`Tried to start the game, even though, no name is assigned`, id);
+        }
         prsi.newGame();
         updateEveryone();
         return;

@@ -1,5 +1,6 @@
 import * as React from "react";
 import Dialog from "./dialog";
+import Button from "./button";
 
 interface NameDialogProps {
     closeDialog: () => void;
@@ -42,7 +43,7 @@ export default class NameDialog extends React.Component<NameDialogProps, {value:
                     value: this.state.value
                 })
             ]),
-            React.createElement("button", {
+            React.createElement(Button, {
                 key: "nameInputButton",
                 onClick: () => {
                     if (this.state.value !== "") {
@@ -51,8 +52,8 @@ export default class NameDialog extends React.Component<NameDialogProps, {value:
                         alertEmptyName();
                     }
                 },
-                className: "nameButton"
-            }, "Potvrdit")
+                text: "Potvrdit"
+            })
         ]);
         return React.createElement(Dialog, {
             onClick: this.props.closeDialog

@@ -16,8 +16,10 @@ interface CardProps {
 
 class CardTooltip extends React.Component<{tooltip: CardTooltipString}> {
     render(): React.ReactNode {
-        return React.createElement("div", {
-            className: "absolute centerInsideDiv tooltip topCardTooltip"},
+        return React.createElement("div",
+            {
+                className: "absolute centerInsideDiv tooltip topCardTooltip",
+            },
             "❌"
         );
     }
@@ -45,7 +47,6 @@ interface CardImageProps {
     onClick?: () => void;
     card: CardType;
     halo: boolean;
-    transform?: Transformation;
 }
 
 class CardImage extends React.Component<CardImageProps> {
@@ -55,11 +56,6 @@ class CardImage extends React.Component<CardImageProps> {
             className: `card${typeof this.props?.onClick !== "undefined" ? " clickable" : ""}${this.props.halo ? " halo" : ""}`,
             src: images[this.props.card.color][this.props.card.value],
             draggable: false,
-            style: {
-                transform: typeof this.props.transform !== "undefined" ?
-                transformationToString(this.props.transform)
-                : undefined
-            }
         }
         return React.createElement("img", {key: "card", ...imgOptions});
     }
@@ -73,7 +69,6 @@ export default class Card extends React.Component<CardProps> {
             onClick: this.props.onClick,
             card: this.props.card,
             halo: this.props.halo === "halo",
-            transform: this.props.transform
         }));
         if (typeof this.props?.colorChange !== "undefined") {
             children.push(React.createElement(ColorChange, {
@@ -85,10 +80,20 @@ export default class Card extends React.Component<CardProps> {
             }));
         }
         if (typeof this.props?.tooltip !== "undefined") {
-            children.push(React.createElement(CardTooltip, {key: "cardTooltip", tooltip: this.props.tooltip}));
+            children.push(React.createElement(CardTooltip, {
+                key: "cardTooltip",
+                tooltip: this.props.tooltip,
+            }));
         }
-        return React.createElement("div", {
-            className: `${typeof this.props?.isBottomCard === "undefined" ? "centerInsideDiv absolute" : "relative"}`},
+        return React.createElement("div",
+            {
+                className: `${typeof this.props?.isBottomCard === "undefined" ? "centerInsideDiv absolute" : "relative"}`,
+                style: {
+                    transform: typeof this.props.transform !== "undefined" ?
+                    transformationToString(this.props.transform)
+                    : undefined
+                }
+            },
             children
         );
     }

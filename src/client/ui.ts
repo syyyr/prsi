@@ -29,7 +29,7 @@ export class UI extends React.Component<{}, {nameDialog: boolean, gameState?: Fr
             if (typeof this.highlightTimeout !== "undefined") {
                 clearTimeout(this.highlightTimeout);
             }
-            this.setState({gameState: state, picker: null, errorHighlight: null});
+            this.setState({nameDialog: false, gameState: state, picker: null, errorHighlight: null});
             if (state.gameInfo?.status === Status.Ok) {
                 switch (state.gameInfo.lastPlay?.playerAction) {
                     case LastAction.DrawFour:
@@ -160,7 +160,6 @@ export class UI extends React.Component<{}, {nameDialog: boolean, gameState?: Fr
 
         if (this.state.nameDialog) {
             const confirmName = (name: string) => {
-                this.setState({nameDialog: false});
                 this.io.registerPlayer(name);
                 window.localStorage.setItem("name", name);
                 this.thisName = name;

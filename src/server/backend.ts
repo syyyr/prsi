@@ -575,7 +575,7 @@ export class Prsi {
         }
         this._currentGame.players = this._currentGame.players.filter((player) => player.name !== name);
         // Just end the game if there is just one player.
-        if (this._currentGame.players.length < 2) {
+        if (this._currentGame.players.filter((player) => player.place === null).length === 1) {
             this._currentGame = undefined;
             return;
         }

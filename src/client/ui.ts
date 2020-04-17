@@ -149,7 +149,16 @@ export class UI extends React.Component<{}, UIState> {
         if (typeof this.thisName === "undefined") {
             elems.push(React.createElement(JoinButton, {key: "joinButton", openDialog: () => this.setState({nameDialog: true})}));
         } else {
-            elems.push(React.createElement(LeaveButton, {key: "leaveButton", leaveGame: () => this.io.unregisterPlayer()));
+            elems.push(React.createElement(LeaveButton, {key: "leaveButton", leaveGame: () => {
+                if (typeof this.thisName === "undefined") {
+                    this.setState({error: {message: "You already left the game.", fatal: false}});
+                    return;
+                }
+
+                const name = this.thisName;
+                this.thisName = undefined;
+                this.io.unregisterPlayer(name);
+            }}));
         }
 
         // FIXME: This algorithm feels a bit clunky, I think it can be improved

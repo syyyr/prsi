@@ -138,7 +138,9 @@ const processMessage = (id: number, message: string): void => {
         }
 
         prsi.unregisterPlayer(parsed.unregisterPlayer);
-        prsiLogger(`Registered "${parsed.unregisterPlayer}".`, ws);
+        socket.name = undefined;
+        prsiLogger(`Unregistered "${parsed.unregisterPlayer}".`, ws);
+        updateEveryone();
         return;
     }
 

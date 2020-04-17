@@ -127,7 +127,7 @@ export class UI extends React.Component<{}, {nameDialog: boolean, gameState?: Fr
             return elems;
         }
 
-        if (this.state.gameState.gameStarted === "no" && this.state.gameState.players.length >= 2) {
+        if (this.state.gameState.gameStarted === "no" && this.state.gameState.players.length >= 2 && typeof this.thisName !== "undefined") {
             elems.push(React.createElement(StartButton, {key: "startButton", startGame: this.io.startGame}));
         }
 

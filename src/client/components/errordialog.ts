@@ -1,5 +1,6 @@
 import * as React from "react";
 import Dialog from "./dialog";
+import Button from "./button";
 
 const defaultOnClick = (event: MouseEvent) => {event.stopPropagation()}
 
@@ -12,7 +13,7 @@ export default class ErrorDialog extends React.Component<{error: string, closeDi
             }, [
                 React.createElement("p", null, this.props.error),
                 typeof this.props.closeDialog !== "undefined" ?
-                    React.createElement("button", {onClick: this.props.closeDialog}, "OK")
+                    React.createElement(Button, {onClick: this.props.closeDialog, text: "OK"})
                     : undefined
             ]);
         return React.createElement(Dialog,

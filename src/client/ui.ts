@@ -43,15 +43,17 @@ export class UI extends React.Component<{}, UIState> {
                 clearTimeout(this.highlightTimeout);
             }
             this.setState({nameDialog: false, gameState: state, picker: null, errorHighlight: null});
-            if (state.gameInfo?.status === Status.Ok) {
-                switch (state.gameInfo.lastPlay?.playerAction) {
-                    case LastAction.DrawFour:
-                    case LastAction.DrawSix:
-                    case LastAction.DrawEight:
-                        new Audio(audio[state.gameInfo.lastPlay.playerAction]).play();
+            if (typeof state.gameInfo !== "undefined") {
+                if (state.gameInfo?.status === Status.Ok) {
+                    switch (state.gameInfo.lastPlay?.playerAction) {
+                        case LastAction.DrawFour:
+                        case LastAction.DrawSix:
+                        case LastAction.DrawEight:
+                            new Audio(audio[state.gameInfo.lastPlay.playerAction]).play();
+                    }
+                } else {
+                    this.blink();
                 }
-            } else {
-                this.blink();
             }
         };
         this.io.onError = (err: ErrorResponse) => {

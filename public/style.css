@@ -45,6 +45,9 @@ body {
     flex-direction: row;
     justify-content: space-evenly;
 }
+.playerbox {
+    margin-top: 1em;
+}
 .player-container {
     height: 8em;
 }

@@ -13,7 +13,7 @@ interface PlayerBoxProps {
 export default class PlayerBox extends React.Component<PlayerBoxProps> {
     render(): React.ReactNode {
         const playerInfo = this.props.playerInfo;
-        return React.createElement("div", {key: "players", className: "flex-row"},
+        return React.createElement("div", {key: "players", className: "flex-row playerbox"},
             [
                 ...this.props.players.map((player) => {
                     return React.createElement(Player, ({

@@ -7,6 +7,8 @@ interface NameDialogProps {
     initialValue?: string;
 }
 
+const alertEmptyName = () => window.alert("Zadals prázdný jméno. To nejde. Nebo jako sice to teoreticky jde, ale dej si neprázdný jméno.");
+
 export default class NameDialog extends React.Component<NameDialogProps, {value: string}> {
     constructor(props: {closeDialog: () => void, confirmName: (name: string) => void}) {
         super(props);
@@ -30,7 +32,7 @@ export default class NameDialog extends React.Component<NameDialogProps, {value:
                             if (this.state.value !== "") {
                                 this.props.confirmName(this.state.value);
                             } else {
-                                window.alert("Zadals prázdný jméno. To nejde. Nebo jako sice to teoreticky jde, ale dej si neprázdný jméno.");
+                                alertEmptyName();
                             }
                         }
                     },
@@ -42,7 +44,13 @@ export default class NameDialog extends React.Component<NameDialogProps, {value:
             ]),
             React.createElement("button", {
                 key: "nameInputButton",
-                onClick: () => {if (this.state.value !== "") this.props.confirmName(this.state.value)},
+                onClick: () => {
+                    if (this.state.value !== "") {
+                        this.props.confirmName(this.state.value);
+                    } else {
+                        alertEmptyName();
+                    }
+                },
                 className: "nameButton"
             }, "Potvrdit")
         ]);

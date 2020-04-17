@@ -121,7 +121,7 @@ const processMessage = (id: number, message: string): void => {
     }
 
     if (isPlayerInput(parsed)) {
-        const name = openSockets[id].name
+        const name = openSockets[id].name;
         if (typeof name === "undefined") {
             prsiLogger(`Got input, but this socket doesn't have a name assigned.`, id);
             return;

@@ -38,7 +38,6 @@ export default class NameDialog extends React.Component<NameDialogProps, {value:
                         }
                     },
                     className: "nameInput",
-                    placeholder: "Jméno...",
                     autoFocus: true,
                     value: this.state.value
                 })

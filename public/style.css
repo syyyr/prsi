@@ -172,14 +172,14 @@ body {
     font-size: 1em;
     padding: 1em;
 }
-.nameButton:focus {
+.fancyButton:focus {
     outline: none;
 }
-.nameButton:active {
+.fancyButton:active {
     filter: drop-shadow(0 0.2em 0.1em black);
     transform: translateY(0.2em);
 }
-.nameButton {
+.fancyButton {
     border-radius: 5em;
     border: 0.2em solid slategray;
     filter: drop-shadow(0 0.4em 0.3em black);

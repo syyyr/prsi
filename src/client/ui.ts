@@ -195,6 +195,7 @@ export class UI extends React.Component<{}, UIState> {
 
             const lastName = window.localStorage.getItem("name") || undefined;
             elems.push(React.createElement(NameDialog, {
+                key: "nameDialog",
                 confirmName,
                 closeDialog: () => this.setState({nameDialog: false}),
                 initialValue: lastName

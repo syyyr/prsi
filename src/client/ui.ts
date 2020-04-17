@@ -14,6 +14,7 @@ import {audio} from "./sounds";
 import PlayerInputOutput from "./io";
 import NameDialog from "./components/namedialog";
 import ErrorDialog from "./components/errordialog";
+import LeaveButton from "./components/leavebutton";
 
 interface UIState {
     nameDialog: boolean;
@@ -147,6 +148,8 @@ export class UI extends React.Component<{}, UIState> {
 
         if (typeof this.thisName === "undefined") {
             elems.push(React.createElement(JoinButton, {key: "joinButton", openDialog: () => this.setState({nameDialog: true})}));
+        } else {
+            elems.push(React.createElement(LeaveButton, {key: "leaveButton", leaveGame: () => this.io.unregisterPlayer()));
         }
 
         // FIXME: This algorithm feels a bit clunky, I think it can be improved

@@ -4,7 +4,7 @@ import FileSync from "lowdb/adapters/FileSync";
 import path from "path";
 import ws from "express-ws";
 import Prsi from "../server/backend";
-import {isPlayerRegistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode} from "../common/communication";
+import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode} from "../common/communication";
 import {ActionType, Status, PlayerAction, Place} from "../common/types";
 
 class impl_Stats {
@@ -117,6 +117,28 @@ const processMessage = (id: number, message: string): void => {
             stats[parsed.registerPlayer] = new Stats();
         }
         updateEveryone();
+        return;
+    }
+
+    if (isPlayerUnregistration(parsed)) {
+        const socket = openSockets[id];
+        if (typeof socket === "undefined") {
+            prsiLogger(`Tried to unregister "${parsed.unregisterPlayer}", but this WebSocket doesn't exist in openSockets.`, id);
+            return;
+        }
+
+        if (typeof socket.name === "undefined") {
+            prsiLogger(`Tried to unregister "${parsed.unregisterPlayer}" but this WebSocket doesn't have any name assigned.`, id);
+            return;
+        }
+
+        if (socket.name !== parsed.unregisterPlayer) {
+            prsiLogger(`Tried to unregister "${parsed.unregisterPlayer}" but this WebSocket has the name "${socket.name}" assigned.`, id);
+            return;
+        }
+
+        prsi.unregisterPlayer(parsed.unregisterPlayer);
+        prsiLogger(`Registered "${parsed.unregisterPlayer}".`, ws);
         return;
     }
 

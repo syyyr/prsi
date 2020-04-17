@@ -5,6 +5,10 @@ export function isPlayerRegistration(toCheck: any): toCheck is PlayerRegistratio
     return typeof toCheck.registerPlayer !== "undefined";
 }
 
+export function isPlayerUnregistration(toCheck: any): toCheck is PlayerUnregistration {
+    return typeof toCheck.unregisterPlayer !== "undefined";
+}
+
 export function isPlayerInput(toCheck: any): toCheck is PlayerInput {
     return typeof toCheck.playType !== "undefined";
 }
@@ -25,6 +29,13 @@ export class PlayerRegistration {
     registerPlayer: string;
     constructor(name: string) {
         this.registerPlayer = name;
+    }
+}
+
+export class PlayerUnregistration {
+    unregisterPlayer: string;
+    constructor(name: string) {
+        this.unregisterPlayer = name;
     }
 }
 

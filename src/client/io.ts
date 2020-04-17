@@ -1,4 +1,4 @@
-import {ErrorResponse, PlayerRegistration, FrontendState, isErrorResponse, isFrontendState, PlayerInput, StartGame} from "../common/communication";
+import {ErrorResponse, PlayerRegistration, FrontendState, isErrorResponse, isFrontendState, PlayerInput, StartGame, PlayerUnregistration} from "../common/communication";
 import {PlayType, Card, Color, PlayDetails} from "../common/types";
 
 export default class PlayerInputOutput {
@@ -32,6 +32,10 @@ export default class PlayerInputOutput {
     }
 
     // These have to be specified as properties, otherwise they lose the meaning of `this`.
+    readonly unregisterPlayer = (name: string): void => {
+        this.ws.send(JSON.stringify(new PlayerUnregistration(name)));
+    };
+
     readonly registerPlayer = (name: string): void => {
         this.ws.send(JSON.stringify(new PlayerRegistration(name)));
     };

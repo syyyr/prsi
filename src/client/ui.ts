@@ -206,6 +206,11 @@ export class UI extends React.Component<{}, UIState> {
         this.io.unregisterPlayer(name);
     }
 
+    private readonly joinGame = (name: string) => {
+        this.io.registerPlayer(name);
+        window.localStorage.setItem("name", name);
+        this.thisName = name;
+    }
 
     readonly render = (): React.ReactNode => {
         this.clearEffectTimeout();
@@ -240,16 +245,10 @@ export class UI extends React.Component<{}, UIState> {
         }));
 
         if (this.state.nameDialog) {
-            const confirmName = (name: string) => {
-                this.io.registerPlayer(name);
-                window.localStorage.setItem("name", name);
-                this.thisName = name;
-            };
-
             const lastName = window.localStorage.getItem("name") || undefined;
             elems.push(React.createElement(NameDialog, {
                 key: "nameDialog",
-                confirmName,
+                confirmName: this.joinGame,
                 closeDialog: this.closeNameDialog,
                 initialValue: lastName
             }));

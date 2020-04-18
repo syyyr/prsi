@@ -30,10 +30,9 @@ interface UIState {
 }
 
 export class UI extends React.Component<{}, UIState> {
-    // FIXME: use browser setTimeout
-    private playReminderTimeout?: NodeJS.Timeout;
+    private playReminderTimeout?: number;
     private audioHandle?: HTMLAudioElement;
-    private highlightTimeout?: NodeJS.Timeout;
+    private highlightTimeout?: number;
     private io: PlayerInputOutput;
     private thisName?: string;
 
@@ -90,13 +89,13 @@ export class UI extends React.Component<{}, UIState> {
         const blinker = (iterations: number) => {
             this.setState({errorHighlight: !this.state.errorHighlight});
             if (iterations < 2) {
-                this.highlightTimeout = global.setTimeout(blinker, blinkingSpeed, iterations + 1);
+                this.highlightTimeout = window.setTimeout(blinker, blinkingSpeed, iterations + 1);
             } else {
-                this.highlightTimeout = global.setTimeout(() => this.setState({errorHighlight: null}), blinkingSpeed);
+                this.highlightTimeout = window.setTimeout(() => this.setState({errorHighlight: null}), blinkingSpeed);
             }
         };
 
-        this.highlightTimeout = global.setTimeout(blinker, blinkingSpeed, 0);
+        this.highlightTimeout = window.setTimeout(blinker, blinkingSpeed, 0);
     }
 
     private onTurn(): boolean {
@@ -140,11 +139,11 @@ export class UI extends React.Component<{}, UIState> {
 
         if (this.state.gameState?.gameInfo?.status === Status.Ok && this.state.gameState?.gameInfo?.who === this.thisName) {
             if (this.state.gameState.gameInfo.wantedAction === ActionType.Shuffle) {
-                this.playReminderTimeout = global.setTimeout(() => {
+                this.playReminderTimeout = window.setTimeout(() => {
                     window.alert("Mícháš.");
                 }, 60000);
             } else {
-                this.playReminderTimeout = global.setTimeout(() => {
+                this.playReminderTimeout = window.setTimeout(() => {
                     this.audioHandle = new Audio(audio.playReminder);
                     this.audioHandle.play();
                 }, 10000);

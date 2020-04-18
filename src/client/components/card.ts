@@ -18,7 +18,7 @@ class CardTooltip extends React.Component<{tooltip: CardTooltipString}> {
     render(): React.ReactNode {
         return React.createElement("div",
             {
-                className: "absolute centerInsideDiv tooltip topCardTooltip",
+                className: "absolute center-inside-div tooltip topCard-tooltip",
             },
             "❌"
         );
@@ -32,7 +32,7 @@ const transformationToString = (transformation: Transformation) => {
 class ColorChange extends React.Component<{color: Color, transform?: Transformation}> {
     render(): React.ReactNode {
         return React.createElement("img", {
-            className: "absolute centerInsideDiv colorChange",
+            className: "absolute center-inside-div color-change",
             src: colors[this.props.color],
             style: {
                 transform: typeof this.props.transform !== "undefined" ?
@@ -87,7 +87,7 @@ export default class Card extends React.Component<CardProps> {
         }
         return React.createElement("div",
             {
-                className: `${typeof this.props?.isBottomCard === "undefined" ? "centerInsideDiv absolute" : "relative"}`,
+                className: `${typeof this.props?.isBottomCard === "undefined" ? "center-inside-div absolute" : "relative"}`,
                 style: {
                     transform: typeof this.props.transform !== "undefined" ?
                     transformationToString(this.props.transform)

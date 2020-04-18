@@ -4,7 +4,7 @@ export default class Button extends React.Component<{onClick: () => void, text: 
     render(): React.ReactNode {
         return React.createElement("button", {
             onClick: this.props.onClick,
-            className: "fancyButton"
+            className: "fancy-button"
         }, this.props.text)
     }
 }

@@ -111,6 +111,6 @@ export default class Game extends React.Component<PlayFieldProps> {
         const shouldDrawHalo = typeof this.props.forceHalo !== "undefined" ? this.props.forceHalo : this.props.onTurn;
 
         return React.createElement("div", {
-            className: `playfield${shouldDrawHalo ? " bigRedHalo" : ""}`}, playfield);
+            className: `playfield${shouldDrawHalo ? " big-red-halo" : ""}`}, playfield);
     }
 }

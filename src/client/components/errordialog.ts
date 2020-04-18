@@ -8,7 +8,7 @@ export default class ErrorDialog extends React.Component<{error: string, fatal: 
     render(): React.ReactNode {
         const dialogContent = React.createElement("div",
             {
-                className: `errorDialog ${this.props.fatal ? "fatalError" : ""}`,
+                className: `error-dialog ${this.props.fatal ? "fatal-error" : ""}`,
                 onClick: defaultOnClick
             }, [
                 React.createElement("p", null, this.props.error),

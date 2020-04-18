@@ -3,16 +3,16 @@ import {FrontendStats} from "../../common/communication";
 
 export default class Stats extends React.Component<{stats: {[key in string]: FrontendStats}}> {
     render(): React.ReactNode {
-        return React.createElement("table", {className: "statsTable"},
+        return React.createElement("table", {className: "stats-table"},
             [
-                React.createElement("thead", {key: "statsTable", className: "statsHeader"}, [
+                React.createElement("thead", {key: "statsTable", className: "stats-header"}, [
                     React.createElement("tr", {key: "statsHeader"},
                         React.createElement("th", {colSpan: "3"}, "Statistika")
                     ),
                     React.createElement("tr", {key: "statsDesc"}, [
-                        React.createElement("td", {key: "statsDescName", className: "statsDesc"}, "Jméno"),
-                        React.createElement("td", {key: "statsDescSuccess", className: "statsDesc"}, "Úspěšnost"),
-                        React.createElement("td", {key: "statsDescPlayed", className: "statsDesc"}, "Odehráno")
+                        React.createElement("td", {key: "statsDescName", className: "stats-desc"}, "Jméno"),
+                        React.createElement("td", {key: "statsDescSuccess", className: "stats-desc"}, "Úspěšnost"),
+                        React.createElement("td", {key: "statsDescPlayed", className: "stats-desc"}, "Odehráno")
                     ])
                 ]),
                 React.createElement("tbody", {key: "statsMain"}, [

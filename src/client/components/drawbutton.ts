@@ -8,7 +8,7 @@ class DrawButtonTooltip extends React.Component<{tooltip: string}> {
         return React.createElement("div",
             {
                 key: "tooltip",
-                className: "absolute centerInsideDiv tooltip"
+                className: "absolute center-inside-div tooltip"
             },
             this.props.tooltip
         );

@@ -1,73 +1,54 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+/* Tags */
 p {
     font-size: 1em;
 }
+
 body {
     font-family: 'Roboto', sans-serif;
-    width: 100%;
     margin: auto;
+    width: 100%;
 }
-.card {
-    filter: drop-shadow(0.2em 0.2em 0.4em black);
-    max-height: 10em;
-    transform-origin: center;
-}
+
+/* Misc */
 .noselect {
     /* https://stackoverflow.com/a/9314458/12263846 */
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
     -khtml-user-select: none; /* Konqueror HTML */
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
     user-select: none; /* Non-prefixed version, currently
                           supported by Chrome and Opera */
-}
-.clickable {
-    color: blue;
-    text-decoration: underline;
-    cursor: pointer;
 }
 .bold {
     font-weight: bold;
 }
+.clickable {
+    color: blue;
+    cursor: pointer;
+    text-decoration: underline;
+}
+.big-red-halo {
+    filter: drop-shadow(0 0 1em red);
+}
 .halo:hover {
     filter: drop-shadow(0 0 1em white);
 }
+
+/* Positioning */
 .flex-column {
+    align-items: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
 }
 .flex-row {
-    width: 100%;
-    flex-wrap: wrap;
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
-}
-.playerbox {
-    margin-top: 1em;
-}
-.player-container {
-    height: 8em;
-}
-.hand-container {
-    justify-content: center;
     flex-wrap: wrap;
-    padding-bottom: 2em;
-}
-.topCard-container {
-    padding-top: 2em;
-    max-width: 30em;
-    margin: auto;
     justify-content: space-evenly;
-}
-.cardBacks-container-height {
-    max-height: 1.5em;
-}
-.cardBacks-container {
-    justify-content: center;
-    flex-wrap: wrap;
+    width: 100%;
 }
 .absolute {
     position: absolute;
@@ -75,60 +56,91 @@ body {
 .relative {
     position: relative;
 }
-.centerInsideDiv {
-    z-index: 1;
-    top: 50%;
+.center-inside-div {
     bottom: 50%;
-    left: -50%;
-    right: -50%;
-    width: fit-content;
     height: fit-content;
+    left: -50%;
     margin: auto;
+    right: -50%;
+    top: 50%;
+    width: fit-content;
+    z-index: 1;
 }
-.topCardTooltip {
-    bottom: initial;
-    top: 10%;
-    left: 0%;
-    font-size: 0.4em;
+
+/* Card related */
+.card {
+    filter: drop-shadow(0.2em 0.2em 0.4em black);
+    max-height: 10em;
+    transform-origin: center;
 }
 .tooltip {
-    pointer-events: none;
-    border: 0.1em black solid;
-    border-radius: 5px;
     background-color: rgba(192, 192, 192, 0.8);
-    padding: 0.5em;
-    color: white;
-    box-shadow: 0 0 1em black;
-}
-.colorChange {
+    border-radius: 5px;
     border: 0.1em black solid;
+    box-shadow: 0 0 1em black;
+    color: white;
+    padding: 0.5em;
+    pointer-events: none;
+}
+.color-change {
     background-color: rgba(128, 128, 128, 0.5);
     border-radius: 5px;
+    border: 0.1em black solid;
     box-shadow: 0 0 1em black;
-    width: 3em;
     height: 3em;
+    width: 3em;
 }
-.bigRedHalo {
-    filter: drop-shadow(0 0 1em red);
+
+/* Playerbox */
+.playerbox {
+    margin-top: 1em;
 }
-.logo {
-    margin-top: 2em;
-    margin-bottom: 2em;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
+
+/* Player container */
+.player-container {
+    height: 8em;
 }
+.cardBacks-container-height {
+    max-height: 1.5em;
+}
+.cardBacks-container {
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Hand container */
+.hand-container {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-bottom: 2em;
+}
+
+/* Top card */
+.topCard-container {
+    justify-content: space-evenly;
+    margin: auto;
+    max-width: 30em;
+    padding-top: 2em;
+}
+.topCard-tooltip {
+    bottom: initial;
+    font-size: 0.4em;
+    left: 0%;
+    top: 10%;
+}
+
+/* Dialogs */
 .dialog {
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    display: flex;
-    width: 100%;
-    height: 100%;
     background-color: rgba(0,0,0,0.4);
+    display: flex;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1;
 }
-.errorDialog {
+.error-dialog {
     align-items: center;
     background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(0,224,0,1) 100%);
     border-radius: 1em;
@@ -139,54 +151,25 @@ body {
     margin: auto;
     padding: 1em;
 }
-.fatalError {
+.fatal-error {
     color: red;
     font-weight: bold;
 }
+
+/* Color picker */
 .picker {
-    display: flex;
-    margin: auto;
-    background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(0,224,0,1) 100%);
-    border-radius: 1em;
     align-items: flex-start;
-    padding: 1em;
-    box-shadow: 1em 1em 1em black;
-    border: 0.2em solid darkgreen;
-}
-.nameDialog {
-    display: flex;
-    flex-direction: column;
-    margin: auto;
     background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(0,224,0,1) 100%);
     border-radius: 1em;
-    align-items: center;
-    padding: 1em;
-    box-shadow: 1em 1em 1em black;
     border: 0.2em solid darkgreen;
-    position: absolute;
-    top: 25%;
-    left: -50%;
-    right: -50%;
-    width: fit-content;
-}
-.nameInput:focus {
-    outline: none;
-}
-.nameInput {
-    border-radius: 5em;
-    border: 0.2em solid slategray;
-    font-family: 'Roboto', sans-serif;
-    font-size: 1em;
+    box-shadow: 1em 1em 1em black;
+    display: flex;
+    margin: auto;
     padding: 1em;
 }
-.fancyButton:focus {
-    outline: none;
-}
-.fancyButton:active {
-    filter: drop-shadow(0 0.2em 0.1em black);
-    transform: translateY(0.2em);
-}
-.fancyButton {
+
+/* Button */
+.fancy-button {
     border-radius: 5em;
     border: 0.2em solid slategray;
     filter: drop-shadow(0 0.4em 0.3em black);
@@ -194,7 +177,42 @@ body {
     margin-top: 1em;
     padding: 0.5em;
 }
-.nameInputText {
+.fancy-button:focus {
+    outline: none;
+}
+.fancy-button:active {
+    filter: drop-shadow(0 0.2em 0.1em black);
+    transform: translateY(0.2em);
+}
+
+/* Name dialog */
+.name-dialog {
+    align-items: center;
+    background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(0,224,0,1) 100%);
+    border-radius: 1em;
+    border: 0.2em solid darkgreen;
+    box-shadow: 1em 1em 1em black;
+    display: flex;
+    flex-direction: column;
+    left: -50%;
+    margin: auto;
+    padding: 1em;
+    position: absolute;
+    right: -50%;
+    top: 25%;
+    width: fit-content;
+}
+.name-input {
+    border-radius: 5em;
+    border: 0.2em solid slategray;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+    padding: 1em;
+}
+.name-input:focus {
+    outline: none;
+}
+.name-input-text {
     bottom: 0%;
     color: darkgrey;
     font-family: 'Roboto', sans-serif;
@@ -204,17 +222,30 @@ body {
     padding-right: 1em;
     right: 6%;
 }
-.statsTable {
-    margin: 1em auto;
+
+/* Stats */
+.stats-table {
     border-collapse: collapse;
+    margin: 1em auto;
     text-align: center;
 }
-.statsHeader {
+.stats-header {
     border-bottom: 0.1em solid black;
 }
-.statsDesc {
+.stats-desc {
     min-width: 6em;
 }
+
+/* Logo */
+.logo {
+    display: block;
+    margin-bottom: 2em;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2em;
+}
+
+/* ID */
 #game {
     margin: auto;
 }

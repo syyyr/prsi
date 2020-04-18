@@ -20,11 +20,11 @@ export default class NameDialog extends React.Component<NameDialogProps, {value:
 
     render(): React.ReactNode {
         const dialogContent = React.createElement("div", {
-            className: "nameDialog",
+            className: "name-dialog",
             onClick: (event: MouseEvent) => {event.stopPropagation();}
         }, [
             React.createElement("div", {key: "inputHolder", className: "relative"}, [
-                React.createElement("div", {className: "absolute nameInputText", key: "nameInputText"}, "jméno"),
+                React.createElement("div", {className: "absolute name-input-text", key: "nameInputText"}, "jméno"),
                 React.createElement("input", {
                     key: "nameInputBox",
                     onChange: (event: Event) => {this.setState({value: (<HTMLInputElement>event.target).value})},
@@ -37,7 +37,7 @@ export default class NameDialog extends React.Component<NameDialogProps, {value:
                             }
                         }
                     },
-                    className: "nameInput",
+                    className: "name-input",
                     autoFocus: true,
                     value: this.state.value
                 })

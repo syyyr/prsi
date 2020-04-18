@@ -97,7 +97,7 @@ export default class Game extends React.Component<PlayFieldProps> {
             drawCard: this.props.drawCard
         }));
 
-        playfield.push(React.createElement(Logo, {key: "logo", center: true}));
+        playfield.push(React.createElement(Logo, {key: "logo"}));
 
         if (typeof this.props.hand !== "undefined") {
             playfield.push(React.createElement(Hand, {

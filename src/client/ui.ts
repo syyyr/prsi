@@ -261,7 +261,7 @@ export class UI extends React.Component<{}, UIState> {
                 buttonText: this.state.error.buttonText,
                 closeDialog: !this.state.error.fatal ?
                     this.clearError :
-                    () => this.reconnect()
+                    this.reconnect
             }))
         }
 

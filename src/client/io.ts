@@ -2,7 +2,7 @@ import {ErrorResponse, PlayerRegistration, FrontendState, isErrorResponse, isFro
 import {PlayType, Card, Color, PlayDetails} from "../common/types";
 
 export default class PlayerInputOutput {
-    ws: any;
+    ws: globalThis.WebSocket;
     onError: (message: ErrorResponse) => void = () => {};
     onState: (message: FrontendState) => void = () => {};
     onClose: (code: number) => void = () => {};
@@ -13,7 +13,7 @@ export default class PlayerInputOutput {
             console.log("ws opened");
         };
 
-        this.ws.onmessage = (message: any) => {
+        this.ws.onmessage = (message: MessageEvent) => {
             const parsed = JSON.parse(message.data);
             console.log("response from server:", parsed);
 

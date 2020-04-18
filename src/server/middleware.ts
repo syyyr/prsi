@@ -266,7 +266,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
                 return;
             }
 
-            let name = "<unknown>";
+            let name = `ws/${id}`;
             // Have to check whether the closing socket was already registered
             if (typeof closed.name !== "undefined") {
                 name = closed.name;

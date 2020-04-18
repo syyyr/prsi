@@ -7,10 +7,13 @@ export default class PlayerInputOutput {
     onState: (message: FrontendState) => void = () => {};
     onClose: (code: number) => void = () => {};
     self: PlayerInputOutput = this;
-    constructor() {
+    constructor(onOpen?: () => void) {
         this.ws = new window.WebSocket(`ws${window.location.protocol === "https:" ? "s" : ""}://${window.location.host}`);
         this.ws.onopen = () => {
             console.log("ws opened");
+            if (typeof onOpen !== "undefined") {
+                onOpen();
+            }
         };
 
         this.ws.onmessage = (message: MessageEvent) => {

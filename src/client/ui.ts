@@ -40,7 +40,6 @@ export class UI extends React.Component<{}, UIState> {
         super(props);
         this.io = new PlayerInputOutput();
         this.initIO();
-
         // FIXME: look for a better solution for picker (don't save color of the played guy)
         this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false};
     }
@@ -148,8 +147,11 @@ export class UI extends React.Component<{}, UIState> {
 
     private readonly reconnect = (): void => {
         this.showError("Připojování...", undefined, "fatal");
-        this.thisName = undefined;
-        this.io = new PlayerInputOutput;
+        this.io = new PlayerInputOutput(() => {
+            if (typeof this.thisName !== "undefined") {
+                this.io.registerPlayer(this.thisName);
+            }
+        });
         this.initIO();
     }
 

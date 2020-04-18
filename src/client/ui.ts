@@ -70,16 +70,11 @@ export class UI extends React.Component<{}, UIState> {
                 this.thisName = undefined;
                 this.openNameDialog();
             }
-            this.setState({error: {message: err.error, buttonText: "OK", fatal: false}});
+            this.showError(err.error, "OK");
         };
 
         this.io.onClose = (code: number) => {
-            this.setState({
-                error: {
-                    message: `Byls odpojen. Kód: ${code}. Důvod: ${wsErrCodeToString(code)}`,
-                    buttonText: "Připojit se znovu",
-                    fatal: true
-                }});
+            this.showError(`Byls odpojen. Kód: ${code}. Důvod: ${wsErrCodeToString(code)}`, "Připojit se znovu", "fatal");
         };
     }
 
@@ -152,6 +147,7 @@ export class UI extends React.Component<{}, UIState> {
     }
 
     private readonly reconnect = (): void => {
+        this.showError("Připojování...", undefined, "fatal");
         this.setState({error: {message: "Připojování...", fatal: true}});
         this.thisName = undefined;
         this.io = new PlayerInputOutput;
@@ -160,6 +156,18 @@ export class UI extends React.Component<{}, UIState> {
 
     private readonly openNameDialog = (): void => {
         this.setState({nameDialog: true});
+    }
+
+    private readonly showError = (message: string, buttonText?: string, fatal?: "fatal"): void => {
+        this.setState({error: {
+            message: message,
+            fatal: fatal === "fatal",
+            buttonText: buttonText
+        }});
+    }
+
+    private readonly clearError = (): void => {
+        this.setState({error: null});
     }
 
     readonly render = (): React.ReactNode => {
@@ -182,7 +190,7 @@ export class UI extends React.Component<{}, UIState> {
         } else {
             buttons.push(React.createElement(LeaveButton, {key: "leaveButton", leaveGame: () => {
                 if (typeof this.thisName === "undefined") {
-                    this.setState({error: {message: "Už jsi opustil hru. (jak se ti povedlo ji opustit znova?)", fatal: false}});
+                    this.showError("Už jsi opustil hru. (jak se ti povedlo ji opustit znova?)");
                     return;
                 }
 
@@ -225,7 +233,7 @@ export class UI extends React.Component<{}, UIState> {
                 fatal: this.state.error.fatal,
                 buttonText: this.state.error.buttonText,
                 closeDialog: !this.state.error.fatal ?
-                    () => this.setState({error: null}) :
+                    this.clearError :
                     () => this.reconnect()
             }))
         }

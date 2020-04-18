@@ -245,7 +245,6 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
         });
 
         ws.on("close", () => {
-            // Using Object here, because I want to compare references
             const closed = openSockets[id];
             if (typeof closed === "undefined") {
                 prsiLogger("A socket we had no idea about closed.");

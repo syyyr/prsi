@@ -45,7 +45,7 @@ export class UI extends React.Component<{}, UIState> {
         this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false};
     }
 
-    private initIO(): void {
+    private readonly initIO = (): void => {
         this.io.onState = (state: FrontendState) => {
             if (typeof this.highlightTimeout !== "undefined") {
                 clearTimeout(this.highlightTimeout);
@@ -83,7 +83,7 @@ export class UI extends React.Component<{}, UIState> {
         };
     }
 
-    private blink(): void {
+    private readonly blink = (): void => {
         this.setState({errorHighlight: this.onTurn() ? false : true});
         const blinkingSpeed = 250;
         const blinker = (iterations: number) => {
@@ -98,11 +98,11 @@ export class UI extends React.Component<{}, UIState> {
         this.highlightTimeout = window.setTimeout(blinker, blinkingSpeed, 0);
     }
 
-    private onTurn(): boolean {
+    private readonly onTurn = (): boolean => {
         return this.state.gameState!.gameInfo!.who === this.thisName;
     }
 
-    private canPlaySvrsek(): boolean {
+    private readonly canPlaySvrsek = (): boolean => {
         switch (this.state.gameState!.gameInfo!.wantedAction) {
             case ActionType.Play:
             case ActionType.PlayKule:
@@ -115,13 +115,13 @@ export class UI extends React.Component<{}, UIState> {
         }
     }
 
-    createStats(stats: { [x: string]: FrontendStats; }): React.ReactNode | undefined {
+    private readonly createStats = (stats: { [x: string]: FrontendStats; }): React.ReactNode | undefined => {
         if (this.state.gameState?.players.length !== 0) {
             return React.createElement(Stats, {key: "stats", stats});
         }
     }
 
-    clearEffectTimeout() {
+    private readonly clearEffectTimeout = () => {
         if (typeof this.playReminderTimeout !== "undefined") {
             clearTimeout(this.playReminderTimeout);
             this.playReminderTimeout = undefined;
@@ -134,7 +134,7 @@ export class UI extends React.Component<{}, UIState> {
         }
     }
 
-    setEffectTimeout() {
+    private readonly setEffectTimeout = () => {
         this.clearEffectTimeout();
 
         if (this.state.gameState?.gameInfo?.status === Status.Ok && this.state.gameState?.gameInfo?.who === this.thisName) {
@@ -151,14 +151,14 @@ export class UI extends React.Component<{}, UIState> {
         }
     }
 
-    reconnect(): void {
+    private readonly reconnect = (): void => {
         this.setState({error: {message: "Připojování...", fatal: true}});
         this.thisName = undefined;
         this.io = new PlayerInputOutput;
         this.initIO();
     }
 
-    render(): React.ReactNode {
+    readonly render = (): React.ReactNode => {
         this.clearEffectTimeout();
 
         const elems = [];

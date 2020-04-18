@@ -174,6 +174,14 @@ export class UI extends React.Component<{}, UIState> {
         this.setState({error: null});
     }
 
+    private readonly openPicker = (svrsekColor: Color): void => {
+        if (this.onTurn() && this.canPlaySvrsek()) {
+            this.setState({picker: svrsekColor});
+        } else {
+            this.io.playCard(new Card(this.state.picker!, Value.Svrsek), svrsekColor);
+        }
+    }
+
     readonly render = (): React.ReactNode => {
         this.clearEffectTimeout();
 
@@ -268,9 +276,7 @@ export class UI extends React.Component<{}, UIState> {
             playCard: this.io.playCard,
             wantedAction: this.state.gameState.gameInfo.wantedAction,
             topCards: this.state.gameState.gameInfo.topCards,
-            openPicker: this.onTurn() && this.canPlaySvrsek() ?
-                (svrsekColor: Color) => this.setState({picker: svrsekColor}) :
-                (svrsekColor: Color) => this.io.playCard(new Card(this.state.picker!, Value.Svrsek), svrsekColor),
+            openPicker: this.openPicker,
             hand: this.state.gameState.gameInfo.hand,
             forceHalo: this.state.errorHighlight !== null ? this.state.errorHighlight : undefined
         }));

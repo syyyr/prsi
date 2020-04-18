@@ -182,8 +182,15 @@ export class UI extends React.Component<{}, UIState> {
         }
     }
 
-    private readonly closePicker = (event: MouseEvent) => {
-        event.stopPropagation();
+    private readonly playSvrsek = (color: Color) => {
+        this.io.playCard(new Card(this.state.picker!, Value.Svrsek), color);
+        this.closePicker();
+    }
+
+    private readonly closePicker = (event?: MouseEvent) => {
+        if (typeof event !== "undefined") {
+            event.stopPropagation();
+        }
         this.setState({picker: null});
     }
 
@@ -292,10 +299,7 @@ export class UI extends React.Component<{}, UIState> {
                 ColorPicker,
                 {
                     key: "picker",
-                    pickColor: (color: Color) => {
-                        this.io.playCard(new Card(this.state.picker!, Value.Svrsek), color);
-                        this.setState({picker: null});
-                    },
+                    pickColor: this.playSvrsek,
                     closePicker: this.closePicker
                 }
             ));

@@ -7,7 +7,9 @@ const wsApp = ws(express(), undefined, {
 });
 const router = express.Router();
 wsApp.applyTo(router);
-wsApp.app.use(prsi(router));
+wsApp.app.use(prsi(router, "", (msg: string, req?: express.Request) => {
+    console.log(`${typeof req !== "undefined" ? `[${(req as any).session.myId}] `: "" }${msg}`);
+}));
 wsApp.app.listen(3000);
 
 

@@ -253,7 +253,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
     wsEnabledRouter.ws(prefix, (ws: WebSocket) => {
         const id = idGen.next().value;
         openSockets[id] = ({ws});
-        prsiLogger("New websocket.", id);
+        prsiLogger("Client connected.", id);
         updateOne(id);
 
         ws.on("message", (message: WebSocket.Data) => {
@@ -267,14 +267,12 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
                 return;
             }
 
-            let name = `ws/${id}`;
             // Have to check whether the closing socket was already registered
             if (typeof closed.name !== "undefined") {
-                name = closed.name;
                 prsi.unregisterPlayer(name);
             }
 
-            prsiLogger(`${name} disconnected.`, id);
+            prsiLogger(`Client disconnected.`, id);
 
             delete openSockets[id];
             updateEveryone();

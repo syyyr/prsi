@@ -158,6 +158,10 @@ export class UI extends React.Component<{}, UIState> {
         this.setState({nameDialog: true});
     }
 
+    private readonly closeNameDialog = (): void => {
+        this.setState({nameDialog: false});
+    }
+
     private readonly showError = (message: string, buttonText?: string, fatal?: "fatal"): void => {
         this.setState({error: {
             message: message,
@@ -222,7 +226,7 @@ export class UI extends React.Component<{}, UIState> {
             elems.push(React.createElement(NameDialog, {
                 key: "nameDialog",
                 confirmName,
-                closeDialog: () => this.setState({nameDialog: false}),
+                closeDialog: this.closeNameDialog,
                 initialValue: lastName
             }));
         }

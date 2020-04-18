@@ -31,7 +31,7 @@ const rollbackStats = (stats: Stats) => {
     stats.current = {...stats.last};
 }
 
-let prsiLogger: (msg: string, ws?: any) => void;
+let prsiLogger: (msg: string, id?: number) => void;
 const prsi = new Prsi();
 
 const statsAccess = lowDb(new FileSync("stats.json"));
@@ -115,7 +115,7 @@ const processMessage = (id: number, message: string): void => {
 
     if (isPlayerRegistration(parsed)) {
         if (openSockets.some((socketInfo) => socketInfo.name === parsed.registerPlayer)) {
-            prsiLogger(`"${parsed.registerPlayer}" already belongs to someone else.`, ws);
+            prsiLogger(`"${parsed.registerPlayer}" already belongs to someone else.`, id);
             sendError(id, new ErrorResponse("Someone else owns this username.", ErrorCode.NameAlreadyUsed));
             return;
         }
@@ -127,7 +127,7 @@ const processMessage = (id: number, message: string): void => {
         }
         socket.name = parsed.registerPlayer;
         prsi.registerPlayer(parsed.registerPlayer);
-        prsiLogger(`Registered "${parsed.registerPlayer}".`, ws);
+        prsiLogger(`Registered "${parsed.registerPlayer}".`, id);
         if (typeof stats[parsed.registerPlayer] === "undefined") {
             stats[parsed.registerPlayer] = new Stats();
         }
@@ -154,7 +154,7 @@ const processMessage = (id: number, message: string): void => {
 
         prsi.unregisterPlayer(parsed.unregisterPlayer);
         socket.name = undefined;
-        prsiLogger(`Unregistered "${parsed.unregisterPlayer}".`, ws);
+        prsiLogger(`Unregistered "${parsed.unregisterPlayer}".`, id);
         updateEveryone();
         return;
     }
@@ -212,7 +212,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
         // Manually inject the ws id. I know using `any` isn't the cleanest
         // solution, but then again, the whole express-ws thing isn't very
         // clean.
-        if (typeof ws !== "undefined") {
+        if (typeof id !== "undefined") {
             logger(msg, {
                 session: {
                     myId: `ws/${id}`
@@ -237,7 +237,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
     wsEnabledRouter.ws(prefix, (ws: any) => {
         const id = idGen.next().value;
         openSockets[id] = ({ws});
-        prsiLogger("New websocket.", ws);
+        prsiLogger("New websocket.", id);
         updateOne(id);
 
         ws.on("message", (message: any) => {
@@ -259,7 +259,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
                 prsi.unregisterPlayer(name);
             }
 
-            prsiLogger(`${name} disconnected.`, ws);
+            prsiLogger(`${name} disconnected.`, id);
 
             openSockets.splice(id, 1);
             updateEveryone();

@@ -212,7 +212,8 @@ export class UI extends React.Component<{}, UIState> {
         if (this.state.error !== null) {
             elems.push(React.createElement(ErrorDialog, {
                 error: this.state.error.message,
-                closeDialog: !this.state.error.fatal ? () => this.setState({error: null}) : undefined
+                closeDialog: !this.state.error.fatal ? () => this.setState({error: null}) : undefined,
+                fatal: this.state.error.fatal
             }))
         }
 

@@ -77,15 +77,30 @@ const buildFrontendStateFor = (player?: string): FrontendState => {
 };
 
 const updateEveryone = () => {
-    openSockets.forEach((socketInfo) => socketInfo.ws.send(JSON.stringify(buildFrontendStateFor(socketInfo.name))));
+    openSockets.forEach((socketInfo, id) => {
+        // FIXME: fix this (after I get proper nodejs ws typing)
+        if (socketInfo.ws.readyState === 1) {
+            socketInfo.ws.send(JSON.stringify(buildFrontendStateFor(socketInfo.name)));
+        } else {
+            prsiLogger("updateEveryone: Socket not OPEN.", id);
+        }
+    });
 };
 
 const updateOne = (id: number) => {
-    openSockets[id].ws.send(JSON.stringify(buildFrontendStateFor(openSockets[id].name)));
+    if (openSockets[id].ws.readyState === 1) {
+        openSockets[id].ws.send(JSON.stringify(buildFrontendStateFor(openSockets[id].name)));
+    } else {
+        prsiLogger("updateOne: Socket not OPEN.", id);
+    }
 };
 
 const sendError = (id: number, error: ErrorResponse) => {
-    openSockets[id].ws.send(JSON.stringify(error));
+    if (openSockets[id].ws.readyState === 1) {
+        openSockets[id].ws.send(JSON.stringify(error));
+    } else {
+        prsiLogger("sendError: Socket not OPEN.", id);
+    }
 }
 
 const processMessage = (id: number, message: string): void => {

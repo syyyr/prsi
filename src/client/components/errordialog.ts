@@ -4,7 +4,7 @@ import Button from "./button";
 
 const defaultOnClick = (event: MouseEvent) => {event.stopPropagation()}
 
-export default class ErrorDialog extends React.Component<{error: string, fatal: boolean, closeDialog?: () => void, buttonText?: string}> {
+export default class ErrorDialog extends React.PureComponent<{error: string, fatal: boolean, closeDialog?: () => void, buttonText?: string}> {
     render(): React.ReactNode {
         const dialogContent = React.createElement("div",
             {

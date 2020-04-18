@@ -49,7 +49,7 @@ interface CoreGameProps {
     drawCard: () => void;
 }
 
-class PlayField extends React.Component<CoreGameProps> {
+class PlayField extends React.PureComponent<CoreGameProps> {
     private genTooltip() {
         const card = this.props.topCards[this.props.topCards.length - 1];
         if (!this.props.onTurn) {
@@ -85,7 +85,7 @@ class PlayField extends React.Component<CoreGameProps> {
     }
 }
 
-export default class Game extends React.Component<PlayFieldProps> {
+export default class Game extends React.PureComponent<PlayFieldProps> {
     render(): React.ReactNode {
         const playfield = [];
         playfield.push(React.createElement(PlayField, {

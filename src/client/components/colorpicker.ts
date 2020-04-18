@@ -3,7 +3,7 @@ import Dialog from "./dialog";
 import {Color} from "../../common/types";
 import colors from "../images/color-images";
 
-class ColorComponent extends React.Component<{color: Color, pickColor: (color: Color) => void}> {
+class ColorComponent extends React.PureComponent<{color: Color, pickColor: (color: Color) => void}> {
     render(): React.ReactNode {
         return React.createElement(
             "img",
@@ -17,7 +17,7 @@ class ColorComponent extends React.Component<{color: Color, pickColor: (color: C
     }
 }
 
-export default class ColorPicker extends React.Component<{pickColor: (color: Color) => void, closePicker: (event: MouseEvent) => void}> {
+export default class ColorPicker extends React.PureComponent<{pickColor: (color: Color) => void, closePicker: (event: MouseEvent) => void}> {
     render(): React.ReactNode {
         const dialogContent = React.createElement("div", {
             className: "picker",

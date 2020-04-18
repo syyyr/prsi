@@ -14,7 +14,7 @@ interface CardProps {
     tooltip?: CardTooltipString;
 }
 
-class CardTooltip extends React.Component<{tooltip: CardTooltipString}> {
+class CardTooltip extends React.PureComponent<{tooltip: CardTooltipString}> {
     render(): React.ReactNode {
         return React.createElement("div",
             {
@@ -29,7 +29,7 @@ const transformationToString = (transformation: Transformation) => {
     return `rotate(${transformation.rotation}deg) translateX(${transformation.translateX}px) translateY(${transformation.translateY}px)`
 };
 
-class ColorChange extends React.Component<{color: Color}> {
+class ColorChange extends React.PureComponent<{color: Color}> {
     render(): React.ReactNode {
         return React.createElement("img", {
             className: "absolute center-inside-div color-change",
@@ -44,7 +44,7 @@ interface CardImageProps {
     halo: boolean;
 }
 
-class CardImage extends React.Component<CardImageProps> {
+class CardImage extends React.PureComponent<CardImageProps> {
     render(): React.ReactNode {
         const imgOptions = {
             onClick: this.props.onClick,
@@ -56,7 +56,7 @@ class CardImage extends React.Component<CardImageProps> {
     }
 }
 
-export default class Card extends React.Component<CardProps> {
+export default class Card extends React.PureComponent<CardProps> {
     render(): React.ReactNode {
         const children = [];
         children.push(React.createElement(CardImage, {

@@ -15,7 +15,7 @@ class DrawButtonTooltip extends React.Component<{tooltip: string}> {
     }
 }
 
-export default class DrawButton extends React.Component<{callback: () => void, wantedAction: ActionType, shouldDrawTooltip: boolean}> {
+export default class DrawButton extends React.PureComponent<{callback: () => void, wantedAction: ActionType, shouldDrawTooltip: boolean}> {
     render(): React.ReactNode {
         const tooltip = (() => {
             if (!this.props.shouldDrawTooltip) {

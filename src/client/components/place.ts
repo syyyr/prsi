@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Place as PlaceType} from "../../common/types";
 
-export default class Place extends React.Component<{place: PlaceType, lastPlace: boolean}> {
+export default class Place extends React.PureComponent<{place: PlaceType, lastPlace: boolean}> {
     render() {
         return React.createElement("div", null, (() => {
             if (this.props.lastPlace) {

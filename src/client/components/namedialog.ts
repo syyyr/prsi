@@ -10,7 +10,7 @@ interface NameDialogProps {
 
 const alertEmptyName = () => window.alert("Zadals prázdný jméno. To nejde. Nebo jako sice to teoreticky jde, ale dej si neprázdný jméno.");
 
-export default class NameDialog extends React.Component<NameDialogProps, {value: string}> {
+export default class NameDialog extends React.PureComponent<NameDialogProps, {value: string}> {
     constructor(props: {closeDialog: () => void, confirmName: (name: string) => void}) {
         super(props);
         this.state = {

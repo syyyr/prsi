@@ -12,7 +12,7 @@ interface InstructionsProps {
     lastPlay?: LastPlay;
 }
 
-export default class Instructions extends React.Component<InstructionsProps> {
+export default class Instructions extends React.PureComponent<InstructionsProps> {
     render(): React.ReactNode {
         const lastPlay = this.props.lastPlay;
         const you = this.props.you;

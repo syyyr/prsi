@@ -10,7 +10,7 @@ interface PlayerBoxProps {
     playerInfo?: {[key in string]: {cards?: number, place?: Place}};
 }
 
-export default class PlayerBox extends React.Component<PlayerBoxProps> {
+export default class PlayerBox extends React.PureComponent<PlayerBoxProps> {
     render(): React.ReactNode {
         const playerInfo = this.props.playerInfo;
         return React.createElement("div", {key: "players", className: "flex-row playerbox"},

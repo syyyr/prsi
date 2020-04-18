@@ -11,9 +11,10 @@ export default class ErrorDialog extends React.PureComponent<{error: string, fat
                 className: `error-dialog ${this.props.fatal ? "fatal-error" : ""}`,
                 onClick: defaultOnClick
             }, [
-                React.createElement("p", null, this.props.error),
+                React.createElement("p", {key: "errorDialogText"}, this.props.error),
                 typeof this.props.buttonText !== "undefined" ?
                     React.createElement(Button, {
+                        key: "errorDialogButton",
                         onClick: typeof this.props.closeDialog !== "undefined" ? this.props.closeDialog : () => {},
                         text: this.props.buttonText
                     })

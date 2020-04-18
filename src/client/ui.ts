@@ -194,6 +194,19 @@ export class UI extends React.Component<{}, UIState> {
         this.setState({picker: null});
     }
 
+    private readonly leaveGame = () => {
+        if (typeof this.thisName === "undefined") {
+            this.showError("Už jsi opustil hru. (jak se ti povedlo ji opustit znova?)");
+            return;
+        }
+
+        const name = this.thisName;
+        // I need to unset the name first so that state update won't happen before that.
+        this.thisName = undefined;
+        this.io.unregisterPlayer(name);
+    }
+
+
     readonly render = (): React.ReactNode => {
         this.clearEffectTimeout();
 
@@ -212,16 +225,7 @@ export class UI extends React.Component<{}, UIState> {
         if (typeof this.thisName === "undefined") {
             buttons.push(React.createElement(JoinButton, {key: "joinButton", openDialog: this.openNameDialog}));
         } else {
-            buttons.push(React.createElement(LeaveButton, {key: "leaveButton", leaveGame: () => {
-                if (typeof this.thisName === "undefined") {
-                    this.showError("Už jsi opustil hru. (jak se ti povedlo ji opustit znova?)");
-                    return;
-                }
-
-                const name = this.thisName;
-                this.thisName = undefined;
-                this.io.unregisterPlayer(name);
-            }}));
+            buttons.push(React.createElement(LeaveButton, {key: "leaveButton", leaveGame: this.leaveGame}));
         }
 
         elems.push(React.createElement("div", {key: "buttonHolder", className: "flex-row button-holder"}, buttons));

@@ -83,7 +83,12 @@ const updateEveryone = () => {
         if (socketInfo.ws.readyState === WebSocket.OPEN) {
             socketInfo.ws.send(JSON.stringify(buildFrontendStateFor(socketInfo.name)));
         } else {
-            prsiLogger("updateEveryone: Socket not OPEN.", id);
+            prsiLogger("updateEveryone: Socket not OPEN. Deleting from openSockets.", id);
+            const name = openSockets[id].name;
+            if (typeof name !== "undefined") {
+                prsi.unregisterPlayer(name);
+            }
+            openSockets.splice(id, 1);
         }
     });
 };
@@ -92,7 +97,12 @@ const updateOne = (id: number) => {
     if (openSockets[id].ws.readyState === WebSocket.OPEN) {
         openSockets[id].ws.send(JSON.stringify(buildFrontendStateFor(openSockets[id].name)));
     } else {
-        prsiLogger("updateOne: Socket not OPEN.", id);
+        prsiLogger("updateOne: Socket not OPEN. Deleting from openSockets.", id);
+        const name = openSockets[id].name;
+        if (typeof name !== "undefined") {
+            prsi.unregisterPlayer(name);
+        }
+        openSockets.splice(id, 1);
     }
 };
 
@@ -100,7 +110,12 @@ const sendError = (id: number, error: ErrorResponse) => {
     if (openSockets[id].ws.readyState === WebSocket.OPEN) {
         openSockets[id].ws.send(JSON.stringify(error));
     } else {
-        prsiLogger("sendError: Socket not OPEN.", id);
+        prsiLogger("sendError: Socket not OPEN. Deleting from openSockets.", id);
+        const name = openSockets[id].name;
+        if (typeof name !== "undefined") {
+            prsi.unregisterPlayer(name);
+        }
+        openSockets.splice(id, 1);
     }
 }
 

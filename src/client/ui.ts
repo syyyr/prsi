@@ -153,6 +153,7 @@ export class UI extends React.Component<{}, UIState> {
 
     reconnect(): void {
         this.setState({error: {message: "Připojování...", fatal: true}});
+        this.thisName = undefined;
         this.io = new PlayerInputOutput;
         this.initIO();
     }

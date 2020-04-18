@@ -9,17 +9,17 @@ export default class Place extends React.PureComponent<{place: PlaceType, lastPl
             }
             switch (this.props.place) {
                 case PlaceType.First:
-                    return "1️⃣";
+                    return "🍺🍺🍺";
                 case PlaceType.Second:
-                    return "2️⃣";
+                    return "🍺🍺";
                 case PlaceType.Third:
-                    return "3️⃣";
+                    return "🍺";
                 case PlaceType.Fourth:
-                    return "4️⃣";
+                    return "✔";
                 case PlaceType.Fifth:
-                    return "5️⃣";
+                    return "✔";
                 case PlaceType.Sixth:
-                    return "6️⃣";
+                    return "✔";
             }
         })());
     }

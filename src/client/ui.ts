@@ -25,6 +25,7 @@ interface UIState {
     error: {
         message: string;
         fatal: boolean;
+        buttonText?: string;
     } | null;
 }
 
@@ -39,11 +40,18 @@ export class UI extends React.Component<{}, UIState> {
     constructor(props: {}) {
         super(props);
         this.io = new PlayerInputOutput();
+        this.initIO();
+
+        // FIXME: look for a better solution for picker (don't save color of the played guy)
+        this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false};
+    }
+
+    private initIO(): void {
         this.io.onState = (state: FrontendState) => {
             if (typeof this.highlightTimeout !== "undefined") {
                 clearTimeout(this.highlightTimeout);
             }
-            this.setState({nameDialog: false, gameState: state, picker: null, errorHighlight: null});
+            this.setState({error: null, nameDialog: false, gameState: state, picker: null, errorHighlight: null});
             if (typeof state.gameInfo !== "undefined") {
                 if (state.gameInfo?.status === Status.Ok) {
                     switch (state.gameInfo.lastPlay?.playerAction) {
@@ -63,15 +71,17 @@ export class UI extends React.Component<{}, UIState> {
                 this.thisName = undefined;
                 this.setState({nameDialog: true});
             }
-            this.setState({error: {message: err.error, fatal: false}});
+            this.setState({error: {message: err.error, buttonText: "OK", fatal: false}});
         };
 
         this.io.onClose = (code: number) => {
-            this.setState({error: {message: `Byls odpojen. Kód: ${code}. Důvod: ${wsErrCodeToString(code)}`, fatal: true}});
+            this.setState({
+                error: {
+                    message: `Byls odpojen. Kód: ${code}. Důvod: ${wsErrCodeToString(code)}`,
+                    buttonText: "Připojit se znovu",
+                    fatal: true
+                }});
         };
-
-        // FIXME: look for a better solution for picker (don't save color of the played guy)
-        this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false};
     }
 
     private blink(): void {
@@ -140,6 +150,12 @@ export class UI extends React.Component<{}, UIState> {
                 }, 10000);
             }
         }
+    }
+
+    reconnect(): void {
+        this.setState({error: {message: "Připojování...", fatal: true}});
+        this.io = new PlayerInputOutput;
+        this.initIO();
     }
 
     render(): React.ReactNode {
@@ -216,8 +232,11 @@ export class UI extends React.Component<{}, UIState> {
         if (this.state.error !== null) {
             elems.push(React.createElement(ErrorDialog, {
                 error: this.state.error.message,
-                closeDialog: !this.state.error.fatal ? () => this.setState({error: null}) : undefined,
-                fatal: this.state.error.fatal
+                fatal: this.state.error.fatal,
+                buttonText: this.state.error.buttonText,
+                closeDialog: !this.state.error.fatal ?
+                    () => this.setState({error: null}) :
+                    () => this.reconnect()
             }))
         }
 

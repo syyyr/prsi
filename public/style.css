@@ -184,6 +184,10 @@ body {
     filter: drop-shadow(0 0.2em 0.1em black);
     transform: translateY(0.2em);
 }
+.button-holder {
+    flex-wrap: nowrap;
+    width: 10%;
+}
 
 /* Name dialog */
 .name-dialog {

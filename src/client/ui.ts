@@ -151,14 +151,16 @@ export class UI extends React.Component<{}, UIState> {
             return elems;
         }
 
+        const buttons = [];
+
         if (this.state.gameState.gameStarted === "no" && this.state.gameState.players.length >= 2 && typeof this.thisName !== "undefined") {
-            elems.push(React.createElement(StartButton, {key: "startButton", startGame: this.io.startGame}));
+            buttons.push(React.createElement(StartButton, {key: "startButton", startGame: this.io.startGame}));
         }
 
         if (typeof this.thisName === "undefined") {
-            elems.push(React.createElement(JoinButton, {key: "joinButton", openDialog: () => this.setState({nameDialog: true})}));
+            buttons.push(React.createElement(JoinButton, {key: "joinButton", openDialog: () => this.setState({nameDialog: true})}));
         } else {
-            elems.push(React.createElement(LeaveButton, {key: "leaveButton", leaveGame: () => {
+            buttons.push(React.createElement(LeaveButton, {key: "leaveButton", leaveGame: () => {
                 if (typeof this.thisName === "undefined") {
                     this.setState({error: {message: "You already left the game.", fatal: false}});
                     return;
@@ -169,6 +171,8 @@ export class UI extends React.Component<{}, UIState> {
                 this.io.unregisterPlayer(name);
             }}));
         }
+
+        elems.push(React.createElement("div", {key: "buttonHolder", className: "flex-row button-holder"}, buttons));
 
         // FIXME: This algorithm feels a bit clunky, I think it can be improved
         const lastPlace: string | undefined = (() => {

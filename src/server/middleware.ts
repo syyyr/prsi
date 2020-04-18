@@ -32,7 +32,7 @@ const rollbackStats = (stats: Stats) => {
     stats.current = {...stats.last};
 }
 
-let prsiLogger: (msg: string, id?: number) => void;
+let prsiLogger: (msg: string, id?: number | string) => void;
 const prsi = new Prsi();
 
 const statsAccess = lowDb(new FileSync("stats.json"));
@@ -45,7 +45,9 @@ interface SocketInfo {
     name?: string;
 }
 
-const openSockets: SocketInfo[] = [];
+const openSockets: {
+    [key in number]: SocketInfo;
+} = {};
 
 const idGen = (function*(): Generator {
     let id = 1;
@@ -79,18 +81,17 @@ const buildFrontendStateFor = (player?: string): FrontendState => {
 };
 
 const updateEveryone = () => {
-    openSockets.forEach((socketInfo, id) => {
+    Object.entries(openSockets).forEach((([id, socketInfo]) => {
         if (socketInfo.ws.readyState === WebSocket.OPEN) {
             socketInfo.ws.send(JSON.stringify(buildFrontendStateFor(socketInfo.name)));
         } else {
             prsiLogger("updateEveryone: Socket not OPEN. Unregistering it from the game.", id);
-            const name = openSockets[id]?.name;
-            if (typeof name !== "undefined") {
-                prsi.unregisterPlayer(name);
-                openSockets[id].name = undefined;
+            if (typeof socketInfo.name !== "undefined") {
+                prsi.unregisterPlayer(socketInfo.name);
+                socketInfo.name = undefined;
             }
         }
-    });
+    }));
 };
 
 const updateOne = (id: number) => {
@@ -98,7 +99,7 @@ const updateOne = (id: number) => {
         openSockets[id].ws.send(JSON.stringify(buildFrontendStateFor(openSockets[id].name)));
     } else {
         prsiLogger("updateOne: Socket not OPEN. Unregistering it from the game.", id);
-        const name = openSockets[id]?.name;
+        const name = openSockets[id].name;
         if (typeof name !== "undefined") {
             prsi.unregisterPlayer(name);
             openSockets[id].name = undefined;
@@ -111,7 +112,7 @@ const sendError = (id: number, error: ErrorResponse) => {
         openSockets[id].ws.send(JSON.stringify(error));
     } else {
         prsiLogger("sendError: Socket not OPEN. Unregistering it from the game.", id);
-        const name = openSockets[id]?.name;
+        const name = openSockets[id].name;
         if (typeof name !== "undefined") {
             prsi.unregisterPlayer(name);
             openSockets[id].name = undefined;
@@ -130,7 +131,7 @@ const processMessage = (id: number, message: string): void => {
     }
 
     if (isPlayerRegistration(parsed)) {
-        if (openSockets.some((socketInfo) => socketInfo.name === parsed.registerPlayer)) {
+        if (Object.entries(openSockets).some(([_, socketInfo]) => socketInfo.name === parsed.registerPlayer)) {
             prsiLogger(`"${parsed.registerPlayer}" already belongs to someone else.`, id);
             sendError(id, new ErrorResponse("Someone else owns this username.", ErrorCode.NameAlreadyUsed));
             return;
@@ -224,7 +225,7 @@ const processMessage = (id: number, message: string): void => {
 };
 
 const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: string, _req?: express.Request) => console.log(msg)) => {
-    prsiLogger = (msg: string, id?: number) => {
+    prsiLogger = (msg: string, id?: number | string) => {
         // Manually inject the ws id. I know using `any` isn't the cleanest
         // solution, but then again, the whole express-ws thing isn't very
         // clean.
@@ -275,7 +276,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
 
             prsiLogger(`${name} disconnected.`, id);
 
-            openSockets.splice(id, 1);
+            delete openSockets[id];
             updateEveryone();
         });
     });

@@ -5,6 +5,7 @@ export default class PlayerInputOutput {
     ws: any;
     onError: (message: ErrorResponse) => void = () => {};
     onState: (message: FrontendState) => void = () => {};
+    onClose: (code: number) => void = () => {};
     self: PlayerInputOutput = this;
     constructor() {
         this.ws = new window.WebSocket(`ws${window.location.protocol === "https:" ? "s" : ""}://${window.location.host}`);
@@ -26,8 +27,9 @@ export default class PlayerInputOutput {
             }
         };
 
-        this.ws.onclose = () => {
+        this.ws.onclose = (event: CloseEvent) => {
             console.log("ws closed");
+            this.onClose(event.code);
         };
     }
 

@@ -159,3 +159,24 @@ export enum CardTooltip {
     NoSkip = "(nestojíš)",
     NoDraw = "(nelížeš)"
 }
+
+export const wsErrCodeToString = (code: number) => {
+    switch(code) {
+    case 1000: return "Normal Closure";
+    case 1001: return "Going Away";
+    case 1002: return "Protocol Error";
+    case 1003: return "Unsupported Data";
+    case 1005: return "No Status Received";
+    case 1006: return "Abnormal Closure";
+    case 1007: return "Invalid frame payload data";
+    case 1008: return "Policy Violation";
+    case 1009: return "Message too big";
+    case 1010: return "Missing Extension";
+    case 1011: return "Internal Error";
+    case 1012: return "Service Restart";
+    case 1013: return "Try Again";
+    case 1014: return "Bad Gateway";
+    case 1015: return "TLS Handshake";
+    default: return "Unknown reason";
+    }
+}

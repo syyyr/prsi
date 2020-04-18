@@ -15,6 +15,7 @@ import PlayerInputOutput from "./io";
 import NameDialog from "./components/namedialog";
 import ErrorDialog from "./components/errordialog";
 import LeaveButton from "./components/leavebutton";
+import {wsErrCodeToString} from "./strings";
 
 interface UIState {
     nameDialog: boolean;
@@ -56,13 +57,19 @@ export class UI extends React.Component<{}, UIState> {
                 }
             }
         };
+
         this.io.onError = (err: ErrorResponse) => {
             if (err.code === ErrorCode.NameAlreadyUsed) {
                 this.thisName = undefined;
                 this.setState({nameDialog: true});
             }
             this.setState({error: {message: err.error, fatal: false}});
-        }
+        };
+
+        this.io.onClose = (code: number) => {
+            this.setState({error: {message: `Byls odpojen. Kód: ${code}. Důvod: ${wsErrCodeToString(code)}`, fatal: true}});
+        };
+
         // FIXME: look for a better solution for picker (don't save color of the played guy)
         this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false};
     }

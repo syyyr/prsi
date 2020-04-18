@@ -189,27 +189,13 @@ export class UI extends React.Component<{}, UIState> {
 
         elems.push(React.createElement("div", {key: "buttonHolder", className: "flex-row button-holder"}, buttons));
 
-        // FIXME: This algorithm feels a bit clunky, I think it can be improved
-        const lastPlace: string | undefined = (() => {
-            if (typeof this.state.gameState.gameInfo === "undefined") {
-                return;
-            }
-
-            const values = Object.entries(this.state.gameState.gameInfo.playerInfo);
-            const playerCount = values.length;
-            const index = values.findIndex(([_, info]) => typeof info.place === "undefined" ? false : info.place === playerCount);
-            if (index !== -1) {
-                return values[index][0];
-            }
-        })();
-
         elems.push(React.createElement(PlayerBox, {
             key: "playerbox",
             thisName: this.thisName,
             players: this.state.gameState.players,
             playerInfo: this.state.gameState.gameInfo?.playerInfo,
             whoseTurn: this.state.gameState.gameInfo?.who,
-            lastPlace: lastPlace
+            lastPlace: this.state.gameState.gameInfo?.loser
         }));
 
         if (this.state.nameDialog) {

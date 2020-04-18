@@ -72,7 +72,8 @@ const buildFrontendStateFor = (player?: string): FrontendState => {
             topCards: state.playedCards.slice(state.playedCards.length - Math.min(state.playedCards.length, 3)),
             hand: typeof player !== "undefined" ? state.hands.get(player) : undefined,
             playerInfo,
-            lastPlay: state.lastPlay
+            lastPlay: state.lastPlay,
+            loser: state.loser
         } : undefined
     };
 };

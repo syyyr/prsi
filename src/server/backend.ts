@@ -73,6 +73,7 @@ class State {
     public lastAction: ActionType = ActionType.Play;
     public status: Status = Status.Ok;
     public lastPlay?: LastPlay;
+    public loser?: string;
 
     constructor(players: string[], whoStarts: string) {
         this.players = players.map((name) => new PlayerState(name));
@@ -312,6 +313,7 @@ export class Prsi {
 
         this._currentGame.gameState = "ended";
         const loser = this._currentGame.players.findIndex((player) => player.place === null);
+        this._currentGame.loser = this._currentGame.players[loser].name;
         this._currentGame.players[loser].place = this.nextPlace();
         this._currentGame.lastAction = this._currentGame.wantedAction ;
         this._currentGame.wantedAction = ActionType.Shuffle;

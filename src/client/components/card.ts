@@ -29,16 +29,11 @@ const transformationToString = (transformation: Transformation) => {
     return `rotate(${transformation.rotation}deg) translateX(${transformation.translateX}px) translateY(${transformation.translateY}px)`
 };
 
-class ColorChange extends React.Component<{color: Color, transform?: Transformation}> {
+class ColorChange extends React.Component<{color: Color}> {
     render(): React.ReactNode {
         return React.createElement("img", {
             className: "absolute center-inside-div color-change",
             src: colors[this.props.color],
-            style: {
-                transform: typeof this.props.transform !== "undefined" ?
-                transformationToString(this.props.transform)
-                : undefined
-            }
         });
     }
 }
@@ -73,10 +68,7 @@ export default class Card extends React.Component<CardProps> {
         if (typeof this.props?.colorChange !== "undefined") {
             children.push(React.createElement(ColorChange, {
                 key: "colorChange",
-                color: this.props.colorChange,
-                transform: typeof this.props.transform !== "undefined" ?
-                    new Transformation(0, this.props.transform.translateX, this.props.transform.translateY)
-                    : undefined
+                color: this.props.colorChange
             }));
         }
         if (typeof this.props?.tooltip !== "undefined") {

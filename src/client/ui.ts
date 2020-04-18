@@ -68,7 +68,7 @@ export class UI extends React.Component<{}, UIState> {
         this.io.onError = (err: ErrorResponse) => {
             if (err.code === ErrorCode.NameAlreadyUsed) {
                 this.thisName = undefined;
-                this.setState({nameDialog: true});
+                this.openNameDialog();
             }
             this.setState({error: {message: err.error, buttonText: "OK", fatal: false}});
         };
@@ -158,6 +158,10 @@ export class UI extends React.Component<{}, UIState> {
         this.initIO();
     }
 
+    private readonly openNameDialog = (): void => {
+        this.setState({nameDialog: true});
+    }
+
     readonly render = (): React.ReactNode => {
         this.clearEffectTimeout();
 
@@ -174,7 +178,7 @@ export class UI extends React.Component<{}, UIState> {
         }
 
         if (typeof this.thisName === "undefined") {
-            buttons.push(React.createElement(JoinButton, {key: "joinButton", openDialog: () => this.setState({nameDialog: true})}));
+            buttons.push(React.createElement(JoinButton, {key: "joinButton", openDialog: this.openNameDialog}));
         } else {
             buttons.push(React.createElement(LeaveButton, {key: "leaveButton", leaveGame: () => {
                 if (typeof this.thisName === "undefined") {

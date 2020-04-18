@@ -162,7 +162,7 @@ export class UI extends React.Component<{}, UIState> {
         } else {
             buttons.push(React.createElement(LeaveButton, {key: "leaveButton", leaveGame: () => {
                 if (typeof this.thisName === "undefined") {
-                    this.setState({error: {message: "You already left the game.", fatal: false}});
+                    this.setState({error: {message: "Už jsi opustil hru. (jak se ti povedlo ji opustit znova?)", fatal: false}});
                     return;
                 }
 

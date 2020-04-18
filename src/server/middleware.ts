@@ -3,6 +3,7 @@ import lowDb from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import path from "path";
 import ws from "express-ws";
+import WebSocket from "ws";
 import Prsi from "../server/backend";
 import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode} from "../common/communication";
 import {ActionType, Status, PlayerAction, Place} from "../common/types";
@@ -233,14 +234,13 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
 
     prsiLogger("Initializing prsi...");
 
-    // FIXME: find the proper type of the WebSocket and use that instead of any
-    wsEnabledRouter.ws(prefix, (ws: any) => {
+    wsEnabledRouter.ws(prefix, (ws: WebSocket) => {
         const id = idGen.next().value;
         openSockets[id] = ({ws});
         prsiLogger("New websocket.", id);
         updateOne(id);
 
-        ws.on("message", (message: any) => {
+        ws.on("message", (message: WebSocket.Data) => {
             processMessage(id, message.toString());
         });
 

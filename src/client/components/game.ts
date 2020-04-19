@@ -1,6 +1,6 @@
 import * as React from "react";
 import DrawButton from "./drawbutton";
-import {Card, Color, Value, ActionType, changeActionToColor} from "../../common/types";
+import {Card, Color, Value, ActionType, changeActionToColor, LastPlay, LastAction} from "../../common/types";
 import Hand from "./hand";
 import PlayedCards from "./playedcards";
 import {CardTooltip} from "../strings";
@@ -37,6 +37,7 @@ interface PlayFieldProps {
     openPicker: (svrsekColor: Color) => void;
     wantedAction: ActionType;
     topCards: Card[];
+    lastPlay?: LastPlay;
     hand?: Card[];
     forceHalo?: boolean;
 }
@@ -47,6 +48,7 @@ interface CoreGameProps {
     wantedAction: ActionType;
     shouldDrawDrawButton: boolean;
     drawCard: () => void;
+    lastPlay?: LastPlay;
 }
 
 class PlayField extends React.PureComponent<CoreGameProps> {
@@ -75,10 +77,19 @@ class PlayField extends React.PureComponent<CoreGameProps> {
             }));
         }
 
+        const colorChange =
+            isColorChange(this.props.wantedAction) ? changeActionToColor(this.props.wantedAction) :
+            this.props.wantedAction === ActionType.Shuffle &&
+                typeof this.props.lastPlay !== "undefined" &&
+                this.props.lastPlay.playerAction === LastAction.Change ? this.props.lastPlay.playDetails?.colorChange :
+            undefined
+
+
+
         res.push(React.createElement(PlayedCards, {
             key: "topCards",
             cards: this.props.topCards,
-            colorChange: isColorChange(this.props.wantedAction) ? changeActionToColor(this.props.wantedAction) : undefined,
+            colorChange: colorChange,
             tooltip: this.genTooltip()
         }));
         return React.createElement("div", {className: "topCard-container flex-row"}, res);
@@ -94,7 +105,8 @@ export default class Game extends React.PureComponent<PlayFieldProps> {
             topCards: this.props.topCards,
             wantedAction: this.props.wantedAction,
             shouldDrawDrawButton: typeof this.props.hand !== "undefined",
-            drawCard: this.props.drawCard
+            drawCard: this.props.drawCard,
+            lastPlay: this.props.lastPlay
         }));
 
         playfield.push(React.createElement(Logo, {key: "logo"}));

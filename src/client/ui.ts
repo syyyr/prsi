@@ -291,6 +291,7 @@ export class UI extends React.Component<{}, UIState> {
             drawCard: this.io.drawCard,
             playCard: this.io.playCard,
             wantedAction: this.state.gameState.gameInfo.wantedAction,
+            lastPlay: this.state.gameState.gameInfo.lastPlay,
             topCards: this.state.gameState.gameInfo.topCards,
             openPicker: this.openPicker,
             hand: this.state.gameState.gameInfo.hand,

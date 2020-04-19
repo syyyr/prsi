@@ -54,9 +54,6 @@ interface CoreGameProps {
 class PlayField extends React.PureComponent<CoreGameProps> {
     private genTooltip() {
         const card = this.props.topCards[this.props.topCards.length - 1];
-        if (!this.props.onTurn) {
-            return;
-        }
         if (card.value === Value.Eso && this.props.wantedAction !== ActionType.SkipTurn) {
             return CardTooltip.NoSkip;
         }

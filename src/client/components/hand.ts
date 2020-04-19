@@ -7,7 +7,7 @@ export default class Hand extends React.PureComponent<{hand: Card[], playCard: (
         return React.createElement("div", {className: "flex-row hand-container"}, this.props.hand.map((card, index) => React.createElement(CardComponent, {
             key: `hand:${index}`,
             card: card,
-            isBottomCard: "bottom",
+            stack: false,
             halo: "halo",
             onClick: () => {
                 if (card.value === Value.Svrsek) {

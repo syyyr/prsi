@@ -7,7 +7,7 @@ import colors from "../images/color-images";
 interface CardProps {
     card: CardType;
     transform?: Transformation;
-    isBottomCard?: "bottom";
+    stack: boolean;
     colorChange?: Color;
     halo?: "halo";
     onClick?: () => void;
@@ -81,7 +81,7 @@ export default class Card extends React.PureComponent<CardProps> {
         }
         return React.createElement("div",
             {
-                className: `${typeof this.props?.isBottomCard === "undefined" ? "center-inside-div absolute" : "relative"}`,
+                className: `${this.props.stack ? "absolute" : "relative"}`,
                 style: {
                     transform: typeof this.props.transform !== "undefined" ?
                     transformationToString(this.props.transform)

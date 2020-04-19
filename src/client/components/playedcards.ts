@@ -28,12 +28,12 @@ export default class TopCards extends React.PureComponent<{cards: Card[], colorC
         }
 
         this.lastTopCard = this.props.cards[this.props.cards.length - 1];
-        return React.createElement("div", {className: "relative"},
+        return React.createElement("div", {className: "relative playedCards"},
             this.props.cards.map((card, index, array) => {
                 return React.createElement(CardComponent, {
                     key: `topCard:${index}`,
                     card: card,
-                    isBottomCard: index === 0 ? "bottom" : undefined,
+                    stack: true,
                     colorChange: index === array.length - 1 ? this.props.colorChange : undefined,
                     tooltip: index === array.length - 1 ? this.props.tooltip : undefined,
                     transform: this.transformations[index]

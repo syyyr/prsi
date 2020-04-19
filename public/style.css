@@ -72,7 +72,7 @@ body {
 /* Card related */
 .card {
     filter: drop-shadow(0.2em 0.2em 0.4em black);
-    max-height: 10em;
+    width: 6em;
     transform-origin: center;
 }
 .tooltip {
@@ -129,6 +129,9 @@ body {
     font-size: 0.4em;
     left: 0%;
     top: 10%;
+}
+.playedCards {
+    width: 6em;
 }
 
 /* Dialogs */

@@ -38,6 +38,7 @@ export default class DrawButton extends React.PureComponent<{callback: () => voi
                 {
                     key: "drawButton",
                     src: image,
+                    draggable: false,
                     className: "clickable halo card",
                     onClick: this.props.callback
                 }

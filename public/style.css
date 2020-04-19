@@ -68,6 +68,16 @@ body {
     z-index: 1;
 }
 
+/* Playfield */
+.playfield {
+    background: radial-gradient(circle, rgba(0,196,0,1) 0%, rgba(0,157,0,1) 23%, rgba(0,54,0,1) 100%);
+    border-radius: 1em;
+    border: 0.2em solid;
+    margin: auto;
+    max-width: 80em;
+    width: 95%;
+}
+
 /* Card related */
 .card {
     filter: drop-shadow(0.2em 0.2em 0.4em black);

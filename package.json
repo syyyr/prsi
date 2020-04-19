@@ -6,11 +6,13 @@
   "main": "build/server/middleware.js",
   "scripts": {
     "build": "npm run build-tsc && npm run build-webpack",
+    "build-prod": "npm run build-tsc && npm run build-webpack-prod",
     "build-tsc": "npx tsc",
     "build-webpack": "npx webpack",
+    "build-webpack-prod": "npx webpack --mode production",
     "clean": "rm -rf build/ node_modules/ dist/ tsconfig.tsbuildinfo",
     "lint": "npx eslint src --ext .ts",
-    "postinstall": "npm run build",
+    "postinstall": "npm run build-prod",
     "start": "npm --silent run build && node build/main.js",
     "test": "npm run build-tsc && while node build/main.js; do :; done"
   },

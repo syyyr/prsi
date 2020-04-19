@@ -59,11 +59,13 @@ body {
 .center-inside-div {
     bottom: 50%;
     height: fit-content;
+    height: -moz-fit-content;
     left: -50%;
     margin: auto;
     right: -50%;
     top: 50%;
     width: fit-content;
+    width: -moz-fit-content;
     z-index: 1;
 }
 
@@ -205,6 +207,7 @@ body {
     right: -50%;
     top: 25%;
     width: fit-content;
+    width: -moz-fit-content;
 }
 .name-input {
     border-radius: 5em;

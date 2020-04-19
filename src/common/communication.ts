@@ -1,4 +1,4 @@
-import {ActionType, Card, LastPlay, PlayType, PlayDetails, Status} from "./types"
+import {ActionType, Card, LastPlay, PlayType, PlayDetails, Status} from "./types";
 import {Place} from "./types";
 
 export function isPlayerRegistration(toCheck: any): toCheck is PlayerRegistration {

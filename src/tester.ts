@@ -1,11 +1,12 @@
-import {Prsi} from "./server/backend"
-import {Color, PlayType, PlayDetails, Status, PlayerAction} from "./common/types"
+import {Prsi} from "./server/backend";
+import {Color, PlayType, PlayDetails, Status, PlayerAction} from "./common/types";
 
 const prsi = new Prsi();
 prsi.registerPlayer("Typek");
 prsi.registerPlayer("Frajer");
 prsi.registerPlayer("Lama");
 prsi.newGame();
+// eslint-disable-next-line no-constant-condition
 while (true) {
     const state = prsi.state();
     state!.printHands();

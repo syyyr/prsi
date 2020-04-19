@@ -27,7 +27,7 @@ export default class NameDialog extends React.PureComponent<NameDialogProps, {va
                 React.createElement("div", {className: "absolute name-input-text", key: "nameInputText"}, "jméno"),
                 React.createElement("input", {
                     key: "nameInputBox",
-                    onChange: (event: Event) => {this.setState({value: (<HTMLInputElement>event.target).value})},
+                    onChange: (event: Event) => {this.setState({value: (<HTMLInputElement>event.target).value});},
                     onKeyUp: (event: KeyboardEvent) => {
                         if (event.keyCode === 13) {
                             if (this.state.value !== "") {

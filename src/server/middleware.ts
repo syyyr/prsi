@@ -26,11 +26,11 @@ const updateStats = (stats: Stats, acquiredPts: number, possiblePts: number) => 
     stats.current.possiblePts += possiblePts;
     stats.current.averagePts = stats.current.acquiredPts / stats.current.possiblePts;
     stats.current.gamesPlayed++;
-}
+};
 
 const rollbackStats = (stats: Stats) => {
     stats.current = {...stats.last};
-}
+};
 
 let prsiLogger: (msg: string, id?: number | string) => void;
 const prsi = new Prsi();
@@ -118,7 +118,7 @@ const sendError = (id: number, error: ErrorResponse) => {
             openSockets[id].name = undefined;
         }
     }
-}
+};
 
 const processMessage = (id: number, message: string): void => {
     let parsed: any;
@@ -139,7 +139,7 @@ const processMessage = (id: number, message: string): void => {
 
         const socket = openSockets[id];
         if (typeof socket === "undefined") {
-            prsiLogger(`Tried to assign a name, but this WebSocket doesn't exist in openSockets.`, id);
+            prsiLogger("Tried to assign a name, but this WebSocket doesn't exist in openSockets.", id);
             return;
         }
         socket.name = parsed.registerPlayer;
@@ -179,7 +179,7 @@ const processMessage = (id: number, message: string): void => {
     if (isPlayerInput(parsed)) {
         const name = openSockets[id].name;
         if (typeof name === "undefined") {
-            prsiLogger(`Got input, but this socket doesn't have a name assigned.`, id);
+            prsiLogger("Got input, but this socket doesn't have a name assigned.", id);
             return;
         }
         prsi.resolveAction(new PlayerAction(parsed.playType, name, parsed.playDetails));
@@ -213,7 +213,7 @@ const processMessage = (id: number, message: string): void => {
     if (isStartGame(parsed)) {
         if (typeof openSockets[id].name === "undefined") {
             sendError(id, new ErrorResponse("Nemůžeš začít hru, když nehraješ? (jax to udělal?)."));
-            prsiLogger(`Tried to start the game, even though, no name is assigned`, id);
+            prsiLogger("Tried to start the game, even though, no name is assigned", id);
         }
         prsi.newGame();
         updateEveryone();
@@ -221,7 +221,7 @@ const processMessage = (id: number, message: string): void => {
     }
 
     sendError(id, new ErrorResponse("Invalid request."));
-    prsiLogger(`Invalid request`, id);
+    prsiLogger("Invalid request", id);
 };
 
 const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: string, _req?: express.Request) => console.log(msg)) => {
@@ -272,7 +272,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
                 prsi.unregisterPlayer(closed.name);
             }
 
-            prsiLogger(`Client disconnected.`, id);
+            prsiLogger("Client disconnected.", id);
 
             delete openSockets[id];
             updateEveryone();
@@ -282,6 +282,6 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
 
     prsiLogger("Prsi initialized.");
     return wsEnabledRouter;
-}
+};
 
 export default createPrsi;

@@ -5,10 +5,11 @@
   "private": true,
   "main": "build/server/middleware.js",
   "scripts": {
-    "clean": "rm -rf build/ node_modules/ dist/ tsconfig.tsbuildinfo",
+    "build": "npm run build-tsc && npm run build-webpack",
     "build-tsc": "npx tsc",
     "build-webpack": "npx webpack",
-    "build": "npm run build-tsc && npm run build-webpack",
+    "clean": "rm -rf build/ node_modules/ dist/ tsconfig.tsbuildinfo",
+    "lint": "npx eslint src --ext .ts",
     "postinstall": "npm run build",
     "start": "npm --silent run build && node build/main.js",
     "test": "npm run build-tsc && while node build/main.js; do :; done"
@@ -19,6 +20,10 @@
     "@types/express": "^4.17.3",
     "@types/node": "^13.9.2",
     "@types/ws": "^7.2.3",
+    "@typescript-eslint/eslint-plugin": "^2.28.0",
+    "@typescript-eslint/parser": "^2.28.0",
+    "eslint": "^7.0.0-alpha.3",
+    "eslint-plugin-react": "^7.19.0",
     "typescript": "^3.8.3",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"

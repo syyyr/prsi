@@ -1,4 +1,4 @@
-import prsi from "./server/middleware"
+import prsi from "./server/middleware";
 import ws from "express-ws";
 import express from "express";
 

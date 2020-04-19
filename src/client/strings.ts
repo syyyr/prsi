@@ -1,4 +1,4 @@
-import {ActionType, Color, Value, LastAction, Status} from "../common/types"
+import {ActionType, Color, Value, LastAction, Status} from "../common/types";
 
 interface YouOther {
     you: string;
@@ -30,7 +30,7 @@ export const colorStrings = {
     [Color.Listy]: "listy",
     [Color.Srdce]: "srdce",
     [Color.Zaludy]: "žaludy",
-}
+};
 
 export const values = {
     [Value.Sedmicka]: "sedmu",
@@ -41,7 +41,7 @@ export const values = {
     [Value.Svrsek]: "svrška",
     [Value.Kral]: "krále",
     [Value.Eso]: "eso",
-}
+};
 
 const genPlayColor = (color: Color): InstructionStrings => {
     return new InstructionStrings({
@@ -49,7 +49,7 @@ const genPlayColor = (color: Color): InstructionStrings => {
         [Status.CardMismatch]: {you: `Tohle tam nemůžeš dát. Musíš zahrát ${colorStrings[color]}.`},
         [Status.PlayerMismatch]: {other: "Teď nehraješ, hraje @PLAYERNAME@."}
     });
-}
+};
 
 const genPlaySeven = (drawCount: string): InstructionStrings => {
     return new InstructionStrings({
@@ -57,7 +57,7 @@ const genPlaySeven = (drawCount: string): InstructionStrings => {
         [Status.NotASeven]: {you: `Tohle tam nemůžeš dát. Lízej ${drawCount}${drawCount !== "osm" ? ", nebo zahraj sedmu" : ""}.`},
         [Status.PlayerMismatch]: {other: "Teď nehraješ, hraje @PLAYERNAME@."}
     });
-}
+};
 
 export const instructionStrings: {[key in keyof typeof ActionType]: InstructionStrings} = {
     [ActionType.Play]: new InstructionStrings({
@@ -153,7 +153,7 @@ export const cardsGenitive: {[key in keyof typeof Color]: {[key2 in keyof typeof
         [Value.Kral]: "srdcovýho krále",
         [Value.Eso]: "srdcový eso",
     }
-}
+};
 
 export enum CardTooltip {
     NoSkip = "(nestojíš)",
@@ -179,4 +179,4 @@ export const wsErrCodeToString = (code: number) => {
     case 1015: return "TLS Handshake";
     default: return "Unknown reason";
     }
-}
+};

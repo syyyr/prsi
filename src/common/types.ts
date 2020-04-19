@@ -138,4 +138,4 @@ export const changeActionToColor = (action: ActionType): Color => {
         }
 
         throw new Error(`Tried to change ${action} to a color.`);
-    }
+    };

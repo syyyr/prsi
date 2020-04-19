@@ -1,4 +1,4 @@
-import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value, PlayerAction, LastPlay, LastAction, Place, changeActionToColor, sameCards} from "../common/types"
+import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value, PlayerAction, LastPlay, LastAction, Place, changeActionToColor, sameCards} from "../common/types";
 
 const sortedDeck = [
     new Card(Color.Zaludy, Value.Sedmicka),
@@ -175,7 +175,7 @@ export class Prsi {
                     playDetails: playerAction.playDetails,
                     playerAction: LastAction.SkipTurn,
                     didWin: false
-                }
+                };
                 return;
             }
 
@@ -250,7 +250,7 @@ export class Prsi {
             }
 
             this._currentGame!.hands.get(player)!.push(this._currentGame!.deck.cards[this._currentGame!.drawn++]);
-        }
+        };
 
         const n = this.drawInfo.get(this._currentGame.wantedAction)!.count;
         Array.from({length: n}).forEach(impl_draw);
@@ -329,7 +329,9 @@ export class Prsi {
             if (color === changeActionToColor(this._currentGame.wantedAction)) {
                 return true;
             }
-        } catch {}
+        } catch {
+            return false;
+        }
         return false;
     }
 
@@ -485,7 +487,7 @@ export class Prsi {
             playerAction: lastAction,
             playDetails: details,
             didWin: updatedHand.length === 0
-        }
+        };
 
         this.nextPlayer();
     }
@@ -572,7 +574,7 @@ export class Prsi {
                 didWin: false,
                 playerAction: LastAction.Disconnect,
                 who: name,
-            }
+            };
             this.nextPlayer();
         }
         this._currentGame.players = this._currentGame.players.filter((player) => player.name !== name);

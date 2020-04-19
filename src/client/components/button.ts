@@ -5,6 +5,6 @@ export default class Button extends React.PureComponent<{onClick: () => void, te
         return React.createElement("button", {
             onClick: this.props.onClick,
             className: "fancy-button"
-        }, this.props.text)
+        }, this.props.text);
     }
 }

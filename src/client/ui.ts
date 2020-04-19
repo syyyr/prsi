@@ -263,7 +263,7 @@ export class UI extends React.Component<{}, UIState> {
                 closeDialog: !this.state.error.fatal ?
                     this.clearError :
                     this.reconnect
-            }))
+            }));
         }
 
         if (typeof this.state.gameState.gameInfo === "undefined") {

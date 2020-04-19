@@ -16,7 +16,7 @@ const isColorChange = (action: ActionType) => {
     default:
         return false;
     }
-}
+};
 
 const isDrawX = (action: ActionType) => {
     switch (action) {
@@ -28,7 +28,7 @@ const isDrawX = (action: ActionType) => {
     default:
         return false;
     }
-}
+};
 
 interface PlayFieldProps {
     onTurn: boolean;

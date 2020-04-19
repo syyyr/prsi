@@ -2,7 +2,7 @@ import * as React from "react";
 import Dialog from "./dialog";
 import Button from "./button";
 
-const defaultOnClick = (event: MouseEvent) => {event.stopPropagation()}
+const defaultOnClick = (event: MouseEvent) => {event.stopPropagation();};
 
 export default class ErrorDialog extends React.PureComponent<{error: string, fatal: boolean, closeDialog?: () => void, buttonText?: string}> {
     render(): React.ReactNode {

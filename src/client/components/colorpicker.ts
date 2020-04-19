@@ -13,7 +13,7 @@ class ColorComponent extends React.PureComponent<{color: Color, pickColor: (colo
                 src: colors[this.props.color],
                 draggable: false
             }
-        )
+        );
     }
 }
 

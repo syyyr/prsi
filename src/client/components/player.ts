@@ -16,7 +16,7 @@ class PlayerCards extends React.PureComponent<{cards: number}> {
     render(): React.ReactNode {
         return React.createElement("div",
             {className: "flex-row cardBacks-container"},
-            Array.from({length: this.props.cards}).map((_value, index) => React.createElement(CardBack, {key: `card:${index}`})))
+            Array.from({length: this.props.cards}).map((_value, index) => React.createElement(CardBack, {key: `card:${index}`})));
     }
 }
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import image from "../images/cardback-image";
-import {drawButtonString} from "../strings"
+import {drawButtonString} from "../strings";
 import {ActionType} from "../../common/types";
 
 class DrawButtonTooltip extends React.Component<{tooltip: string}> {

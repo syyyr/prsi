@@ -26,7 +26,7 @@ class CardTooltip extends React.PureComponent<{tooltip: CardTooltipString}> {
 }
 
 const transformationToString = (transformation: Transformation) => {
-    return `rotate(${transformation.rotation}deg) translateX(${transformation.translateX}px) translateY(${transformation.translateY}px)`
+    return `rotate(${transformation.rotation}deg) translateX(${transformation.translateX}px) translateY(${transformation.translateY}px)`;
 };
 
 class ColorChange extends React.PureComponent<{color: Color, transformation?: Transformation}> {
@@ -52,7 +52,7 @@ class CardImage extends React.PureComponent<CardImageProps> {
             className: `card${typeof this.props?.onClick !== "undefined" ? " clickable" : ""}${this.props.halo ? " halo" : ""}`,
             src: images[this.props.card.color][this.props.card.value],
             draggable: false,
-        }
+        };
         return React.createElement("img", {key: "card", ...imgOptions});
     }
 }

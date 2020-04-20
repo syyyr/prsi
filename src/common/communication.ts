@@ -94,10 +94,10 @@ export class BadStatus {
 }
 
 export class FrontendStats {
-    successRate: number;
+    acquiredPts: number;
     gamesPlayed: number;
-    constructor(successRate: number, gamesPlayed: number) {
-        this.successRate = successRate;
+    constructor(acquiredPts: number, gamesPlayed: number) {
+        this.acquiredPts = acquiredPts;
         this.gamesPlayed = gamesPlayed;
     }
 }

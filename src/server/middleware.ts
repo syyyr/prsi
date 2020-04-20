@@ -8,9 +8,9 @@ import Prsi from "../server/backend";
 import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode, BadStatus} from "../common/communication";
 import {ActionType, Status, PlayerAction, Place} from "../common/types";
 
+// FIXME: get rid of this
 class impl_Stats {
     acquiredPts: number = 0;
-    averagePts: number = 0;
     gamesPlayed: number = 0;
 }
 
@@ -23,7 +23,6 @@ const updateStats = (stats: Stats, acquiredPts: number) => {
     stats.last = {...stats.current};
     stats.current.acquiredPts += acquiredPts;
     stats.current.gamesPlayed++;
-    stats.current.averagePts = stats.current.acquiredPts / stats.current.gamesPlayed;
 };
 
 const rollbackStats = (stats: Stats) => {
@@ -64,7 +63,7 @@ const buildFrontendStateFor = (player?: string): FrontendState => {
         players: prsi.players(),
         gameStarted: typeof state !== "undefined" ? "yes" : "no",
         stats: Object.assign({}, ...prsi.players().map(player =>
-            ({[player]: new FrontendStats(stats[player].current.averagePts, stats[player].current.gamesPlayed)}))),
+            ({[player]: stats[player].current}))),
         gameInfo: typeof state !== "undefined" ? {
             wantedAction: state.wantedAction,
             who: state.whoseTurn,

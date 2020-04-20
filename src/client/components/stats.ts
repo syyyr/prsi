@@ -1,6 +1,13 @@
 import * as React from "react";
 import {FrontendStats} from "../../common/communication";
 
+const calcSuccess = (stats: FrontendStats) => {
+    if (stats.gamesPlayed === 0) {
+        return 0;
+    }
+    return Math.round(stats.acquiredPts / stats.gamesPlayed * 100);
+}
+
 export default class Stats extends React.PureComponent<{stats: {[key in string]: FrontendStats}}> {
     render(): React.ReactNode {
         return React.createElement("table", {className: "stats-table"},
@@ -18,7 +25,7 @@ export default class Stats extends React.PureComponent<{stats: {[key in string]:
                 React.createElement("tbody", {key: "statsMain"}, [
                     ...Object.entries(this.props.stats).map(([player, stats]) => React.createElement("tr", {key: `stats:${player}`}, [
                         React.createElement("td", {key: `stats:${player}:name`}, player),
-                        React.createElement("td", {key: `stats:${player}:success`}, `${Math.round(stats.successRate * 100)} %`),
+                        React.createElement("td", {key: `stats:${player}:success`}, `${calcSuccess(stats)} %`),
                         React.createElement("td", {key: `stats:${player}:played`}, stats.gamesPlayed),
                     ]))
                 ]),

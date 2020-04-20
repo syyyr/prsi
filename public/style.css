@@ -107,6 +107,8 @@ body {
 
 /* Player container */
 .player-container {
+    flex-basis: 0;
+    flex-grow: 1;
     height: 8em;
 }
 .cardBacks-container-height {

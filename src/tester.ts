@@ -16,14 +16,13 @@ while (true) {
     const player = state!.whoseTurn;
     let status: Status = Status.Ok;
     state!.hands.get(player)?.forEach((card) => {
-        prsi.resolveAction(
+        status = prsi.resolveAction(
             new PlayerAction(
                 PlayType.Play,
                 player,
                 new PlayDetails(
                     card,
                     [Color.Kule, Color.Listy, Color.Srdce, Color.Zaludy][Math.floor(Math.random() * 4)])));
-        status = prsi.state()!.status;
     }, false);
 
     if (status !== Status.Ok) {

@@ -71,7 +71,6 @@ class State {
     public gameState: "active" | "ended" = "active";
     public wantedAction: ActionType = ActionType.Play;
     public lastAction: ActionType = ActionType.Play;
-    public status: Status = Status.Ok;
     public lastPlay?: LastPlay;
     public loser?: string;
 
@@ -92,15 +91,13 @@ export class Prsi {
     private _history: State[] = [];
     private _currentGame?: State;
 
-    public resolveAction(playerAction: PlayerAction): void {
+    public resolveAction(playerAction: PlayerAction): Status {
         if (typeof this._currentGame === "undefined") {
             throw new Error("Game hasn't started.");
         }
-        this._currentGame.status = Status.Ok;
 
         if (playerAction.who !== this._currentGame.whoseTurn) {
-            this._currentGame.status = Status.PlayerMismatch;
-            return;
+            return Status.PlayerMismatch;
         }
 
         switch (this._currentGame.wantedAction) {
@@ -110,11 +107,14 @@ export class Prsi {
                 if (typeof playerAction.playDetails === "undefined") {
                     throw new Error("User wanted to play, but didn't specify what.");
                 }
-                this.playCard(playerAction.who, playerAction.playDetails);
-                return;
+                if (this.playCard(playerAction.who, playerAction.playDetails)) {
+                    return Status.Ok;
+                } else {
+                    return Status.CardMismatch;
+                }
             case PlayType.Draw:
                 this.drawCard(playerAction.who);
-                return;
+                return Status.Ok;
             }
 
         case ActionType.Shuffle:
@@ -125,15 +125,17 @@ export class Prsi {
                         console.log(this._currentGame.lastAction);
                         this._currentGame.wantedAction = this.drawInfo.get(this._currentGame.lastAction)!.next;
                         console.log(this._currentGame.wantedAction);
-                        this.playCard(playerAction.who, playerAction.playDetails);
-                        return;
+                        if (this.playCard(playerAction.who, playerAction.playDetails)) {
+                            return Status.Ok;
+                        } else {
+                            return Status.CardMismatch;
+                        }
                     }
                 }
-                this._currentGame.status = Status.MustShuffle;
-                return;
+                return Status.MustShuffle;
             case PlayType.Draw:
                 this.newGame(playerAction.who);
-                return;
+                return Status.Ok;
             }
 
         case ActionType.DrawTwo:
@@ -146,14 +148,16 @@ export class Prsi {
                     throw new Error("User wanted to play, but didn't specify what.");
                 }
                 if (playerAction.playDetails.card.value !== Value.Sedmicka) {
-                    this._currentGame.status = Status.NotASeven;
-                    return;
+                    return Status.NotASeven;
                 }
-                this.playCard(playerAction.who, playerAction.playDetails);
-                return;
+                if (this.playCard(playerAction.who, playerAction.playDetails)) {
+                    return Status.Ok;
+                } else {
+                    return Status.CardMismatch;
+                }
             case PlayType.Draw:
                 this.drawCard(playerAction.who);
-                return;
+                return Status.Ok;
             }
 
         case ActionType.SkipTurn:
@@ -163,11 +167,13 @@ export class Prsi {
                     throw new Error("User wanted to play, but didn't specify what.");
                 }
                 if (playerAction.playDetails.card.value !== Value.Eso) {
-                    this._currentGame.status = Status.NotAnAce;
-                    return;
+                    return Status.NotAnAce;
                 }
-                this.playCard(playerAction.who, playerAction.playDetails);
-                return;
+                if (this.playCard(playerAction.who, playerAction.playDetails)) {
+                    return Status.Ok;
+                } else {
+                    Status.CardMismatch;
+                }
             case PlayType.Draw:
                 this.skipTurn();
                 this._currentGame.lastPlay = {
@@ -176,7 +182,7 @@ export class Prsi {
                     playerAction: LastAction.SkipTurn,
                     didWin: false
                 };
-                return;
+                return Status.Ok;
             }
 
         case ActionType.PlayZaludy:
@@ -189,11 +195,14 @@ export class Prsi {
                     throw new Error("User wanted to play, but didn't specify what.");
                 }
 
-                this.playCard(playerAction.who, playerAction.playDetails);
-                return;
+                if (this.playCard(playerAction.who, playerAction.playDetails)) {
+                    return Status.Ok;
+                } else {
+                    return Status.CardMismatch;
+                }
             case PlayType.Draw:
                 this.drawCard(playerAction.who);
-                return;
+                return Status.Ok;
             }
         }
     }
@@ -434,7 +443,7 @@ export class Prsi {
         this._currentGame.wantedAction = ActionType.Play;
     }
 
-    private playCard(who: string, details: PlayDetails) {
+    private playCard(who: string, details: PlayDetails): boolean {
         if (typeof this._currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
@@ -444,8 +453,7 @@ export class Prsi {
         }
 
         if (!this.canBePlayed(details.card)) {
-            this._currentGame.status = Status.CardMismatch;
-            return;
+            return false;
         }
 
         this._currentGame.playedCards.push(details.card);
@@ -490,6 +498,7 @@ export class Prsi {
         };
 
         this.nextPlayer();
+        return true;
     }
 
     private playerHasCard(player: string, cardToCheck: Card): boolean {

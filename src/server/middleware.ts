@@ -5,7 +5,7 @@ import path from "path";
 import ws from "express-ws";
 import WebSocket from "ws";
 import Prsi from "../server/backend";
-import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode} from "../common/communication";
+import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode, BadStatus} from "../common/communication";
 import {ActionType, Status, PlayerAction, Place} from "../common/types";
 
 class impl_Stats {
@@ -69,7 +69,6 @@ const buildFrontendStateFor = (player?: string): FrontendState => {
             ({[player]: new FrontendStats(stats[player].current.averagePts, stats[player].current.gamesPlayed)}))),
         gameInfo: typeof state !== "undefined" ? {
             wantedAction: state.wantedAction,
-            status: state.status,
             who: state.whoseTurn,
             topCards: state.playedCards.slice(state.playedCards.length - Math.min(state.playedCards.length, 3)),
             hand: typeof player !== "undefined" ? state.hands.get(player) : undefined,
@@ -99,6 +98,19 @@ const updateOne = (id: number) => {
         openSockets[id].ws.send(JSON.stringify(buildFrontendStateFor(openSockets[id].name)));
     } else {
         prsiLogger("updateOne: Socket not OPEN. Unregistering it from the game.", id);
+        const name = openSockets[id].name;
+        if (typeof name !== "undefined") {
+            prsi.unregisterPlayer(name);
+            openSockets[id].name = undefined;
+        }
+    }
+};
+
+const sendBadStatus = (id: number, status: Status) => {
+    if (openSockets[id].ws.readyState === WebSocket.OPEN) {
+        openSockets[id].ws.send(JSON.stringify(new BadStatus(status)));
+    } else {
+        prsiLogger("sendBadStatus: Socket not OPEN. Unregistering it from the game.", id);
         const name = openSockets[id].name;
         if (typeof name !== "undefined") {
             prsi.unregisterPlayer(name);
@@ -182,8 +194,8 @@ const processMessage = (id: number, message: string): void => {
             prsiLogger("Got input, but this socket doesn't have a name assigned.", id);
             return;
         }
-        prsi.resolveAction(new PlayerAction(parsed.playType, name, parsed.playDetails));
-        if (prsi.state()!.status === Status.Ok) {
+        const status = prsi.resolveAction(new PlayerAction(parsed.playType, name, parsed.playDetails));
+        if (status === Status.Ok) {
             const state = prsi.state();
             if (typeof state?.lastPlay?.playDetails?.returned !== "undefined") {
                 rollbackStats(stats[state?.lastPlay?.playDetails?.returned]);
@@ -205,7 +217,7 @@ const processMessage = (id: number, message: string): void => {
             }
             updateEveryone();
         } else {
-            updateOne(id);
+            sendBadStatus(id, status);
         }
         return;
     }

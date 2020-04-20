@@ -1,10 +1,11 @@
-import {ErrorResponse, PlayerRegistration, FrontendState, isErrorResponse, isFrontendState, PlayerInput, StartGame, PlayerUnregistration} from "../common/communication";
+import {ErrorResponse, PlayerRegistration, FrontendState, isErrorResponse, isFrontendState, PlayerInput, StartGame, PlayerUnregistration, BadStatus, isBadStatus} from "../common/communication";
 import {PlayType, Card, Color, PlayDetails} from "../common/types";
 
 export default class PlayerInputOutput {
     ws: globalThis.WebSocket;
     onError: (message: ErrorResponse) => void = () => {};
     onState: (message: FrontendState) => void = () => {};
+    onBadStatus: (message: BadStatus) => void = () => {};
     onClose: (code: number) => void = () => {};
     self: PlayerInputOutput = this;
     constructor(onOpen?: () => void) {
@@ -27,6 +28,10 @@ export default class PlayerInputOutput {
 
             if (isFrontendState(parsed)) {
                 this.onState(parsed);
+            }
+
+            if (isBadStatus(parsed)) {
+                this.onBadStatus(parsed);
             }
         };
 

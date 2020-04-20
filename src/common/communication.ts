@@ -21,6 +21,10 @@ export function isFrontendState(toCheck: any): toCheck is FrontendState {
     return typeof toCheck.players !== "undefined";
 }
 
+export function isBadStatus(toCheck: any): toCheck is BadStatus {
+    return typeof toCheck.badStatus !== "undefined";
+}
+
 export function isStartGame(toCheck: any): toCheck is FrontendState {
     return typeof toCheck.startGame !== "undefined";
 }
@@ -67,20 +71,25 @@ export class ErrorResponse {
 
 export class FrontendInfo {
     wantedAction: ActionType;
-    status: Status;
     who: string;
     playerInfo: {[key in string]: {cards?: number, place?: Place}};
     topCards: Card[];
     hand?: Card[];
     lastPlay?: LastPlay;
     loser?: string;
-    constructor(wantedAction: ActionType, status: Status, who: string, topCards: Card[], hand: Card[], playerInfo: {[key in string]: {cards?: number, place?: Place}}) {
+    constructor(wantedAction: ActionType, who: string, topCards: Card[], hand: Card[], playerInfo: {[key in string]: {cards?: number, place?: Place}}) {
         this.wantedAction = wantedAction;
-        this.status = status;
         this.who = who;
         this.topCards = topCards;
         this.hand = hand;
         this.playerInfo = playerInfo;
+    }
+}
+
+export class BadStatus {
+    badStatus: Status;
+    constructor(status: Status) {
+        this.badStatus = status;
     }
 }
 

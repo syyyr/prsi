@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FrontendState, FrontendStats, ErrorResponse, ErrorCode} from "../common/communication";
+import {FrontendState, FrontendStats, ErrorResponse, ErrorCode, BadStatus} from "../common/communication";
 import {Card, Value, Color, ActionType, Status, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
 import Game from "./components/game";
@@ -20,6 +20,7 @@ import {wsErrCodeToString} from "./strings";
 interface UIState {
     nameDialog: boolean;
     gameState?: FrontendState;
+    status: Status;
     picker: null | Color;
     errorHighlight: boolean | null;
     error: {
@@ -41,7 +42,7 @@ export class UI extends React.Component<{}, UIState> {
         this.io = new PlayerInputOutput();
         this.initIO();
         // FIXME: look for a better solution for picker (don't save color of the played guy)
-        this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false};
+        this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false, status: Status.Ok};
     }
 
     private readonly initIO = (): void => {
@@ -51,18 +52,19 @@ export class UI extends React.Component<{}, UIState> {
             }
             this.setState({error: null, nameDialog: false, gameState: state, picker: null, errorHighlight: null});
             if (typeof state.gameInfo !== "undefined") {
-                if (state.gameInfo?.status === Status.Ok) {
-                    switch (state.gameInfo.lastPlay?.playerAction) {
-                        case LastAction.DrawFour:
-                        case LastAction.DrawSix:
-                        case LastAction.DrawEight:
-                            new Audio(audio[state.gameInfo.lastPlay.playerAction]).play();
-                    }
-                } else {
-                    this.blink();
+                switch (state.gameInfo.lastPlay?.playerAction) {
+                    case LastAction.DrawFour:
+                    case LastAction.DrawSix:
+                    case LastAction.DrawEight:
+                        new Audio(audio[state.gameInfo.lastPlay.playerAction]).play();
                 }
             }
         };
+
+        this.io.onBadStatus = (status: BadStatus) => {
+            this.setState({status: status.badStatus});
+            this.blink();
+        }
 
         this.io.onError = (err: ErrorResponse) => {
             if (err.code === ErrorCode.NameAlreadyUsed) {
@@ -122,7 +124,7 @@ export class UI extends React.Component<{}, UIState> {
         }
 
         // Only clear if status is ok, that way the user can't just press random cards to stop the sound.
-        if (typeof this.audioHandle !== "undefined" && this.state.gameState?.gameInfo?.status === Status.Ok) {
+        if (typeof this.audioHandle !== "undefined" && this.state.status === Status.Ok) {
             this.audioHandle.pause();
             this.audioHandle = undefined;
         }
@@ -131,8 +133,8 @@ export class UI extends React.Component<{}, UIState> {
     private readonly setEffectTimeout = () => {
         this.clearEffectTimeout();
 
-        if (this.state.gameState?.gameInfo?.status === Status.Ok && this.state.gameState?.gameInfo?.who === this.thisName) {
-            if (this.state.gameState.gameInfo.wantedAction === ActionType.Shuffle) {
+        if (this.state.status === Status.Ok && this.state.gameState?.gameInfo?.who === this.thisName) {
+            if (this.state.gameState?.gameInfo?.wantedAction === ActionType.Shuffle) {
                 this.playReminderTimeout = window.setTimeout(() => {
                     window.alert("Mícháš.");
                 }, 60000);
@@ -278,7 +280,7 @@ export class UI extends React.Component<{}, UIState> {
         elems.push(React.createElement(Instructions, {
             key: "instructions",
             wantedAction: this.state.gameState.gameInfo.wantedAction,
-            status: this.state.gameState.gameInfo.status,
+            status: this.state.status,
             you: this.thisName,
             whoseTurn: this.state.gameState.gameInfo.who,
             topCard: this.state.gameState.gameInfo.topCards[this.state.gameState.gameInfo.topCards.length - 1],

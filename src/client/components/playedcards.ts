@@ -3,8 +3,21 @@ import {Card, Color, Transformation, sameCards} from "../../common/types";
 import CardComponent from "./card";
 import {CardTooltip} from "../strings";
 
+// https://stackoverflow.com/a/39187274
+// This is basically the Central Limit Theorem. Using other transformation
+// method would probably be more precise, but this is enough for my usecase
+const gaussianRand = () => {
+      let rand = 0;
+
+      for (let i = 0; i < 4; i += 1) {
+              rand += Math.random();
+      }
+
+      return rand / 6;
+}
+
 const getRandomTransform = (): Transformation => ({
-    rotation: Math.floor(Math.random() * 120) - 60,
+    rotation: Math.floor(gaussianRand() * 160 - 80),
     translateX: Math.floor(Math.random() * 40) - 20,
     translateY: Math.floor(Math.random() * 40) - 20,
 });

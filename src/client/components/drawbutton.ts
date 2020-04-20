@@ -15,7 +15,7 @@ class DrawButtonTooltip extends React.Component<{tooltip: string}> {
     }
 }
 
-export default class DrawButton extends React.PureComponent<{callback: () => void, wantedAction: ActionType, shouldDrawTooltip: boolean}> {
+export default class DrawButton extends React.PureComponent<{callback?: () => void, wantedAction: ActionType, shouldDrawTooltip: boolean}> {
     render(): React.ReactNode {
         const tooltip = (() => {
             if (!this.props.shouldDrawTooltip) {
@@ -39,7 +39,7 @@ export default class DrawButton extends React.PureComponent<{callback: () => voi
                     key: "drawButton",
                     src: image,
                     draggable: false,
-                    className: "clickable halo card",
+                    className: `${typeof this.props.callback !== "undefined" ? "clickable halo " : ""} card`,
                     onClick: this.props.callback
                 }
             )

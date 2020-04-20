@@ -46,8 +46,7 @@ interface CoreGameProps {
     onTurn: boolean;
     topCards: Card[];
     wantedAction: ActionType;
-    shouldDrawDrawButton: boolean;
-    drawCard: () => void;
+    drawCard?: () => void;
     lastPlay?: LastPlay;
 }
 
@@ -65,14 +64,12 @@ class PlayField extends React.PureComponent<CoreGameProps> {
     render(): React.ReactNode {
         const res = [];
 
-        if (this.props.shouldDrawDrawButton) {
-            res.push(React.createElement(DrawButton, {
-                key: "drawButton",
-                callback: this.props.drawCard,
-                wantedAction: this.props.wantedAction,
-                shouldDrawTooltip: this.props.onTurn || this.props.wantedAction === ActionType.Shuffle
-            }));
-        }
+        res.push(React.createElement(DrawButton, {
+            key: "drawButton",
+            callback: this.props.drawCard,
+            wantedAction: this.props.wantedAction,
+            shouldDrawTooltip: this.props.onTurn || this.props.wantedAction === ActionType.Shuffle
+        }));
 
         const colorChange =
             isColorChange(this.props.wantedAction) ? changeActionToColor(this.props.wantedAction) :
@@ -101,8 +98,7 @@ export default class Game extends React.PureComponent<PlayFieldProps> {
             onTurn: this.props.onTurn,
             topCards: this.props.topCards,
             wantedAction: this.props.wantedAction,
-            shouldDrawDrawButton: typeof this.props.hand !== "undefined",
-            drawCard: this.props.drawCard,
+            drawCard: typeof this.props.hand !== "undefined" ? this.props.drawCard : undefined,
             lastPlay: this.props.lastPlay
         }));
 

@@ -284,6 +284,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
             // Have to check whether the closing socket was already registered
             if (typeof closed.name !== "undefined") {
                 prsi.unregisterPlayer(closed.name);
+                prsiLogger(`Unregistered "${closed.name}".`, id);
             }
 
             prsiLogger("Client disconnected.", id);

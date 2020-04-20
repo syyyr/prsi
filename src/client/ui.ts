@@ -87,6 +87,9 @@ export class UI extends React.Component<{}, UIState> {
     }
 
     private readonly blink = (): void => {
+        if (typeof this.highlightTimeout !== "undefined") {
+            return;
+        }
         this.setState({errorHighlight: this.onTurn() ? false : true});
         const blinkingSpeed = 250;
         const blinker = (iterations: number) => {
@@ -94,7 +97,10 @@ export class UI extends React.Component<{}, UIState> {
             if (iterations < 2) {
                 this.highlightTimeout = window.setTimeout(blinker, blinkingSpeed, iterations + 1);
             } else {
-                this.highlightTimeout = window.setTimeout(() => this.setState({errorHighlight: null}), blinkingSpeed);
+                this.highlightTimeout = window.setTimeout(() => {
+                    this.setState({errorHighlight: null}), blinkingSpeed;
+                    this.highlightTimeout = undefined;
+                });
             }
         };
 

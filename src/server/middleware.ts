@@ -212,7 +212,7 @@ const processMessage = (id: number, message: string): void => {
                 updateStats(prevStats, acquiredPts, state.players.length - 1);
                 if (state.wantedAction === ActionType.Shuffle) { // If shuffle, then the game is over - we have to recalculate last guy's stats
                     const prevStats = stats[state.whoseTurn];
-                    updateStats(prevStats, 0, state.players.length);
+                    updateStats(prevStats, 0, state.players.length - 1);
                 }
             }
             updateEveryone();

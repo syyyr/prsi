@@ -10,7 +10,6 @@ import {ActionType, Status, PlayerAction, Place} from "../common/types";
 
 class impl_Stats {
     acquiredPts: number = 0;
-    possiblePts: number = 0;
     averagePts: number = 0;
     gamesPlayed: number = 0;
 }
@@ -20,12 +19,11 @@ class Stats {
     last: impl_Stats = new impl_Stats();
 }
 
-const updateStats = (stats: Stats, acquiredPts: number, possiblePts: number) => {
+const updateStats = (stats: Stats, acquiredPts: number) => {
     stats.last = {...stats.current};
     stats.current.acquiredPts += acquiredPts;
-    stats.current.possiblePts += possiblePts;
-    stats.current.averagePts = stats.current.acquiredPts / stats.current.possiblePts;
     stats.current.gamesPlayed++;
+    stats.current.averagePts = stats.current.acquiredPts / stats.current.gamesPlayed;
 };
 
 const rollbackStats = (stats: Stats) => {
@@ -208,11 +206,11 @@ const processMessage = (id: number, message: string): void => {
             }
             if (state?.lastPlay?.didWin) {
                 const prevStats = stats[state.lastPlay.who];
-                const acquiredPts = state.players.length - state.players.find((player) => player.name === state.lastPlay?.who)!.place!;
-                updateStats(prevStats, acquiredPts, state.players.length - 1);
+                const acquiredPts = 1 - (state.players.find((player) => player.name === state.lastPlay?.who)!.place! - 1) / state.players.length;
+                updateStats(prevStats, acquiredPts);
                 if (state.wantedAction === ActionType.Shuffle) { // If shuffle, then the game is over - we have to recalculate last guy's stats
                     const prevStats = stats[state.whoseTurn];
-                    updateStats(prevStats, 0, state.players.length - 1);
+                    updateStats(prevStats, 0);
                 }
             }
             updateEveryone();

@@ -6,7 +6,7 @@ const calcSuccess = (stats: FrontendStats) => {
         return 0;
     }
     return Math.round(stats.acquiredPts / stats.gamesPlayed * 100);
-}
+};
 
 export default class Stats extends React.PureComponent<{stats: {[key in string]: FrontendStats}}> {
     render(): React.ReactNode {

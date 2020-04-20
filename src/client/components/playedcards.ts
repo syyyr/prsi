@@ -9,7 +9,7 @@ import {CardTooltip} from "../strings";
 const gaussianRand = () => {
     const tightness = 6;
     return Array(tightness).fill(null).reduce((prev) => prev + Math.random(), 0) / tightness;
-}
+};
 
 const getRandomTransform = (): Transformation => ({
     rotation: Math.floor(gaussianRand() * 180 - 90),

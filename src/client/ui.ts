@@ -71,7 +71,7 @@ export class UI extends React.Component<{}, UIState> {
         this.io.onBadStatus = (status: BadStatus) => {
             this.setState({status: status.badStatus});
             this.blink();
-        }
+        };
 
         this.io.onError = (err: ErrorResponse) => {
             if (err.code === ErrorCode.NameAlreadyUsed) {

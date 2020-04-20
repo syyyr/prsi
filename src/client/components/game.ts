@@ -76,7 +76,7 @@ class PlayField extends React.PureComponent<CoreGameProps> {
             this.props.wantedAction === ActionType.Shuffle &&
                 typeof this.props.lastPlay !== "undefined" &&
                 this.props.lastPlay.playerAction === LastAction.Change ? this.props.lastPlay.playDetails?.colorChange :
-            undefined
+            undefined;
 
 
 

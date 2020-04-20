@@ -50,7 +50,14 @@ export class UI extends React.Component<{}, UIState> {
             if (typeof this.highlightTimeout !== "undefined") {
                 clearTimeout(this.highlightTimeout);
             }
-            this.setState({error: null, nameDialog: false, gameState: state, picker: null, errorHighlight: null, status: Status.Ok});
+            this.setState({
+                error: null,
+                nameDialog: typeof this.thisName !== "undefined" ? false : this.state.nameDialog,
+                gameState: state,
+                picker: null,
+                errorHighlight: null,
+                status: Status.Ok
+            });
             if (typeof state.gameInfo !== "undefined") {
                 switch (state.gameInfo.lastPlay?.playerAction) {
                     case LastAction.DrawFour:

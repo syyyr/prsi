@@ -257,7 +257,12 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
         updateOne(id);
 
         ws.on("message", (message: WebSocket.Data) => {
-            processMessage(id, message.toString());
+            try {
+                processMessage(id, message.toString());
+            } catch (err) {
+                prsiLogger("EXCEPTION WHILE HANDLING A MESSAGE:", id);
+                prsiLogger(err, id);
+            }
         });
 
         ws.on("close", () => {

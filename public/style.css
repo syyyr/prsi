@@ -58,8 +58,6 @@ body {
 }
 .center-inside-div {
     bottom: 50%;
-    height: fit-content;
-    height: -moz-fit-content;
     left: -50%;
     margin: auto;
     right: -50%;

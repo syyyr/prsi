@@ -91,7 +91,7 @@ export default class Prsi {
 
     public resolveAction(playerAction: PlayerAction): Status {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game hasn't started.");
+            throw new Error("resolveAction: Game hasn't started.");
         }
 
         if (playerAction.who !== this.currentGame.whoseTurn) {
@@ -103,7 +103,7 @@ export default class Prsi {
             switch (playerAction.action) {
             case PlayType.Play:
                 if (typeof playerAction.playDetails === "undefined") {
-                    throw new Error("User wanted to play, but didn't specify what.");
+                    throw new Error("resolveAction: User wanted to play, but didn't specify what.");
                 }
                 if (this.playCard(playerAction.who, playerAction.playDetails)) {
                     return Status.Ok;
@@ -141,7 +141,7 @@ export default class Prsi {
             switch (playerAction.action) {
             case PlayType.Play:
                 if (typeof playerAction.playDetails === "undefined") {
-                    throw new Error("User wanted to play, but didn't specify what.");
+                    throw new Error("resolveAction: User wanted to play, but didn't specify what.");
                 }
                 if (playerAction.playDetails.card.value !== Value.Sedmicka) {
                     return Status.NotASeven;
@@ -160,7 +160,7 @@ export default class Prsi {
             switch (playerAction.action) {
             case PlayType.Play:
                 if (typeof playerAction.playDetails === "undefined") {
-                    throw new Error("User wanted to play, but didn't specify what.");
+                    throw new Error("resolveAction: User wanted to play, but didn't specify what.");
                 }
                 if (playerAction.playDetails.card.value !== Value.Eso) {
                     return Status.NotAnAce;
@@ -188,7 +188,7 @@ export default class Prsi {
             switch (playerAction.action) {
             case PlayType.Play:
                 if (typeof playerAction.playDetails === "undefined") {
-                    throw new Error("User wanted to play, but didn't specify what.");
+                    throw new Error("resolveAction: User wanted to play, but didn't specify what.");
                 }
 
                 if (this.playCard(playerAction.who, playerAction.playDetails)) {
@@ -205,7 +205,7 @@ export default class Prsi {
 
     private skipTurn(): void {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("skipTurn: Game isn't running.");
         }
 
         // After someone skips, the next person will definitely play
@@ -215,7 +215,7 @@ export default class Prsi {
 
     private nextPlayer(): void {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("nextPlayer: Game isn't running.");
         }
 
         if (this.currentGame.players.filter((player) => player.place === null).length === 1) {
@@ -238,7 +238,7 @@ export default class Prsi {
 
     private drawCard(player: string): void {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("drawCard: Game isn't running.");
         }
 
         const impl_draw = () => {
@@ -308,7 +308,7 @@ export default class Prsi {
 
     private concludeGame() {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("concludeGame: Game isn't running.");
         }
 
         const loser = this.currentGame.players.findIndex((player) => player.place === null);
@@ -321,7 +321,7 @@ export default class Prsi {
 
     private resolveChangeCard(color: Color): boolean {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("resolveChangeCard: Game isn't running.");
         }
         // try here, because the helper function only works on Play* actions
         try {
@@ -336,7 +336,7 @@ export default class Prsi {
 
     private canBePlayed(card: Card) {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("canBePlayed: Game isn't running.");
         }
 
         if (card.value === Value.Svrsek) {
@@ -356,7 +356,7 @@ export default class Prsi {
 
     private rollbackPlace() {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("rollbackPlace: Game isn't running.");
         }
 
         switch (this.currentGame.nextPlace) {
@@ -377,7 +377,7 @@ export default class Prsi {
 
     private nextPlace(): Place {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("nextPlacer: Game isn't running.");
         }
 
         const res = this.currentGame.nextPlace;
@@ -404,7 +404,7 @@ export default class Prsi {
 
     private checkReturnToGame() {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("checkReturnTo: Game isn't running.");
         }
 
         const curPlayer = this.currentGame.players.findIndex((playerState) => playerState.name === this.currentGame!.whoseTurn);
@@ -423,7 +423,7 @@ export default class Prsi {
 
     private resolveReturnToGame(who: string) {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("resolveReturnTo: Game isn't running.");
         }
         this.currentGame.players.find((player) => player.name === this.currentGame?.whoseTurn)!.place = null;
         this.rollbackPlace();
@@ -435,11 +435,11 @@ export default class Prsi {
 
     private playCard(who: string, details: PlayDetails): boolean {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("playCard: Game isn't running.");
         }
 
         if (!this.playerHasCard(who, details.card)) {
-            throw new Error("User wanted to play a card he doesn't have.");
+            throw new Error("playCard: User wanted to play a card he doesn't have.");
         }
 
         if (!this.canBePlayed(details.card)) {
@@ -466,7 +466,7 @@ export default class Prsi {
             lastAction = LastAction.Play;
         } else if (details.card.value === Value.Svrsek) {
             if (typeof details.colorChange === "undefined") {
-                throw new Error("User didn't specify which color he wants.");
+                throw new Error("playCard: User didn't specify which color he wants.");
             }
             this.currentGame.wantedAction = this.changeColorToAction(details.colorChange);
             lastAction = LastAction.Change;
@@ -493,17 +493,17 @@ export default class Prsi {
 
     private playerHasCard(player: string, cardToCheck: Card): boolean {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("playerHasCard: Game isn't running.");
         }
         if (!this.currentGame.hands.has(player)) {
-            throw new Error("playerHasCard: User doesn' exist.");
+            throw new Error("playerHasCard: User doesn't exist.");
         }
         return this.currentGame.hands.get(player)!.some(sameCards.bind(null, cardToCheck));
     }
 
     public newGame(shuffler?: string): void {
         if (this.players.length < 2) {
-            throw new Error("Tried to start a game with one player.");
+            throw new Error("newGame: Tried to start a game with one player.");
         }
 
         this.currentGame = this.newState(shuffler);
@@ -512,7 +512,7 @@ export default class Prsi {
 
     private dealCards(): void {
         if (typeof this.currentGame === "undefined") {
-            throw new Error("Game isn't running.");
+            throw new Error("dealCards: Game isn't running.");
         }
 
         this.players.forEach((player) => {
@@ -557,7 +557,7 @@ export default class Prsi {
 
     public registerPlayer(name: string): void {
         if (this.players.some((player) => player == name)) {
-            throw new Error("Player already exists.");
+            throw new Error("registerPlayer: Player already exists.");
         }
         this.players.push(name);
     }

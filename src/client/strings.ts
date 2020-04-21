@@ -180,3 +180,5 @@ export const wsErrCodeToString = (code: number) => {
     default: return "Unknown reason";
     }
 };
+
+export const promptExit = "Hra ještě neskončila. Opravdu chceš odejít?";

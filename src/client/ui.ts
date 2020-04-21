@@ -15,7 +15,7 @@ import PlayerInputOutput from "./io";
 import NameDialog from "./components/namedialog";
 import ErrorDialog from "./components/errordialog";
 import LeaveButton from "./components/leavebutton";
-import {wsErrCodeToString} from "./strings";
+import {wsErrCodeToString, promptExit} from "./strings";
 
 interface UIState {
     nameDialog: boolean;
@@ -44,12 +44,16 @@ export class UI extends React.Component<{}, UIState> {
         // FIXME: look for a better solution for picker (don't save color of the played guy)
         this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false, status: Status.Ok};
         window.onbeforeunload = () => {
-            if (typeof this.thisName !== "undefined"
-                && typeof this.state.gameState?.gameInfo?.hand?.length !== "undefined"
-                && this.state.gameState.gameInfo.hand.length !== 0) {
-                return "Hra ještě neskončila. Opravdu chceš odejít?";
+            if (this.playing()) {
+                return promptExit;
             }
         };
+    }
+
+    private readonly playing = (): boolean => {
+        return typeof this.thisName !== "undefined" &&
+            typeof this.state.gameState?.gameInfo?.hand?.length !== "undefined" &&
+            this.state.gameState.gameInfo.hand.length !== 0;
     }
 
     private readonly initIO = (): void => {
@@ -218,6 +222,11 @@ export class UI extends React.Component<{}, UIState> {
     }
 
     private readonly leaveGame = () => {
+        if (this.playing()) {
+            if (!window.confirm(promptExit)) {
+                return;
+            }
+        }
         if (typeof this.thisName === "undefined") {
             this.showError("Už jsi opustil hru. (jak se ti povedlo ji opustit znova?)");
             return;

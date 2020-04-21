@@ -542,7 +542,7 @@ export default class Prsi {
 
     private newState(shuffler?: string): State {
         if (typeof shuffler === "undefined") {
-            return new State([...this.players], this.getRandomPlayer());
+            return new State(this.players, this.getRandomPlayer());
         }
 
         let firstTurnPlayerIndex = this.players.indexOf(shuffler) + 1;
@@ -550,7 +550,7 @@ export default class Prsi {
             firstTurnPlayerIndex = 0;
         }
 
-        return new State([...this.players], this.players[firstTurnPlayerIndex]);
+        return new State(this.players, this.players[firstTurnPlayerIndex]);
     }
 
     public registerPlayer(name: string): void {

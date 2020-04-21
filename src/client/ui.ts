@@ -51,7 +51,8 @@ export class UI extends React.Component<{}, UIState> {
     }
 
     private readonly playing = (): boolean => {
-        return typeof this.thisName !== "undefined" &&
+        return this.state.error?.fatal !== true &&
+            typeof this.thisName !== "undefined" &&
             typeof this.state.gameState?.gameInfo?.hand?.length !== "undefined" &&
             this.state.gameState.gameInfo.hand.length !== 0;
     }

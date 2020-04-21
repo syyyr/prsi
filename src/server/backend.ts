@@ -120,9 +120,7 @@ export default class Prsi {
             case PlayType.Play:
                 if (playerAction.playDetails?.card.value === Value.Sedmicka && playerAction.playDetails.card.color === Color.Srdce) {
                     if (this.currentGame.lastAction !== ActionType.SkipTurn && this.canBePlayed(playerAction.playDetails.card)) {
-                        console.log(this.currentGame.lastAction);
                         this.currentGame.wantedAction = this.drawInfo.get(this.currentGame.lastAction)!.next;
-                        console.log(this.currentGame.wantedAction);
                         if (this.playCard(playerAction.who, playerAction.playDetails)) {
                             return Status.Ok;
                         } else {

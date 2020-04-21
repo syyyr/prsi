@@ -43,6 +43,13 @@ export class UI extends React.Component<{}, UIState> {
         this.initIO();
         // FIXME: look for a better solution for picker (don't save color of the played guy)
         this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false, status: Status.Ok};
+        window.onbeforeunload = () => {
+            if (typeof this.thisName !== "undefined"
+                && typeof this.state.gameState?.gameInfo?.hand?.length !== "undefined"
+                && this.state.gameState.gameInfo.hand.length !== 0) {
+                return "Hra ještě neskončila. Opravdu chceš odejít?";
+            }
+        };
     }
 
     private readonly initIO = (): void => {

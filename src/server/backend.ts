@@ -381,23 +381,7 @@ export default class Prsi {
         }
 
         const res = this.currentGame.nextPlace;
-
-        this.currentGame.nextPlace = ((): Place => {
-            switch (this.currentGame!.nextPlace) {
-                case Place.First:
-                    return Place.Second;
-                case Place.Second:
-                    return Place.Third;
-                case Place.Third:
-                    return Place.Fourth;
-                case Place.Fourth:
-                    return Place.Fifth;
-                case Place.Fifth:
-                    return Place.Sixth;
-                default:
-                    return Place.Sixth;
-            }
-        })();
+        this.currentGame.nextPlace++;
 
         return res;
     }

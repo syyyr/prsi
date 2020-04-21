@@ -85,7 +85,7 @@ class State {
     }
 }
 
-export class Prsi {
+export default class Prsi {
     private _players: string[] = [];
     private _currentGame?: State;
 
@@ -595,5 +595,3 @@ export class Prsi {
         return this._currentGame;
     }
 }
-
-export default Prsi;

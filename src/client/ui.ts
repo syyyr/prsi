@@ -44,6 +44,7 @@ export class UI extends React.Component<{}, UIState> {
         // FIXME: look for a better solution for picker (don't save color of the played guy)
         this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false, status: Status.Ok};
         window.onbeforeunload = () => {
+            this.clearEffectTimeout();
             if (this.playing()) {
                 return promptExit;
             }

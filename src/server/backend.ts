@@ -563,6 +563,10 @@ export default class Prsi {
     }
 
     public unregisterPlayer(name: string): void {
+        if (!this.players.some((player) => player == name)) {
+            throw new Error("unregisterPlayer: Player doesn't exist.");
+        }
+
         this.players = this.players.filter((player) => player !== name);
 
         if (typeof this.currentGame === "undefined") {

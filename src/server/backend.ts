@@ -367,10 +367,7 @@ export default class Prsi {
             throw new Error("nextPlacer: Game isn't running.");
         }
 
-        const res = this.currentGame.nextPlace;
-        this.currentGame.nextPlace++;
-
-        return res;
+        return this.currentGame.nextPlace++;
     }
 
     private checkReturnToGame() {

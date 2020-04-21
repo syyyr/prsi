@@ -103,6 +103,7 @@ body {
 /* Playerbox */
 .playerbox {
     margin-top: 1em;
+    max-width: 80em;
 }
 
 /* Player container */

@@ -319,21 +319,6 @@ export default class Prsi {
         this.currentGame.whoseTurn = this.currentGame.players[loser].name;
     }
 
-    private resolveChangeCard(color: Color): boolean {
-        if (typeof this.currentGame === "undefined") {
-            throw new Error("resolveChangeCard: Game isn't running.");
-        }
-        // try here, because the helper function only works on Play* actions
-        try {
-            if (color === changeActionToColor(this.currentGame.wantedAction)) {
-                return true;
-            }
-        } catch {
-            return false;
-        }
-        return false;
-    }
-
     private canBePlayed(card: Card) {
         if (typeof this.currentGame === "undefined") {
             throw new Error("canBePlayed: Game isn't running.");
@@ -348,7 +333,7 @@ export default class Prsi {
         case ActionType.PlayKule:
         case ActionType.PlayListy:
         case ActionType.PlaySrdce:
-            return this.resolveChangeCard(card.color);
+            return card.color === changeActionToColor(this.currentGame.wantedAction);
         }
 
         return compatibleCards(card, this.currentGame.playedCards[this.currentGame.playedCards.length - 1]);

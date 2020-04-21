@@ -73,8 +73,8 @@ class State {
     public lastPlay?: LastPlay;
     public loser?: string;
 
-    constructor(players: string[], whoStarts: string) {
-        this.players = players.map((name) => new PlayerState(name));
+    constructor(players: PlayerState[], whoStarts: string) {
+        this.players = players;
         this.whoseTurn = whoStarts;
     }
 
@@ -540,9 +540,13 @@ export default class Prsi {
         return this.players[Math.floor(Math.random() *  this.players.length)];
     }
 
+    private newPlayerStates(): PlayerState[] {
+        return this.players.map((name) => new PlayerState(name));
+    }
+
     private newState(shuffler?: string): State {
         if (typeof shuffler === "undefined") {
-            return new State(this.players, this.getRandomPlayer());
+            return new State(this.newPlayerStates(), this.getRandomPlayer());
         }
 
         let firstTurnPlayerIndex = this.players.indexOf(shuffler) + 1;
@@ -550,7 +554,7 @@ export default class Prsi {
             firstTurnPlayerIndex = 0;
         }
 
-        return new State(this.players, this.players[firstTurnPlayerIndex]);
+        return new State(this.newPlayerStates(), this.players[firstTurnPlayerIndex]);
     }
 
     public registerPlayer(name: string): void {

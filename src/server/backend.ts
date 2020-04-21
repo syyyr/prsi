@@ -245,11 +245,6 @@ export class Prsi {
             throw new Error("Game isn't running.");
         }
 
-        if (!this._currentGame.hands.has(player)) {
-            throw new Error("User tried to play a card he doesn't have.");
-        }
-
-
         const impl_draw = () => {
             if (this._currentGame!.drawn === this._currentGame!.deck.cards.length) {
                 this._currentGame!.deck.cards = this._currentGame!.playedCards;

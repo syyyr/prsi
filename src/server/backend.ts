@@ -88,7 +88,6 @@ class State {
 
 export class Prsi {
     private _players: string[] = [];
-    private _history: State[] = [];
     private _currentGame?: State;
 
     public resolveAction(playerAction: PlayerAction): Status {
@@ -510,9 +509,7 @@ export class Prsi {
         if (this._players.length < 2) {
             throw new Error("Tried to start a game with one player.");
         }
-        if (typeof this._currentGame !== "undefined") {
-            this._history.push(this._currentGame);
-        }
+
         this._currentGame = this.newState(shuffler);
         this.dealCards();
     }

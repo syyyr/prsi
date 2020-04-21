@@ -1,4 +1,4 @@
-import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value, PlayerAction, LastPlay, LastAction, Place, changeActionToColor, sameCards} from "../common/types";
+import {ActionType, Color, Card, PlayType, PlayDetails, Status, Value, PlayerAction, LastPlay, LastAction, changeActionToColor, sameCards} from "../common/types";
 
 const sortedDeck = [
     new Card(Color.Zaludy, Value.Sedmicka),
@@ -51,7 +51,7 @@ class Deck {
 
 class PlayerState {
     name: string;
-    place: null | Place = null;
+    place: null | number = null;
     canBeReturned: boolean = false;
     constructor(name: string) {
         this.name = name;
@@ -67,7 +67,7 @@ class State {
     public hands: Map<string, Card[]> = new Map();
     public whoseTurn: string;
     public players: PlayerState[];
-    public nextPlace: Place = Place.First;
+    public nextPlace: number = 1;
     public wantedAction: ActionType = ActionType.Play;
     public lastAction: ActionType = ActionType.Play;
     public lastPlay?: LastPlay;
@@ -359,23 +359,10 @@ export default class Prsi {
             throw new Error("rollbackPlace: Game isn't running.");
         }
 
-        switch (this.currentGame.nextPlace) {
-        case Place.Second:
-            this.currentGame.nextPlace = Place.First;
-        case Place.Third:
-            this.currentGame.nextPlace = Place.Second;
-        case Place.Fourth:
-            this.currentGame.nextPlace = Place.Third;
-        case Place.Fifth:
-            this.currentGame.nextPlace = Place.Fourth;
-        case Place.Sixth:
-            this.currentGame.nextPlace = Place.Fifth;
-        default:
-            this.currentGame.nextPlace = Place.First;
-        }
+        this.currentGame.nextPlace--;
     }
 
-    private nextPlace(): Place {
+    private nextPlace(): number {
         if (typeof this.currentGame === "undefined") {
             throw new Error("nextPlacer: Game isn't running.");
         }

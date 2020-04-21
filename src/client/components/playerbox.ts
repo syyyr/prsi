@@ -1,13 +1,12 @@
 import * as React from "react";
 import Player from "./player";
-import {Place} from "../../common/types";
 
 interface PlayerBoxProps {
     thisName?: string;
     players: string[];
     lastPlace?: string;
     whoseTurn?: string;
-    playerInfo?: {[key in string]: {cards?: number, place?: Place}};
+    playerInfo?: {[key in string]: {cards?: number, place?: number}};
 }
 
 export default class PlayerBox extends React.PureComponent<PlayerBoxProps> {

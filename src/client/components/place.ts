@@ -1,24 +1,19 @@
 import * as React from "react";
-import {Place as PlaceType} from "../../common/types";
 
-export default class Place extends React.PureComponent<{place: PlaceType, lastPlace: boolean}> {
+export default class Place extends React.PureComponent<{place: number, lastPlace: boolean}> {
     render() {
         return React.createElement("div", null, (() => {
             if (this.props.lastPlace) {
                 return "👎";
             }
             switch (this.props.place) {
-                case PlaceType.First:
+                case 1:
                     return "🍺🍺🍺";
-                case PlaceType.Second:
+                case 2:
                     return "🍺🍺";
-                case PlaceType.Third:
+                case 3:
                     return "🍺";
-                case PlaceType.Fourth:
-                    return "✔";
-                case PlaceType.Fifth:
-                    return "✔";
-                case PlaceType.Sixth:
+                default:
                     return "✔";
             }
         })());

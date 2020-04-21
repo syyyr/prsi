@@ -2,7 +2,6 @@ import * as React from "react";
 import CardBack from "./cardback";
 import playerImage from "../images/player";
 import PlaceComponent from "./place";
-import {Place} from "../../common/types";
 
 class PlayerDetails extends React.PureComponent<{name: string, shouldEmphasize: boolean}> {
     render(): React.ReactNode {
@@ -27,7 +26,7 @@ interface PlayerProps {
     onTurn: boolean;
     lastPlace: boolean;
     cards?: number;
-    place?: Place;
+    place?: number;
 }
 
 export default class Player extends React.PureComponent<PlayerProps> {

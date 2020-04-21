@@ -1,5 +1,4 @@
 import {ActionType, Card, LastPlay, PlayType, PlayDetails, Status} from "./types";
-import {Place} from "./types";
 
 export function isPlayerRegistration(toCheck: any): toCheck is PlayerRegistration {
     return typeof toCheck.registerPlayer !== "undefined";
@@ -72,12 +71,12 @@ export class ErrorResponse {
 export class FrontendInfo {
     wantedAction: ActionType;
     who: string;
-    playerInfo: {[key in string]: {cards?: number, place?: Place}};
+    playerInfo: {[key in string]: {cards?: number, place?: number}};
     topCards: Card[];
     hand?: Card[];
     lastPlay?: LastPlay;
     loser?: string;
-    constructor(wantedAction: ActionType, who: string, topCards: Card[], hand: Card[], playerInfo: {[key in string]: {cards?: number, place?: Place}}) {
+    constructor(wantedAction: ActionType, who: string, topCards: Card[], hand: Card[], playerInfo: {[key in string]: {cards?: number, place?: number}}) {
         this.wantedAction = wantedAction;
         this.who = who;
         this.topCards = topCards;

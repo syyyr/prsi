@@ -6,7 +6,7 @@ import ws from "express-ws";
 import WebSocket from "ws";
 import Prsi from "../server/backend";
 import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode, BadStatus} from "../common/communication";
-import {ActionType, Status, PlayerAction, Place} from "../common/types";
+import {ActionType, Status, PlayerAction} from "../common/types";
 
 // FIXME: get rid of this
 class impl_Stats {
@@ -55,7 +55,7 @@ const idGen = (function*(): Generator {
 
 const buildFrontendStateFor = (player?: string): FrontendState => {
     const state = prsi.state();
-    const playerInfo: {[key in string]: {cards?: number, place?: Place}} = {};
+    const playerInfo: {[key in string]: {cards?: number, place?: number}} = {};
     state?.players.forEach(
         (playerState) => playerInfo[playerState.name] = playerState.place !== null ? {place: playerState.place} : {cards: state.hands.get(playerState.name)!.length}
     );

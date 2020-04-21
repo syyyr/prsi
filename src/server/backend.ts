@@ -68,7 +68,6 @@ class State {
     public whoseTurn: string;
     public players: PlayerState[];
     public nextPlace: Place = Place.First;
-    public gameState: "active" | "ended" = "active";
     public wantedAction: ActionType = ActionType.Play;
     public lastAction: ActionType = ActionType.Play;
     public lastPlay?: LastPlay;
@@ -314,7 +313,6 @@ export class Prsi {
             throw new Error("Game isn't running.");
         }
 
-        this._currentGame.gameState = "ended";
         const loser = this._currentGame.players.findIndex((player) => player.place === null);
         this._currentGame.loser = this._currentGame.players[loser].name;
         this._currentGame.players[loser].place = this.nextPlace();

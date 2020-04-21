@@ -1,5 +1,5 @@
 import {Prsi} from "./server/backend";
-import {Color, PlayType, PlayDetails, Status, PlayerAction} from "./common/types";
+import {Color, PlayType, PlayDetails, Status, PlayerAction, ActionType} from "./common/types";
 
 const prsi = new Prsi();
 prsi.registerPlayer("Typek");
@@ -10,7 +10,7 @@ prsi.newGame();
 while (true) {
     const state = prsi.state();
     state!.printHands();
-    if (state!.gameState === "ended") {
+    if (state!.wantedAction === ActionType.Shuffle) {
         break;
     }
     const player = state!.whoseTurn;

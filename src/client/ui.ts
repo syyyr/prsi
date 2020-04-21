@@ -78,6 +78,14 @@ export class UI extends React.Component<{}, UIState> {
                     case LastAction.DrawEight:
                         new Audio(audio[state.gameInfo.lastPlay.playerAction]).play();
                 }
+
+                if (state.gameInfo.lastPlay?.didWin && state.gameInfo.lastPlay.who == this.thisName) {
+                    new Audio(audio.win).play();
+                }
+
+                if (state.gameInfo.loser === this.thisName) {
+                    new Audio(audio.lose).play();
+                }
             }
         };
 

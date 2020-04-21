@@ -86,19 +86,19 @@ class State {
 }
 
 export default class Prsi {
-    private _players: string[] = [];
-    private _currentGame?: State;
+    private players: string[] = [];
+    private currentGame?: State;
 
     public resolveAction(playerAction: PlayerAction): Status {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game hasn't started.");
         }
 
-        if (playerAction.who !== this._currentGame.whoseTurn) {
+        if (playerAction.who !== this.currentGame.whoseTurn) {
             return Status.PlayerMismatch;
         }
 
-        switch (this._currentGame.wantedAction) {
+        switch (this.currentGame.wantedAction) {
         case ActionType.Play:
             switch (playerAction.action) {
             case PlayType.Play:
@@ -119,10 +119,10 @@ export default class Prsi {
             switch (playerAction.action) {
             case PlayType.Play:
                 if (playerAction.playDetails?.card.value === Value.Sedmicka && playerAction.playDetails.card.color === Color.Srdce) {
-                    if (this._currentGame.lastAction !== ActionType.SkipTurn && this.canBePlayed(playerAction.playDetails.card)) {
-                        console.log(this._currentGame.lastAction);
-                        this._currentGame.wantedAction = this.drawInfo.get(this._currentGame.lastAction)!.next;
-                        console.log(this._currentGame.wantedAction);
+                    if (this.currentGame.lastAction !== ActionType.SkipTurn && this.canBePlayed(playerAction.playDetails.card)) {
+                        console.log(this.currentGame.lastAction);
+                        this.currentGame.wantedAction = this.drawInfo.get(this.currentGame.lastAction)!.next;
+                        console.log(this.currentGame.wantedAction);
                         if (this.playCard(playerAction.who, playerAction.playDetails)) {
                             return Status.Ok;
                         } else {
@@ -174,7 +174,7 @@ export default class Prsi {
                 }
             case PlayType.Draw:
                 this.skipTurn();
-                this._currentGame.lastPlay = {
+                this.currentGame.lastPlay = {
                     who: playerAction.who,
                     playDetails: playerAction.playDetails,
                     playerAction: LastAction.SkipTurn,
@@ -206,58 +206,58 @@ export default class Prsi {
     }
 
     private skipTurn(): void {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
 
         // After someone skips, the next person will definitely play
-        this._currentGame.wantedAction = ActionType.Play;
+        this.currentGame.wantedAction = ActionType.Play;
         this.nextPlayer();
     }
 
     private nextPlayer(): void {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
 
-        if (this._currentGame.players.filter((player) => player.place === null).length === 1) {
+        if (this.currentGame.players.filter((player) => player.place === null).length === 1) {
             this.concludeGame();
             return;
         }
 
-        let curPlayer = this._currentGame.players.findIndex((playerState) => playerState.name === this._currentGame!.whoseTurn);
+        let curPlayer = this.currentGame.players.findIndex((playerState) => playerState.name === this.currentGame!.whoseTurn);
         do {
             curPlayer++;
-            if (curPlayer === this._currentGame.players.length) {
+            if (curPlayer === this.currentGame.players.length) {
                 curPlayer = 0;
             }
-            this._currentGame.players[curPlayer].canBeReturned = false;
-        } while (this._currentGame.players[curPlayer].place !== null);
+            this.currentGame.players[curPlayer].canBeReturned = false;
+        } while (this.currentGame.players[curPlayer].place !== null);
 
-        this._currentGame.whoseTurn = this._currentGame.players[curPlayer].name;
+        this.currentGame.whoseTurn = this.currentGame.players[curPlayer].name;
 
     }
 
     private drawCard(player: string): void {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
 
         const impl_draw = () => {
-            if (this._currentGame!.drawn === this._currentGame!.deck.cards.length) {
-                this._currentGame!.deck.cards = this._currentGame!.playedCards;
-                this._currentGame!.drawn = 0;
-                this._currentGame!.playedCards = [];
-                this._currentGame!.playedCards.push(this._currentGame!.deck.cards[this._currentGame!.drawn++]);
+            if (this.currentGame!.drawn === this.currentGame!.deck.cards.length) {
+                this.currentGame!.deck.cards = this.currentGame!.playedCards;
+                this.currentGame!.drawn = 0;
+                this.currentGame!.playedCards = [];
+                this.currentGame!.playedCards.push(this.currentGame!.deck.cards[this.currentGame!.drawn++]);
             }
 
-            this._currentGame!.hands.get(player)!.push(this._currentGame!.deck.cards[this._currentGame!.drawn++]);
+            this.currentGame!.hands.get(player)!.push(this.currentGame!.deck.cards[this.currentGame!.drawn++]);
         };
 
-        const n = this.drawInfo.get(this._currentGame.wantedAction)!.count;
+        const n = this.drawInfo.get(this.currentGame.wantedAction)!.count;
         Array.from({length: n}).forEach(impl_draw);
 
-        this._currentGame.lastPlay = {
+        this.currentGame.lastPlay = {
             who: player,
             didWin: false,
             playerAction: (() => {
@@ -277,12 +277,12 @@ export default class Prsi {
 
         // After someone draws, the next person will surely play (but keep color change)
         if (
-            this._currentGame.wantedAction !== ActionType.PlaySrdce &&
-            this._currentGame.wantedAction !== ActionType.PlayKule &&
-            this._currentGame.wantedAction !== ActionType.PlayListy &&
-            this._currentGame.wantedAction !== ActionType.PlayZaludy
+            this.currentGame.wantedAction !== ActionType.PlaySrdce &&
+            this.currentGame.wantedAction !== ActionType.PlayKule &&
+            this.currentGame.wantedAction !== ActionType.PlayListy &&
+            this.currentGame.wantedAction !== ActionType.PlayZaludy
         ) {
-            this._currentGame.wantedAction = ActionType.Play;
+            this.currentGame.wantedAction = ActionType.Play;
         }
         this.nextPlayer();
     }
@@ -309,25 +309,25 @@ export default class Prsi {
     }
 
     private concludeGame() {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
 
-        const loser = this._currentGame.players.findIndex((player) => player.place === null);
-        this._currentGame.loser = this._currentGame.players[loser].name;
-        this._currentGame.players[loser].place = this.nextPlace();
-        this._currentGame.lastAction = this._currentGame.wantedAction ;
-        this._currentGame.wantedAction = ActionType.Shuffle;
-        this._currentGame.whoseTurn = this._currentGame.players[loser].name;
+        const loser = this.currentGame.players.findIndex((player) => player.place === null);
+        this.currentGame.loser = this.currentGame.players[loser].name;
+        this.currentGame.players[loser].place = this.nextPlace();
+        this.currentGame.lastAction = this.currentGame.wantedAction ;
+        this.currentGame.wantedAction = ActionType.Shuffle;
+        this.currentGame.whoseTurn = this.currentGame.players[loser].name;
     }
 
     private resolveChangeCard(color: Color): boolean {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
         // try here, because the helper function only works on Play* actions
         try {
-            if (color === changeActionToColor(this._currentGame.wantedAction)) {
+            if (color === changeActionToColor(this.currentGame.wantedAction)) {
                 return true;
             }
         } catch {
@@ -337,7 +337,7 @@ export default class Prsi {
     }
 
     private canBePlayed(card: Card) {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
 
@@ -345,7 +345,7 @@ export default class Prsi {
             return true;
         }
 
-        switch (this._currentGame.wantedAction) {
+        switch (this.currentGame.wantedAction) {
         case ActionType.PlayZaludy:
         case ActionType.PlayKule:
         case ActionType.PlayListy:
@@ -353,39 +353,39 @@ export default class Prsi {
             return this.resolveChangeCard(card.color);
         }
 
-        return compatibleCards(card, this._currentGame.playedCards[this._currentGame.playedCards.length - 1]);
+        return compatibleCards(card, this.currentGame.playedCards[this.currentGame.playedCards.length - 1]);
     }
 
     private rollbackPlace() {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
 
-        switch (this._currentGame.nextPlace) {
+        switch (this.currentGame.nextPlace) {
         case Place.Second:
-            this._currentGame.nextPlace = Place.First;
+            this.currentGame.nextPlace = Place.First;
         case Place.Third:
-            this._currentGame.nextPlace = Place.Second;
+            this.currentGame.nextPlace = Place.Second;
         case Place.Fourth:
-            this._currentGame.nextPlace = Place.Third;
+            this.currentGame.nextPlace = Place.Third;
         case Place.Fifth:
-            this._currentGame.nextPlace = Place.Fourth;
+            this.currentGame.nextPlace = Place.Fourth;
         case Place.Sixth:
-            this._currentGame.nextPlace = Place.Fifth;
+            this.currentGame.nextPlace = Place.Fifth;
         default:
-            this._currentGame.nextPlace = Place.First;
+            this.currentGame.nextPlace = Place.First;
         }
     }
 
     private nextPlace(): Place {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
 
-        const res = this._currentGame.nextPlace;
+        const res = this.currentGame.nextPlace;
 
-        this._currentGame.nextPlace = ((): Place => {
-            switch (this._currentGame!.nextPlace) {
+        this.currentGame.nextPlace = ((): Place => {
+            switch (this.currentGame!.nextPlace) {
                 case Place.First:
                     return Place.Second;
                 case Place.Second:
@@ -405,38 +405,38 @@ export default class Prsi {
     }
 
     private checkReturnToGame() {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
 
-        const curPlayer = this._currentGame.players.findIndex((playerState) => playerState.name === this._currentGame!.whoseTurn);
+        const curPlayer = this.currentGame.players.findIndex((playerState) => playerState.name === this.currentGame!.whoseTurn);
         let i = curPlayer;
         do {
             i++;
-            if (i === this._currentGame.players.length) {
+            if (i === this.currentGame.players.length) {
                 i = 0;
             }
 
-            if (this._currentGame.players[i].canBeReturned) {
-                return this._currentGame.players[i].name;
+            if (this.currentGame.players[i].canBeReturned) {
+                return this.currentGame.players[i].name;
             }
         } while (i !== curPlayer);
     }
 
     private resolveReturnToGame(who: string) {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
-        this._currentGame.players.find((player) => player.name === this._currentGame?.whoseTurn)!.place = null;
+        this.currentGame.players.find((player) => player.name === this.currentGame?.whoseTurn)!.place = null;
         this.rollbackPlace();
-        this._currentGame.players.find((player) => player.name === who)!.place = null;
+        this.currentGame.players.find((player) => player.name === who)!.place = null;
         this.drawCard(who);
-        this._currentGame.whoseTurn = who;
-        this._currentGame.wantedAction = ActionType.Play;
+        this.currentGame.whoseTurn = who;
+        this.currentGame.wantedAction = ActionType.Play;
     }
 
     private playCard(who: string, details: PlayDetails): boolean {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
 
@@ -448,10 +448,10 @@ export default class Prsi {
             return false;
         }
 
-        this._currentGame.playedCards.push(details.card);
+        this.currentGame.playedCards.push(details.card);
 
-        const updatedHand = this._currentGame.hands.get(who)!.filter((x) => !sameCards(details.card, x));
-        this._currentGame.hands.set(who, updatedHand);
+        const updatedHand = this.currentGame.hands.get(who)!.filter((x) => !sameCards(details.card, x));
+        this.currentGame.hands.set(who, updatedHand);
 
         let lastAction: LastAction;
         const returned = this.checkReturnToGame();
@@ -459,30 +459,30 @@ export default class Prsi {
             this.resolveReturnToGame(returned);
             details.returned = returned;
             lastAction = LastAction.Return;
-            this._currentGame.wantedAction = ActionType.Play;
+            this.currentGame.wantedAction = ActionType.Play;
         } else if (details.card.value === Value.Sedmicka) {
-            this._currentGame.wantedAction = this.drawInfo.get(this._currentGame.wantedAction)!.next;
+            this.currentGame.wantedAction = this.drawInfo.get(this.currentGame.wantedAction)!.next;
             lastAction = LastAction.Play;
         } else if (details.card.value === Value.Eso) {
-            this._currentGame.wantedAction = ActionType.SkipTurn;
+            this.currentGame.wantedAction = ActionType.SkipTurn;
             lastAction = LastAction.Play;
         } else if (details.card.value === Value.Svrsek) {
             if (typeof details.colorChange === "undefined") {
                 throw new Error("User didn't specify which color he wants.");
             }
-            this._currentGame.wantedAction = this.changeColorToAction(details.colorChange);
+            this.currentGame.wantedAction = this.changeColorToAction(details.colorChange);
             lastAction = LastAction.Change;
         } else {
-            this._currentGame.wantedAction = ActionType.Play;
+            this.currentGame.wantedAction = ActionType.Play;
             lastAction = LastAction.Play;
         }
 
         if (updatedHand.length === 0) {
-            this._currentGame.players.find((player) => player.name === who)!.place = this.nextPlace();
-            this._currentGame.players.find((player) => player.name === who)!.canBeReturned = true;
+            this.currentGame.players.find((player) => player.name === who)!.place = this.nextPlace();
+            this.currentGame.players.find((player) => player.name === who)!.canBeReturned = true;
         }
 
-        this._currentGame.lastPlay = {
+        this.currentGame.lastPlay = {
             who: who,
             playerAction: lastAction,
             playDetails: details,
@@ -494,104 +494,104 @@ export default class Prsi {
     }
 
     private playerHasCard(player: string, cardToCheck: Card): boolean {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
-        if (!this._currentGame.hands.has(player)) {
+        if (!this.currentGame.hands.has(player)) {
             throw new Error("playerHasCard: User doesn' exist.");
         }
-        return this._currentGame.hands.get(player)!.some(sameCards.bind(null, cardToCheck));
+        return this.currentGame.hands.get(player)!.some(sameCards.bind(null, cardToCheck));
     }
 
     public newGame(shuffler?: string): void {
-        if (this._players.length < 2) {
+        if (this.players.length < 2) {
             throw new Error("Tried to start a game with one player.");
         }
 
-        this._currentGame = this.newState(shuffler);
+        this.currentGame = this.newState(shuffler);
         this.dealCards();
     }
 
     private dealCards(): void {
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             throw new Error("Game isn't running.");
         }
 
-        this._players.forEach((player) => {
-            this._currentGame!.hands.set(player, this._currentGame!.deck.cards.slice(this._currentGame!.drawn, this._currentGame!.drawn + 4));
-            this._currentGame!.drawn += 4;
+        this.players.forEach((player) => {
+            this.currentGame!.hands.set(player, this.currentGame!.deck.cards.slice(this.currentGame!.drawn, this.currentGame!.drawn + 4));
+            this.currentGame!.drawn += 4;
         });
 
-        this._currentGame.playedCards.push(this._currentGame.deck.cards[this._currentGame.drawn++]);
-        switch (this._currentGame.playedCards[0].value) {
+        this.currentGame.playedCards.push(this.currentGame.deck.cards[this.currentGame.drawn++]);
+        switch (this.currentGame.playedCards[0].value) {
         case Value.Eso:
-            this._currentGame.wantedAction = ActionType.SkipTurn;
+            this.currentGame.wantedAction = ActionType.SkipTurn;
             break;
         case Value.Sedmicka:
-            this._currentGame.wantedAction = ActionType.DrawTwo;
+            this.currentGame.wantedAction = ActionType.DrawTwo;
             break;
         case Value.Svrsek:
-            this._currentGame.wantedAction = this.changeColorToAction(this._currentGame.playedCards[0].color);
+            this.currentGame.wantedAction = this.changeColorToAction(this.currentGame.playedCards[0].color);
             break;
         }
     }
 
     private getRandomPlayer(): string {
-        return this._players[Math.floor(Math.random() *  this._players.length)];
+        return this.players[Math.floor(Math.random() *  this.players.length)];
     }
 
     private newState(shuffler?: string): State {
         if (typeof shuffler === "undefined") {
-            return new State([...this._players], this.getRandomPlayer());
+            return new State([...this.players], this.getRandomPlayer());
         }
 
-        let firstTurnPlayerIndex = this._players.indexOf(shuffler) + 1;
-        if (firstTurnPlayerIndex === this._players.length) {
+        let firstTurnPlayerIndex = this.players.indexOf(shuffler) + 1;
+        if (firstTurnPlayerIndex === this.players.length) {
             firstTurnPlayerIndex = 0;
         }
 
-        return new State([...this._players], this._players[firstTurnPlayerIndex]);
+        return new State([...this.players], this.players[firstTurnPlayerIndex]);
     }
 
     public registerPlayer(name: string): void {
-        if (this._players.some((player) => player == name)) {
+        if (this.players.some((player) => player == name)) {
             throw new Error("Player already exists.");
         }
-        this._players.push(name);
+        this.players.push(name);
     }
 
     public unregisterPlayer(name: string): void {
-        this._players = this._players.filter((player) => player !== name);
+        this.players = this.players.filter((player) => player !== name);
 
-        if (typeof this._currentGame === "undefined") {
+        if (typeof this.currentGame === "undefined") {
             return;
         }
 
         // If a player disconnected during a game
-        if (this._currentGame.whoseTurn === name) {
-            this._currentGame.lastPlay = {
+        if (this.currentGame.whoseTurn === name) {
+            this.currentGame.lastPlay = {
                 didWin: false,
                 playerAction: LastAction.Disconnect,
                 who: name,
             };
             this.nextPlayer();
         }
-        this._currentGame.players = this._currentGame.players.filter((player) => player.name !== name);
+        this.currentGame.players = this.currentGame.players.filter((player) => player.name !== name);
         // Just end the game if there is just one player.
-        if (this._currentGame.players.filter((player) => player.place === null).length < 2) {
-            this._currentGame = undefined;
+        if (this.currentGame.players.filter((player) => player.place === null).length < 2) {
+            this.currentGame = undefined;
             return;
         }
-        const hand = this._currentGame.hands.get(name);
-        hand?.forEach((card) => this._currentGame!.deck.cards.push(card));
-        this._currentGame.hands.delete(name);
+        const hand = this.currentGame.hands.get(name);
+        hand?.forEach((card) => this.currentGame!.deck.cards.push(card));
+        this.currentGame.hands.delete(name);
     }
 
-    public players(): string[] {
-        return this._players.slice(0);
+    public getPlayers(): string[] {
+        return this.players.slice(0);
     }
 
     public state(): State | undefined {
-        return this._currentGame;
+        return this.currentGame;
     }
 }

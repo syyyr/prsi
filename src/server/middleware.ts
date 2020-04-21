@@ -59,10 +59,11 @@ const buildFrontendStateFor = (player?: string): FrontendState => {
     state?.players.forEach(
         (playerState) => playerInfo[playerState.name] = playerState.place !== null ? {place: playerState.place} : {cards: state.hands.get(playerState.name)!.length}
     );
+    const players = prsi.getPlayers();
     return {
-        players: prsi.players(),
+        players,
         gameStarted: typeof state !== "undefined" ? "yes" : "no",
-        stats: Object.assign({}, ...prsi.players().map(player =>
+        stats: Object.assign({}, ...players.map(player =>
             ({[player]: stats[player].current}))),
         gameInfo: typeof state !== "undefined" ? {
             wantedAction: state.wantedAction,

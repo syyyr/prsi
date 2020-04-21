@@ -60,7 +60,7 @@ export class UI extends React.Component<{}, UIState> {
     private readonly initIO = (): void => {
         this.io.onState = (state: FrontendState) => {
             if (typeof this.highlightTimeout !== "undefined") {
-                clearTimeout(this.highlightTimeout);
+                window.clearTimeout(this.highlightTimeout);
             }
             this.setState({
                 error: null,
@@ -147,7 +147,7 @@ export class UI extends React.Component<{}, UIState> {
 
     private readonly clearEffectTimeout = () => {
         if (typeof this.playReminderTimeout !== "undefined") {
-            clearTimeout(this.playReminderTimeout);
+            window.clearTimeout(this.playReminderTimeout);
             this.playReminderTimeout = undefined;
         }
 

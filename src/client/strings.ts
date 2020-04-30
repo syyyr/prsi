@@ -114,7 +114,7 @@ export const drawButtonString = {
 
 export const cardsGenitive: {[key in keyof typeof Color]: {[key2 in keyof typeof Value]: string}} = {
     [Color.Kule]: {
-        [Value.Sedmicka]: "kulou sedmu",
+        [Value.Sedmicka]: "kulovou sedmu",
         [Value.Osmicka]: "kulovou osmičku",
         [Value.Devitka]: "kulovou devítku",
         [Value.Desitka]: "kulovou desítku",

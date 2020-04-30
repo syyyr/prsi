@@ -234,14 +234,14 @@ const processMessage = (id: number, message: string): void => {
     prsiLogger("Invalid request", id);
 };
 
-const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: string, _req?: express.Request) => console.log(msg)) => {
+const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: string, _res?: express.Response) => console.log(msg)) => {
     prsiLogger = (msg: string, id?: number | string) => {
         // Manually inject the ws id. I know using `any` isn't the cleanest
         // solution, but then again, the whole express-ws thing isn't very
         // clean.
         if (typeof id !== "undefined") {
             logger(msg, {
-                session: {
+                locals: {
                     myId: `ws/${id}`
                 }
             } as any);

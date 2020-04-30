@@ -201,7 +201,7 @@ const processMessage = (id: number, message: string): void => {
             }
             if (state?.lastPlay?.didWin) {
                 const prevStats = stats[state.lastPlay.who];
-                const acquiredPts = 1 - (state.players.find((player) => player.name === state.lastPlay?.who)!.place! - 1) / state.players.length;
+                const acquiredPts = 1 - (state.players.find((player) => player.name === state.lastPlay?.who)!.place! - 1) / (state.players.length - 1);
                 updateStats(prevStats, acquiredPts);
                 if (state.wantedAction === ActionType.Shuffle) { // If shuffle, then the game is over - we have to recalculate last guy's stats
                     const prevStats = stats[state.whoseTurn];

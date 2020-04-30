@@ -37,6 +37,7 @@ export class UI extends React.Component<{}, UIState> {
     private highlightTimeout?: number;
     private io: PlayerInputOutput;
     private thisName?: string;
+    private thisRoom?: string;
 
     constructor(props: {}) {
         super(props);
@@ -234,8 +235,11 @@ export class UI extends React.Component<{}, UIState> {
     private readonly reconnect = (): void => {
         this.showError("Připojování...", undefined, "fatal");
         this.io = new PlayerInputOutput(() => {
-            if (typeof this.thisName !== "undefined") {
-                this.io.registerPlayer(this.thisName);
+            if (typeof this.thisRoom !== "undefined") {
+                this.io.joinRoom(this.thisRoom);
+                if (typeof this.thisName !== "undefined") {
+                    this.io.registerPlayer(this.thisName);
+                }
             }
         });
         this.initIO();
@@ -302,6 +306,11 @@ export class UI extends React.Component<{}, UIState> {
         this.io.registerPlayer(name);
         window.localStorage.setItem("name", name);
         this.thisName = name;
+    }
+
+    private readonly joinRoom = (name: string) => {
+        this.io.joinRoom(name);
+        this.thisRoom = name;
     }
 
     private renderState = (gameState: FrontendState): React.ReactNode[] => {
@@ -412,7 +421,7 @@ export class UI extends React.Component<{}, UIState> {
         if (this.insideRoom(this.state.gameState)) {
             elems.push(...this.renderState(this.state.gameState));
         } else {
-            elems.push(React.createElement(RoomsComponent, {key: "rooms", rooms: this.state.gameState, joinRoom: this.io.joinRoom}));
+            elems.push(React.createElement(RoomsComponent, {key: "rooms", rooms: this.state.gameState, joinRoom: this.joinRoom}));
         }
 
 

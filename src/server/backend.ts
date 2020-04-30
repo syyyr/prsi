@@ -355,23 +355,20 @@ export default class Prsi {
         return this.currentGame.nextPlace++;
     }
 
-    private checkReturnToGame() {
+    private checkReturnToGame(): string | undefined {
         if (typeof this.currentGame === "undefined") {
             throw new Error("checkReturnTo: Game isn't running.");
         }
 
         const curPlayer = this.currentGame.players.findIndex((playerState) => playerState.name === this.currentGame!.whoseTurn);
-        let i = curPlayer;
-        do {
-            i++;
-            if (i === this.currentGame.players.length) {
-                i = 0;
-            }
+        let possiblyReturned = curPlayer + 1;
+        if (possiblyReturned === this.currentGame.players.length) {
+            possiblyReturned = 0;
+        }
 
-            if (this.currentGame.players[i].canBeReturned) {
-                return this.currentGame.players[i].name;
-            }
-        } while (i !== curPlayer);
+        if (this.currentGame.players[possiblyReturned].canBeReturned) {
+            return this.currentGame.players[possiblyReturned].name;
+        }
     }
 
     private resolveReturnToGame(who: string) {

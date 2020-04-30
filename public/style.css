@@ -159,7 +159,7 @@ body {
     align-items: center;
     background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(0,224,0,1) 100%);
     border-radius: 1em;
-    border: 0.2em solid orangered;
+    border: 0.2em solid red;
     box-shadow: 1em 1em 1em black;
     display: flex;
     flex-direction: column;
@@ -167,7 +167,6 @@ body {
     padding: 1em;
 }
 .fatal-error {
-    color: red;
     font-weight: bold;
 }
 

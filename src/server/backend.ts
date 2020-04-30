@@ -378,6 +378,7 @@ export default class Prsi {
         this.currentGame.players.find((player) => player.name === this.currentGame?.whoseTurn)!.place = null;
         this.rollbackPlace();
         this.currentGame.players.find((player) => player.name === who)!.place = null;
+        this.currentGame.wantedAction = this.drawInfo.get(this.currentGame.wantedAction)!.next;
         this.drawCard(who);
         this.currentGame.whoseTurn = who;
         this.currentGame.wantedAction = ActionType.Play;

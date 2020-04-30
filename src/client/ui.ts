@@ -83,7 +83,9 @@ export class UI extends React.Component<{}, UIState> {
                     new Audio(audio.win).play();
                 }
 
-                if (typeof state.gameInfo.loser !== "undefined" && state.gameInfo.loser === this.thisName) {
+                if (typeof state.gameInfo.loser !== "undefined"
+                    && state.gameInfo.loser === this.thisName
+                    && state.gameInfo.lastPlay?.playerAction !== LastAction.Disconnect) {
                     new Audio(audio.lose).play();
                 }
             }

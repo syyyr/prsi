@@ -5,7 +5,7 @@ import path from "path";
 import ws from "express-ws";
 import WebSocket from "ws";
 import Prsi from "../server/backend";
-import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode, BadStatus} from "../common/communication";
+import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode, BadStatus, PlayerRegistration} from "../common/communication";
 import {ActionType, Status, PlayerAction} from "../common/types";
 
 // FIXME: get rid of this
@@ -77,10 +77,12 @@ const buildFrontendStateFor = (player?: string): FrontendState => {
     };
 };
 
-const updateEveryone = () => {
+const sendEveryone = (what?: PlayerRegistration) => {
     Object.entries(openSockets).forEach((([id, socketInfo]) => {
         if (socketInfo.ws.readyState === WebSocket.OPEN) {
-            socketInfo.ws.send(JSON.stringify(buildFrontendStateFor(socketInfo.name)));
+            const toSend = typeof what !== "undefined" ? what :
+                buildFrontendStateFor(socketInfo.name);
+            socketInfo.ws.send(JSON.stringify(toSend));
         } else {
             prsiLogger("updateEveryone: Socket not OPEN. Unregistering it from the game.", id);
             if (typeof socketInfo.name !== "undefined") {
@@ -91,9 +93,11 @@ const updateEveryone = () => {
     }));
 };
 
-const updateOne = (id: number) => {
+const sendOne = (id: number, what?: BadStatus) => {
     if (openSockets[id].ws.readyState === WebSocket.OPEN) {
-        openSockets[id].ws.send(JSON.stringify(buildFrontendStateFor(openSockets[id].name)));
+        const toSend = typeof what !== "undefined" ? what :
+            buildFrontendStateFor(openSockets[id].name);
+        openSockets[id].ws.send(JSON.stringify(toSend));
     } else {
         prsiLogger("updateOne: Socket not OPEN. Unregistering it from the game.", id);
         const name = openSockets[id].name;
@@ -105,16 +109,7 @@ const updateOne = (id: number) => {
 };
 
 const sendBadStatus = (id: number, status: Status) => {
-    if (openSockets[id].ws.readyState === WebSocket.OPEN) {
-        openSockets[id].ws.send(JSON.stringify(new BadStatus(status)));
-    } else {
-        prsiLogger("sendBadStatus: Socket not OPEN. Unregistering it from the game.", id);
-        const name = openSockets[id].name;
-        if (typeof name !== "undefined") {
-            prsi.unregisterPlayer(name);
-            openSockets[id].name = undefined;
-        }
-    }
+    sendOne(id, new BadStatus(status));
 };
 
 const sendError = (id: number, error: ErrorResponse) => {
@@ -158,7 +153,7 @@ const processMessage = (id: number, message: string): void => {
         if (typeof stats[parsed.registerPlayer] === "undefined") {
             stats[parsed.registerPlayer] = new Stats();
         }
-        updateEveryone();
+        sendEveryone();
         return;
     }
 
@@ -182,7 +177,7 @@ const processMessage = (id: number, message: string): void => {
         prsi.unregisterPlayer(parsed.unregisterPlayer);
         socket.name = undefined;
         prsiLogger(`Unregistered "${parsed.unregisterPlayer}".`, id);
-        updateEveryone();
+        sendEveryone();
         return;
     }
 
@@ -213,7 +208,7 @@ const processMessage = (id: number, message: string): void => {
                     updateStats(prevStats, 0);
                 }
             }
-            updateEveryone();
+            sendEveryone();
         } else {
             sendBadStatus(id, status);
         }
@@ -226,7 +221,7 @@ const processMessage = (id: number, message: string): void => {
             prsiLogger("Tried to start the game, even though, no name is assigned", id);
         }
         prsi.newGame();
-        updateEveryone();
+        sendEveryone();
         return;
     }
 
@@ -264,7 +259,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
         const id = idGen.next().value;
         openSockets[id] = ({ws});
         prsiLogger("Client connected.", id);
-        updateOne(id);
+        sendOne(id);
 
         ws.on("message", (message: WebSocket.Data) => {
             try {
@@ -291,7 +286,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
             prsiLogger("Client disconnected.", id);
 
             delete openSockets[id];
-            updateEveryone();
+            sendEveryone();
         });
     });
 

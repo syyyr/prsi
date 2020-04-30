@@ -1,4 +1,4 @@
-import {ErrorResponse, PlayerRegistration, FrontendState, isErrorResponse, isFrontendState, PlayerInput, StartGame, PlayerUnregistration, BadStatus, isBadStatus} from "../common/communication";
+import {ErrorResponse, PlayerRegistration, FrontendState, isErrorResponse, isFrontendState, isPlayerRegistration, PlayerInput, StartGame, PlayerUnregistration, BadStatus, isBadStatus} from "../common/communication";
 import {PlayType, Card, Color, PlayDetails} from "../common/types";
 
 export default class PlayerInputOutput {
@@ -6,6 +6,7 @@ export default class PlayerInputOutput {
     onError: (message: ErrorResponse) => void = () => {};
     onState: (message: FrontendState) => void = () => {};
     onBadStatus: (message: BadStatus) => void = () => {};
+    onPlayerRegistration: (message: PlayerRegistration) => void = () => {};
     onClose: (code: number) => void = () => {};
     self: PlayerInputOutput = this;
     constructor(onOpen?: () => void) {
@@ -32,6 +33,10 @@ export default class PlayerInputOutput {
 
             if (isBadStatus(parsed)) {
                 this.onBadStatus(parsed);
+            }
+
+            if (isPlayerRegistration(parsed)) {
+                this.onPlayerRegistration(parsed);
             }
         };
 

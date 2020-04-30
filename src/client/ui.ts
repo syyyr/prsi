@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FrontendState, FrontendStats, ErrorResponse, ErrorCode, BadStatus} from "../common/communication";
+import {FrontendState, FrontendStats, ErrorResponse, ErrorCode, BadStatus, PlayerRegistration} from "../common/communication";
 import {Card, Value, Color, ActionType, Status, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
 import Game from "./components/game";
@@ -94,6 +94,18 @@ export class UI extends React.Component<{}, UIState> {
         this.io.onBadStatus = (status: BadStatus) => {
             this.setState({status: status.badStatus});
             this.blink();
+        };
+
+        this.io.onPlayerRegistration = (registration: PlayerRegistration) => {
+            if (typeof this.state.gameState !== "undefined") {
+                this.setState({
+                    gameState: {
+                        ...this.state.gameState,
+                        players: [...this.state.gameState.players, registration.registerPlayer]
+                    },
+                    nameDialog: registration.registerPlayer === this.thisName ? false : this.state.nameDialog
+                });
+            }
         };
 
         this.io.onError = (err: ErrorResponse) => {

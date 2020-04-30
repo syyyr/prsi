@@ -153,7 +153,7 @@ const processMessage = (id: number, message: string): void => {
         if (typeof stats[parsed.registerPlayer] === "undefined") {
             stats[parsed.registerPlayer] = new Stats();
         }
-        sendEveryone();
+        sendEveryone(parsed);
         return;
     }
 

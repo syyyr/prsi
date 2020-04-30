@@ -103,6 +103,7 @@ export class UI extends React.Component<{}, UIState> {
         };
 
         this.io.onClose = (code: number) => {
+            this.setState({picker: null});
             this.showError(`Byls odpojen. Kód: ${code}. Důvod: ${wsErrCodeToString(code)}`, "Připojit se znovu", "fatal");
             if (typeof this.playReminderTimeout !== "undefined") {
                 window.clearTimeout(this.playReminderTimeout);

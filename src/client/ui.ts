@@ -62,6 +62,7 @@ export class UI extends React.Component<{}, UIState> {
         this.io.onState = (state: FrontendState) => {
             if (typeof this.highlightTimeout !== "undefined") {
                 window.clearTimeout(this.highlightTimeout);
+                this.highlightTimeout = undefined;
             }
             this.setState({
                 error: null,

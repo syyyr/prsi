@@ -410,7 +410,6 @@ export class UI extends React.Component<{}, UIState> {
         }
 
         if (this.insideRoom(this.state.gameState)) {
-            console.log(this.state.gameState);
             elems.push(...this.renderState(this.state.gameState));
         } else {
             elems.push(React.createElement(RoomsComponent, {key: "rooms", rooms: this.state.gameState, joinRoom: this.io.joinRoom}));

@@ -1,10 +1,11 @@
-import {ErrorResponse, PlayerRegistration, FrontendState, isErrorResponse, isFrontendState, isPlayerRegistration, PlayerInput, StartGame, PlayerUnregistration, BadStatus, isBadStatus} from "../common/communication";
+import {ErrorResponse, PlayerRegistration, FrontendState, isErrorResponse, isFrontendState, isPlayerRegistration, PlayerInput, StartGame, PlayerUnregistration, BadStatus, isBadStatus, Rooms, isRooms, JoinRoom} from "../common/communication";
 import {PlayType, Card, Color, PlayDetails} from "../common/types";
 
 export default class PlayerInputOutput {
     ws: globalThis.WebSocket;
     onError: (message: ErrorResponse) => void = () => {};
     onState: (message: FrontendState) => void = () => {};
+    onRooms: (message: Rooms) => void = () => {};
     onBadStatus: (message: BadStatus) => void = () => {};
     onPlayerRegistration: (message: PlayerRegistration) => void = () => {};
     onClose: (code: number) => void = () => {};
@@ -29,14 +30,22 @@ export default class PlayerInputOutput {
 
             if (isFrontendState(parsed)) {
                 this.onState(parsed);
+                return;
             }
 
             if (isBadStatus(parsed)) {
                 this.onBadStatus(parsed);
+                return;
             }
 
             if (isPlayerRegistration(parsed)) {
                 this.onPlayerRegistration(parsed);
+                return;
+            }
+
+            if (isRooms(parsed)) {
+                this.onRooms(parsed);
+                return;
             }
         };
 
@@ -65,5 +74,9 @@ export default class PlayerInputOutput {
 
     readonly playCard = (card: Card, colorChange?: Color): void => {
         this.ws.send(JSON.stringify(new PlayerInput(PlayType.Play, new PlayDetails(card, colorChange))));
+    };
+
+    readonly joinRoom = (name: string): void => {
+        this.ws.send(JSON.stringify(new JoinRoom(name)));
     };
 }

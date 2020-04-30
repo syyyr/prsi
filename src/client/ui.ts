@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FrontendState, FrontendStats, ErrorResponse, ErrorCode, BadStatus, PlayerRegistration} from "../common/communication";
+import {FrontendState, FrontendStats, ErrorResponse, ErrorCode, BadStatus, PlayerRegistration, Rooms, isFrontendState} from "../common/communication";
 import {Card, Value, Color, ActionType, Status, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
 import Game from "./components/game";
@@ -15,11 +15,12 @@ import PlayerInputOutput from "./io";
 import NameDialog from "./components/namedialog";
 import ErrorDialog from "./components/errordialog";
 import LeaveButton from "./components/leavebutton";
+import RoomsComponent from "./components/rooms";
 import {wsErrCodeToString, promptExit} from "./strings";
 
 interface UIState {
     nameDialog: boolean;
-    gameState?: FrontendState;
+    gameState?: FrontendState | Rooms;
     status: Status;
     picker: null | Color;
     errorHighlight: boolean | null;
@@ -51,11 +52,19 @@ export class UI extends React.Component<{}, UIState> {
         };
     }
 
+    private readonly insideRoom = (state?: FrontendState | Rooms): state is FrontendState => {
+        return isFrontendState(state);
+    }
+
     private readonly playing = (): boolean => {
-        return this.state.error?.fatal !== true &&
-            typeof this.thisName !== "undefined" &&
-            typeof this.state.gameState?.gameInfo?.hand?.length !== "undefined" &&
-            this.state.gameState.gameInfo.hand.length !== 0;
+        if (this.insideRoom(this.state.gameState)) {
+            return this.state.error?.fatal !== true &&
+                typeof this.thisName !== "undefined" &&
+                typeof this.state.gameState?.gameInfo?.hand?.length !== "undefined" &&
+                this.state.gameState.gameInfo.hand.length !== 0;
+        }
+
+        throw new Error("playing: Not inside a room");
     }
 
     private readonly initIO = (): void => {
@@ -97,8 +106,12 @@ export class UI extends React.Component<{}, UIState> {
             this.blink();
         };
 
+        this.io.onRooms = (rooms: Rooms) => {
+            this.setState({gameState: rooms});
+        };
+
         this.io.onPlayerRegistration = (registration: PlayerRegistration) => {
-            if (typeof this.state.gameState !== "undefined") {
+            if (this.insideRoom(this.state.gameState)) {
                 this.setState({
                     gameState: {
                         ...this.state.gameState,
@@ -148,26 +161,39 @@ export class UI extends React.Component<{}, UIState> {
     }
 
     private readonly onTurn = (): boolean => {
-        return this.state.gameState!.gameInfo!.who === this.thisName;
+        if (this.insideRoom(this.state.gameState)) {
+            return this.state.gameState!.gameInfo!.who === this.thisName;
+        }
+
+        throw new Error("onTurn: Not inside a room");
     }
 
     private readonly canPlaySvrsek = (): boolean => {
-        switch (this.state.gameState!.gameInfo!.wantedAction) {
-            case ActionType.Play:
-            case ActionType.PlayKule:
-            case ActionType.PlayListy:
-            case ActionType.PlayZaludy:
-            case ActionType.PlaySrdce:
-                return true;
-            default:
-                return false;
+        if (this.insideRoom(this.state.gameState)) {
+            switch (this.state.gameState!.gameInfo!.wantedAction) {
+                case ActionType.Play:
+                case ActionType.PlayKule:
+                case ActionType.PlayListy:
+                case ActionType.PlayZaludy:
+                case ActionType.PlaySrdce:
+                    return true;
+                default:
+                    return false;
+            }
         }
+
+        throw new Error("canPlaySvrsek: Not inside a room");
     }
 
     private readonly createStats = (stats: { [x: string]: FrontendStats; }): React.ReactNode | undefined => {
-        if (this.state.gameState?.players.length !== 0) {
-            return React.createElement(Stats, {key: "stats", stats});
+        if (this.insideRoom(this.state.gameState)) {
+            if (this.state.gameState?.players.length !== 0) {
+                return React.createElement(Stats, {key: "stats", stats});
+            }
+            return;
         }
+
+        throw new Error("createStats: Not inside a room");
     }
 
     private readonly clearEffectTimeout = () => {
@@ -184,20 +210,25 @@ export class UI extends React.Component<{}, UIState> {
     }
 
     private readonly setEffectTimeout = () => {
-        this.clearEffectTimeout();
+        if (this.insideRoom(this.state.gameState)) {
+            this.clearEffectTimeout();
 
-        if (this.state.status === Status.Ok && this.state.gameState?.gameInfo?.who === this.thisName) {
-            if (this.state.gameState?.gameInfo?.wantedAction === ActionType.Shuffle) {
-                this.playReminderTimeout = window.setTimeout(() => {
-                    window.alert("Mícháš.");
-                }, 60000);
-            } else {
-                this.playReminderTimeout = window.setTimeout(() => {
-                    this.audioHandle = new Audio(audio.playReminder);
-                    this.audioHandle.play();
-                }, 10000);
+            if (this.state.status === Status.Ok && this.state.gameState?.gameInfo?.who === this.thisName) {
+                if (this.state.gameState?.gameInfo?.wantedAction === ActionType.Shuffle) {
+                    this.playReminderTimeout = window.setTimeout(() => {
+                        window.alert("Mícháš.");
+                    }, 60000);
+                } else {
+                    this.playReminderTimeout = window.setTimeout(() => {
+                        this.audioHandle = new Audio(audio.playReminder);
+                        this.audioHandle.play();
+                    }, 10000);
+                }
             }
+            return;
         }
+
+        throw new Error("setEffectTimeout: Not inside a room");
     }
 
     private readonly reconnect = (): void => {
@@ -273,18 +304,12 @@ export class UI extends React.Component<{}, UIState> {
         this.thisName = name;
     }
 
-    readonly render = (): React.ReactNode => {
+    private renderState = (gameState: FrontendState): React.ReactNode[] => {
         this.clearEffectTimeout();
-
         const elems = [];
-        elems.push(React.createElement(Title, {key: "title"}, null));
-        if (typeof this.state.gameState === "undefined") {
-            return elems;
-        }
-
         const buttons = [];
 
-        if (this.state.gameState.gameStarted === "no" && this.state.gameState.players.length >= 2 && typeof this.thisName !== "undefined") {
+        if (gameState.gameStarted === "no" && gameState.players.length >= 2 && typeof this.thisName !== "undefined") {
             buttons.push(React.createElement(StartButton, {key: "startButton", startGame: this.io.startGame}));
         }
 
@@ -299,10 +324,10 @@ export class UI extends React.Component<{}, UIState> {
         elems.push(React.createElement(PlayerBox, {
             key: "playerbox",
             thisName: this.thisName,
-            players: this.state.gameState.players,
-            playerInfo: this.state.gameState.gameInfo?.playerInfo,
-            whoseTurn: this.state.gameState.gameInfo?.who,
-            lastPlace: this.state.gameState.gameInfo?.loser
+            players: gameState.players,
+            playerInfo: gameState.gameInfo?.playerInfo,
+            whoseTurn: gameState.gameInfo?.who,
+            lastPlace: gameState.gameInfo?.loser
         }));
 
         if (this.state.nameDialog) {
@@ -327,23 +352,23 @@ export class UI extends React.Component<{}, UIState> {
             }));
         }
 
-        if (typeof this.state.gameState.gameInfo === "undefined") {
+        if (typeof gameState.gameInfo === "undefined") {
             elems.push(React.createElement(Prompt, {
                 key: "prompt",
-                instructions: this.state.gameState.players.length < 2 ? "Čeká se alespoň na dva hráče." : "Stisknutím Start se spustí hra."
+                instructions: gameState.players.length < 2 ? "Čeká se alespoň na dva hráče." : "Stisknutím Start se spustí hra."
             }));
-            elems.push(this.createStats(this.state.gameState.stats));
+            elems.push(this.createStats(gameState.stats));
             return elems;
         }
 
         elems.push(React.createElement(Instructions, {
             key: "instructions",
-            wantedAction: this.state.gameState.gameInfo.wantedAction,
+            wantedAction: gameState.gameInfo.wantedAction,
             status: this.state.status,
             you: this.thisName,
-            whoseTurn: this.state.gameState.gameInfo.who,
-            topCard: this.state.gameState.gameInfo.topCards[this.state.gameState.gameInfo.topCards.length - 1],
-            lastPlay: this.state.gameState.gameInfo.lastPlay
+            whoseTurn: gameState.gameInfo.who,
+            topCard: gameState.gameInfo.topCards[gameState.gameInfo.topCards.length - 1],
+            lastPlay: gameState.gameInfo.lastPlay
         }));
 
         elems.push(React.createElement(Game, {
@@ -351,14 +376,14 @@ export class UI extends React.Component<{}, UIState> {
             onTurn: this.onTurn(),
             drawCard: this.io.drawCard,
             playCard: this.io.playCard,
-            wantedAction: this.state.gameState.gameInfo.wantedAction,
-            lastPlay: this.state.gameState.gameInfo.lastPlay,
-            topCards: this.state.gameState.gameInfo.topCards,
+            wantedAction: gameState.gameInfo.wantedAction,
+            lastPlay: gameState.gameInfo.lastPlay,
+            topCards: gameState.gameInfo.topCards,
             openPicker: this.openPicker,
-            hand: this.state.gameState.gameInfo.hand,
+            hand: gameState.gameInfo.hand,
             forceHalo: this.state.errorHighlight !== null ? this.state.errorHighlight : undefined
         }));
-        elems.push(this.createStats(this.state.gameState.stats));
+        elems.push(this.createStats(gameState.stats));
 
         if (this.state.picker !== null) {
             elems.push(React.createElement(
@@ -372,6 +397,25 @@ export class UI extends React.Component<{}, UIState> {
         }
 
         this.setEffectTimeout();
+
+        return elems;
+    }
+
+    readonly render = (): React.ReactNode => {
+
+        const elems = [];
+        elems.push(React.createElement(Title, {key: "title"}, null));
+        if (typeof this.state.gameState === "undefined") {
+            return elems;
+        }
+
+        if (this.insideRoom(this.state.gameState)) {
+            console.log(this.state.gameState);
+            elems.push(...this.renderState(this.state.gameState));
+        } else {
+            elems.push(React.createElement(RoomsComponent, {key: "rooms", rooms: this.state.gameState, joinRoom: this.io.joinRoom}));
+        }
+
 
         return elems;
     }

@@ -5,7 +5,7 @@ import path from "path";
 import ws from "express-ws";
 import WebSocket from "ws";
 import Prsi from "../server/backend";
-import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode, BadStatus, PlayerRegistration} from "../common/communication";
+import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode, BadStatus, PlayerRegistration, Rooms, isJoinRoom} from "../common/communication";
 import {ActionType, Status, PlayerAction} from "../common/types";
 
 // FIXME: get rid of this
@@ -30,7 +30,10 @@ const rollbackStats = (stats: Stats) => {
 };
 
 let prsiLogger: (msg: string, id?: number | string) => void;
-const prsi = new Prsi();
+const rooms: {[key in string]: Prsi} = {
+    "Pilsner Urquell": new Prsi(),
+    "Radegast": new Prsi()
+};
 
 const statsAccess = lowDb(new FileSync("stats.json"));
 statsAccess.defaults({stats: {}}).write();
@@ -39,7 +42,10 @@ setInterval(() => statsAccess.set("stats", stats).write(), 10000);
 
 interface SocketInfo {
     ws: WebSocket;
-    name?: string;
+    room?: {
+        roomName: string;
+        nickName?: string;
+    }
 }
 
 const openSockets: {
@@ -53,13 +59,13 @@ const idGen = (function*(): Generator {
     }
 }());
 
-const buildFrontendStateFor = (player?: string): FrontendState => {
-    const state = prsi.state();
+const buildFrontendStateFor = (room: string, player?: string): FrontendState => {
+    const state = rooms[room].state();
     const playerInfo: {[key in string]: {cards?: number, place?: number}} = {};
     state?.players.forEach(
         (playerState) => playerInfo[playerState.name] = playerState.place !== null ? {place: playerState.place} : {cards: state.hands.get(playerState.name)!.length}
     );
-    const players = prsi.getPlayers();
+    const players = rooms[room].getPlayers();
     return {
         players,
         gameStarted: typeof state !== "undefined" ? "yes" : "no",
@@ -77,33 +83,43 @@ const buildFrontendStateFor = (player?: string): FrontendState => {
     };
 };
 
-const sendEveryone = (what?: PlayerRegistration) => {
+const sendEveryone = (room: string, what?: PlayerRegistration) => {
     Object.entries(openSockets).forEach((([id, socketInfo]) => {
+        if (socketInfo.room?.roomName !== room) {
+            return;
+        }
         if (socketInfo.ws.readyState === WebSocket.OPEN) {
             const toSend = typeof what !== "undefined" ? what :
-                buildFrontendStateFor(socketInfo.name);
+                buildFrontendStateFor(room, socketInfo.room.nickName);
             socketInfo.ws.send(JSON.stringify(toSend));
         } else {
             prsiLogger("updateEveryone: Socket not OPEN. Unregistering it from the game.", id);
-            if (typeof socketInfo.name !== "undefined") {
-                prsi.unregisterPlayer(socketInfo.name);
-                socketInfo.name = undefined;
+            if (typeof socketInfo.room.nickName !== "undefined") {
+                rooms[room].unregisterPlayer(socketInfo.room.nickName);
+                socketInfo.room = undefined;
             }
         }
     }));
 };
 
-const sendOne = (id: number, what?: BadStatus) => {
+const buildRoomInfo = (): Rooms => {
+    return {
+        rooms: Object.assign({}, ...Object.entries(rooms).map(([name, prsi]) => ({[name]: prsi.getPlayers()})))
+    };
+};
+
+const sendOne = (id: number, what?: BadStatus | ErrorResponse) => {
+    const room = openSockets[id].room;
     if (openSockets[id].ws.readyState === WebSocket.OPEN) {
-        const toSend = typeof what !== "undefined" ? what :
-            buildFrontendStateFor(openSockets[id].name);
+        const toSend = typeof room === "undefined" ? buildRoomInfo() :
+            typeof what !== "undefined" ? what :
+            buildFrontendStateFor(room.roomName, room.nickName);
         openSockets[id].ws.send(JSON.stringify(toSend));
     } else {
         prsiLogger("updateOne: Socket not OPEN. Unregistering it from the game.", id);
-        const name = openSockets[id].name;
-        if (typeof name !== "undefined") {
-            prsi.unregisterPlayer(name);
-            openSockets[id].name = undefined;
+        if (typeof room?.nickName !== "undefined") {
+            rooms[room.roomName].unregisterPlayer(name);
+            openSockets[id].room = undefined;
         }
     }
 };
@@ -112,33 +128,39 @@ const sendBadStatus = (id: number, status: Status) => {
     sendOne(id, new BadStatus(status));
 };
 
-const sendError = (id: number, error: ErrorResponse) => {
-    if (openSockets[id].ws.readyState === WebSocket.OPEN) {
-        openSockets[id].ws.send(JSON.stringify(error));
-    } else {
-        prsiLogger("sendError: Socket not OPEN. Unregistering it from the game.", id);
-        const name = openSockets[id].name;
-        if (typeof name !== "undefined") {
-            prsi.unregisterPlayer(name);
-            openSockets[id].name = undefined;
-        }
-    }
-};
-
 const processMessage = (id: number, message: string): void => {
     let parsed: any;
 
     try {
         parsed = JSON.parse(message);
     } catch (err) {
-        sendError(id, new ErrorResponse("Invalid request."));
+        sendOne(id, new ErrorResponse("Invalid request."));
+        return;
+    }
+
+    if (isJoinRoom(parsed)) {
+        const socket = openSockets[id];
+        if (typeof socket === "undefined") {
+            prsiLogger("Tried to join a room, but this WebSocket doesn't exist in openSockets.", id);
+            return;
+        }
+
+        if (typeof socket.room !== "undefined") {
+            prsiLogger("Tried to join a room, but this WebSocket already has a room assigned.", id);
+            return;
+        }
+
+        socket.room = {
+            roomName: parsed.joinRoom
+        };
+        sendOne(id);
         return;
     }
 
     if (isPlayerRegistration(parsed)) {
-        if (Object.entries(openSockets).some(([_, socketInfo]) => socketInfo.name === parsed.registerPlayer)) {
+        if (Object.entries(openSockets).some(([_, socketInfo]) => socketInfo.room?.nickName === parsed.registerPlayer)) {
             prsiLogger(`"${parsed.registerPlayer}" already belongs to someone else.`, id);
-            sendError(id, new ErrorResponse("Someone else owns this username.", ErrorCode.NameAlreadyUsed));
+            sendOne(id, new ErrorResponse("Someone else owns this username.", ErrorCode.NameAlreadyUsed));
             return;
         }
 
@@ -147,13 +169,17 @@ const processMessage = (id: number, message: string): void => {
             prsiLogger("Tried to assign a name, but this WebSocket doesn't exist in openSockets.", id);
             return;
         }
-        socket.name = parsed.registerPlayer;
-        prsi.registerPlayer(parsed.registerPlayer);
+        if (typeof socket.room === "undefined") {
+            prsiLogger("Tried to assign a name, but this WebSocket isn't inside any rooms.", id);
+            return;
+        }
+        socket.room.nickName = parsed.registerPlayer;
+        rooms[socket.room.roomName].registerPlayer(parsed.registerPlayer);
         prsiLogger(`Registered "${parsed.registerPlayer}".`, id);
         if (typeof stats[parsed.registerPlayer] === "undefined") {
             stats[parsed.registerPlayer] = new Stats();
         }
-        sendEveryone(parsed);
+        sendEveryone(socket.room.roomName, parsed);
         return;
     }
 
@@ -164,32 +190,43 @@ const processMessage = (id: number, message: string): void => {
             return;
         }
 
-        if (typeof socket.name === "undefined") {
+        if (typeof socket.room === "undefined") {
+            prsiLogger(`Tried to unregister "${parsed.unregisterPlayer}" but this isn't inside any rooms.`, id);
+            return;
+        }
+
+        if (typeof socket.room.nickName === "undefined") {
             prsiLogger(`Tried to unregister "${parsed.unregisterPlayer}" but this WebSocket doesn't have any name assigned.`, id);
             return;
         }
 
-        if (socket.name !== parsed.unregisterPlayer) {
-            prsiLogger(`Tried to unregister "${parsed.unregisterPlayer}" but this WebSocket has the name "${socket.name}" assigned.`, id);
+        if (socket.room.nickName !== parsed.unregisterPlayer) {
+            prsiLogger(`Tried to unregister "${parsed.unregisterPlayer}" but this WebSocket has the name "${socket.room.nickName}" assigned.`, id);
             return;
         }
 
-        prsi.unregisterPlayer(parsed.unregisterPlayer);
-        socket.name = undefined;
+        rooms[socket.room.roomName].unregisterPlayer(parsed.unregisterPlayer);
+        socket.room.nickName = undefined;
         prsiLogger(`Unregistered "${parsed.unregisterPlayer}".`, id);
-        sendEveryone();
+        sendEveryone(socket.room.roomName);
         return;
     }
 
     if (isPlayerInput(parsed)) {
-        const name = openSockets[id].name;
-        if (typeof name === "undefined") {
+        const room = openSockets[id].room;
+        if (typeof room === "undefined") {
+            prsiLogger("Got input, but this socket doesn't have a room assigned.", id);
+            return;
+        }
+
+        if (typeof room.nickName === "undefined") {
             prsiLogger("Got input, but this socket doesn't have a name assigned.", id);
             return;
         }
-        const status = prsi.resolveAction(new PlayerAction(parsed.playType, name, parsed.playDetails));
+
+        const status = rooms[room.roomName].resolveAction(new PlayerAction(parsed.playType, name, parsed.playDetails));
         if (status === Status.Ok) {
-            const state = prsi.state();
+            const state = rooms[room.roomName].state();
             if (typeof state?.lastPlay?.playDetails?.returned !== "undefined") {
                 rollbackStats(stats[state?.lastPlay?.playDetails?.returned]);
                 // Last guy returned another guy, when he was already supposed
@@ -208,7 +245,7 @@ const processMessage = (id: number, message: string): void => {
                     updateStats(prevStats, 0);
                 }
             }
-            sendEveryone();
+            sendEveryone(room.roomName);
         } else {
             sendBadStatus(id, status);
         }
@@ -216,16 +253,23 @@ const processMessage = (id: number, message: string): void => {
     }
 
     if (isStartGame(parsed)) {
-        if (typeof openSockets[id].name === "undefined") {
-            sendError(id, new ErrorResponse("Nemůžeš začít hru, když nehraješ? (jax to udělal?)."));
-            prsiLogger("Tried to start the game, even though, no name is assigned", id);
+        const room = openSockets[id].room;
+        if (typeof room === "undefined") {
+            prsiLogger("Tried to start the game, but this WebSocket isn't inside any room.", id);
+            return;
         }
-        prsi.newGame();
-        sendEveryone();
+
+        if (typeof room.nickName === "undefined") {
+            sendOne(id, new ErrorResponse("Nemůžeš začít hru, když nehraješ? (jax to udělal?)."));
+            prsiLogger("Tried to start the game, even though, no name is assigned", id);
+            return;
+        }
+        rooms[room.roomName].newGame();
+        sendEveryone(room.roomName);
         return;
     }
 
-    sendError(id, new ErrorResponse("Invalid request."));
+    sendOne(id, new ErrorResponse("Invalid request."));
     prsiLogger("Invalid request", id);
 };
 
@@ -278,15 +322,17 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
             }
 
             // Have to check whether the closing socket was already registered
-            if (typeof closed.name !== "undefined") {
-                prsi.unregisterPlayer(closed.name);
-                prsiLogger(`Unregistered "${closed.name}".`, id);
+            if (typeof closed.room?.nickName !== "undefined") {
+                rooms[closed.room.roomName].unregisterPlayer(closed.room.nickName);
+                prsiLogger(`Unregistered "${closed.room.nickName}".`, id);
             }
 
             prsiLogger("Client disconnected.", id);
 
             delete openSockets[id];
-            sendEveryone();
+            if (typeof closed.room !== "undefined") {
+                sendEveryone(closed.room.roomName);
+            }
         });
     });
 

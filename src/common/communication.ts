@@ -1,5 +1,9 @@
 import {ActionType, Card, LastPlay, PlayType, PlayDetails, Status} from "./types";
 
+export function isJoinRoom(toCheck: any): toCheck is JoinRoom {
+    return typeof toCheck.joinRoom !== "undefined";
+}
+
 export function isPlayerRegistration(toCheck: any): toCheck is PlayerRegistration {
     return typeof toCheck.registerPlayer !== "undefined";
 }
@@ -18,6 +22,10 @@ export function isErrorResponse(toCheck: any): toCheck is ErrorResponse {
 
 export function isFrontendState(toCheck: any): toCheck is FrontendState {
     return typeof toCheck.players !== "undefined";
+}
+
+export function isRooms(toCheck: any): toCheck is Rooms {
+    return typeof toCheck.rooms !== "undefined";
 }
 
 export function isBadStatus(toCheck: any): toCheck is BadStatus {
@@ -39,6 +47,13 @@ export class PlayerUnregistration {
     unregisterPlayer: string;
     constructor(name: string) {
         this.unregisterPlayer = name;
+    }
+}
+
+export class JoinRoom {
+    joinRoom: string;
+    constructor(joinRoom: string) {
+        this.joinRoom = joinRoom;
     }
 }
 
@@ -98,6 +113,13 @@ export class FrontendStats {
     constructor(acquiredPts: number, gamesPlayed: number) {
         this.acquiredPts = acquiredPts;
         this.gamesPlayed = gamesPlayed;
+    }
+}
+
+export class Rooms {
+    rooms: {[key in string]: string[]};
+    constructor(rooms: {[key in string]: string[]}) {
+        this.rooms = rooms;
     }
 }
 

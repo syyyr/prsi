@@ -5,7 +5,7 @@ import path from "path";
 import ws from "express-ws";
 import WebSocket from "ws";
 import Prsi from "../server/backend";
-import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode, BadStatus, PlayerRegistration, Rooms, isJoinRoom} from "../common/communication";
+import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode, BadStatus, PlayerRegistration, Rooms, isJoinRoom, FrontendConnected} from "../common/communication";
 import {ActionType, Status, PlayerAction} from "../common/types";
 
 // FIXME: get rid of this
@@ -83,7 +83,7 @@ const buildFrontendStateFor = (room: string, player?: string): FrontendState => 
     };
 };
 
-const sendEveryone = (room: string, what?: PlayerRegistration) => {
+const sendEveryone = (room: string, what?: FrontendConnected) => {
     Object.entries(openSockets).forEach((([id, socketInfo]) => {
         if (socketInfo.room?.roomName !== room) {
             return;
@@ -179,7 +179,11 @@ const processMessage = (id: number, message: string): void => {
         if (typeof stats[parsed.registerPlayer] === "undefined") {
             stats[parsed.registerPlayer] = new Stats();
         }
-        sendEveryone(socket.room.roomName, parsed);
+        sendEveryone(socket.room.roomName, {
+            connected: parsed.registerPlayer,
+            stats: Object.assign({}, ...rooms[socket.room.roomName].getPlayers().map(player => // FIXME: refactor stat building to a function
+                ({[player]: stats[player].current}))),
+        });
         return;
     }
 

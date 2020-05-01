@@ -24,6 +24,10 @@ export function isFrontendState(toCheck: any): toCheck is FrontendState {
     return typeof toCheck.players !== "undefined";
 }
 
+export function isFrontendConnected(toCheck: any): toCheck is FrontendConnected {
+    return typeof toCheck.connected !== "undefined";
+}
+
 export function isRooms(toCheck: any): toCheck is Rooms {
     return typeof toCheck.rooms !== "undefined";
 }
@@ -34,6 +38,15 @@ export function isBadStatus(toCheck: any): toCheck is BadStatus {
 
 export function isStartGame(toCheck: any): toCheck is FrontendState {
     return typeof toCheck.startGame !== "undefined";
+}
+
+export class FrontendConnected {
+    connected: string;
+    stats: {[key in string]: FrontendStats};
+    constructor(connected: string, stats: {[key in string]: FrontendStats}) {
+        this.connected = connected;
+        this.stats = stats;
+    }
 }
 
 export class PlayerRegistration {

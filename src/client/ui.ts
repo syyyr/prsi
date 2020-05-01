@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FrontendState, FrontendStats, ErrorResponse, ErrorCode, BadStatus, PlayerRegistration, Rooms, isFrontendState} from "../common/communication";
+import {FrontendState, FrontendStats, ErrorResponse, ErrorCode, BadStatus, PlayerRegistration, Rooms, isFrontendState, FrontendConnected} from "../common/communication";
 import {Card, Value, Color, ActionType, Status, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
 import Game from "./components/game";
@@ -111,14 +111,15 @@ export class UI extends React.Component<{}, UIState> {
             this.setState({gameState: rooms});
         };
 
-        this.io.onPlayerRegistration = (registration: PlayerRegistration) => {
+        this.io.onPlayerConnect = (message: FrontendConnected) => {
             if (this.insideRoom(this.state.gameState)) {
                 this.setState({
                     gameState: {
                         ...this.state.gameState,
-                        players: [...this.state.gameState.players, registration.registerPlayer]
+                        players: [...this.state.gameState.players, message.connected],
+                        stats: message.stats
                     },
-                    nameDialog: registration.registerPlayer === this.thisName ? false : this.state.nameDialog
+                    nameDialog: message.connected === this.thisName ? false : this.state.nameDialog
                 });
             }
         };

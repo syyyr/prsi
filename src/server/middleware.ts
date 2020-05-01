@@ -229,7 +229,7 @@ const processMessage = (id: number, message: string): void => {
             return;
         }
 
-        const status = rooms[room.roomName].resolveAction(new PlayerAction(parsed.playType, name, parsed.playDetails));
+        const status = rooms[room.roomName].resolveAction(new PlayerAction(parsed.playType, room.nickName, parsed.playDetails));
         if (status === Status.Ok) {
             const state = rooms[room.roomName].state();
             if (typeof state?.lastPlay?.playDetails?.returned !== "undefined") {

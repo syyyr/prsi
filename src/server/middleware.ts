@@ -153,6 +153,7 @@ const processMessage = (id: number, message: string): void => {
         socket.room = {
             roomName: parsed.joinRoom
         };
+        prsiLogger(`Joined "${parsed.joinRoom}".`, id);
         sendOne(id);
         return;
     }

@@ -85,16 +85,14 @@ const buildFrontendStateFor = (room: string, player?: string): FrontendState => 
 
 const sendEveryone = (room: string, what?: FrontendConnected) => {
     Object.entries(openSockets).forEach((([id, socketInfo]) => {
-        if (socketInfo.room?.roomName !== room) {
-            return;
-        }
         if (socketInfo.ws.readyState === WebSocket.OPEN) {
-            const toSend = typeof what !== "undefined" ? what :
+            const toSend = typeof socketInfo.room === "undefined" ? buildRoomInfo() :
+                typeof what !== "undefined" ? what :
                 buildFrontendStateFor(room, socketInfo.room.nickName);
             socketInfo.ws.send(JSON.stringify(toSend));
         } else {
             prsiLogger("updateEveryone: Socket not OPEN. Unregistering it from the game.", id);
-            if (typeof socketInfo.room.nickName !== "undefined") {
+            if (typeof socketInfo.room?.nickName !== "undefined") {
                 rooms[room].unregisterPlayer(socketInfo.room.nickName);
                 socketInfo.room = undefined;
             }

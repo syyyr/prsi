@@ -5,7 +5,7 @@ import path from "path";
 import ws from "express-ws";
 import WebSocket from "ws";
 import Prsi from "../server/backend";
-import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, ErrorCode, BadStatus, Rooms, isJoinRoom, FrontendConnected} from "../common/communication";
+import {KickState, VoteKick, isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, ErrorCode, BadStatus, Rooms, isJoinRoom, FrontendConnected, isVoteKick, isVote, KickResolution, KickResolutionEnum} from "../common/communication";
 import {ActionType, Status, PlayerAction} from "../common/types";
 
 class Stats {
@@ -25,10 +25,33 @@ const rollbackStats = (stats: Stats) => {
     stats.current = [...stats.last];
 };
 
+class VoteKickStatus {
+    name: string;
+    status: {[key in string]: boolean};
+    callback: (shouldKick: boolean) => void; // FIXME: convert to a promise
+
+    timeout: NodeJS.Timeout;
+    constructor(initiator: string, name: string, voters: string[], callback: (shouldKick: boolean) => void) {
+        this.name = name;
+        this.callback = callback;
+        this.status = {};
+        Object.assign(this.status, ...voters.map(player => ({[player]: false})));
+        this.status[initiator] = true;
+        this.timeout = global.setTimeout(() => {
+            const entries = Object.values(this.status);
+            this.callback(entries.filter((value) => value === true).length / entries.length > 0.5);
+        }, 30000);
+    }
+};
+
 let prsiLogger: (msg: string, id?: number | string) => void;
-const rooms: {[key in string]: Prsi} = {
-    "Pilsner Urquell": new Prsi(),
-    "Radegast": new Prsi()
+const rooms: {[key in string]: {prsi: Prsi, voteKick?: VoteKickStatus}} = {
+    "Pilsner Urquell": {
+        prsi: new Prsi()
+    },
+    "Radegast":{
+        prsi: new Prsi()
+    }
 };
 
 const statsAccess = lowDb(new FileSync("stats.json"));
@@ -56,12 +79,12 @@ const idGen = (function*(): Generator {
 }());
 
 const buildFrontendStateFor = (room: string, player?: string): FrontendState => {
-    const state = rooms[room].state();
+    const state = rooms[room].prsi.state();
     const playerInfo: {[key in string]: {cards?: number, place?: number}} = {};
     state?.players.forEach(
         (playerState) => playerInfo[playerState.name] = playerState.place !== null ? {place: playerState.place} : {cards: state.hands.get(playerState.name)!.length}
     );
-    const players = rooms[room].getPlayers();
+    const players = rooms[room].prsi.getPlayers();
     return {
         players,
         gameStarted: typeof state !== "undefined" ? "yes" : "no",
@@ -79,7 +102,7 @@ const buildFrontendStateFor = (room: string, player?: string): FrontendState => 
     };
 };
 
-const sendEveryone = (room: string, what?: FrontendConnected) => {
+const sendEveryone = (room: string, what?: FrontendConnected | KickResolution | KickState) => {
     Object.entries(openSockets).forEach((([id, socketInfo]) => {
         if (socketInfo.ws.readyState === WebSocket.OPEN) {
             const toSend = typeof socketInfo.room === "undefined" ? buildRoomInfo() :
@@ -89,7 +112,7 @@ const sendEveryone = (room: string, what?: FrontendConnected) => {
         } else {
             prsiLogger("updateEveryone: Socket not OPEN. Unregistering it from the game.", id);
             if (typeof socketInfo.room?.nickName !== "undefined") {
-                rooms[room].unregisterPlayer(socketInfo.room.nickName);
+                rooms[room].prsi.unregisterPlayer(socketInfo.room.nickName);
                 socketInfo.room = undefined;
             }
         }
@@ -98,7 +121,7 @@ const sendEveryone = (room: string, what?: FrontendConnected) => {
 
 const buildRoomInfo = (): Rooms => {
     return {
-        rooms: Object.assign({}, ...Object.entries(rooms).map(([name, prsi]) => ({[name]: prsi.getPlayers()})))
+        rooms: Object.assign({}, ...Object.entries(rooms).map(([name, prsi]) => ({[name]: prsi.prsi.getPlayers()})))
     };
 };
 
@@ -112,7 +135,7 @@ const sendOne = (id: number, what?: BadStatus | ErrorResponse) => {
     } else {
         prsiLogger("updateOne: Socket not OPEN. Unregistering it from the game.", id);
         if (typeof room?.nickName !== "undefined") {
-            rooms[room.roomName].unregisterPlayer(name);
+            rooms[room.roomName].prsi.unregisterPlayer(name);
             openSockets[id].room = undefined;
         }
     }
@@ -122,6 +145,8 @@ const sendBadStatus = (id: number, status: Status) => {
     sendOne(id, new BadStatus(status));
 };
 
+// FIXME: refactor into more functions
+// FIXME: prioritize some checks over others (e. g. put isPlayerInput first)
 const processMessage = (id: number, message: string): void => {
     let parsed: any;
 
@@ -129,6 +154,93 @@ const processMessage = (id: number, message: string): void => {
         parsed = JSON.parse(message);
     } catch (err) {
         sendOne(id, new ErrorResponse("Invalid request."));
+        return;
+    }
+
+    if (isVoteKick(parsed)) {
+        // FIXME: move this declaration above - it's used in all of the if-statements
+        const socket = openSockets[id];
+        // FIXME: move this check above too
+        if (typeof socket === "undefined") {
+            prsiLogger("Tried to kick a player, but this WebSocket doesn't exist in openSockets.", id);
+            return;
+        }
+
+        if (typeof socket.room === "undefined") {
+            prsiLogger("Tried to kick a player, but this WebSocket isn't inside any room.", id);
+            sendOne(id, new ErrorResponse("Invalid request.", ErrorCode.CantKick));
+            return;
+        }
+
+        if (typeof socket.room.nickName === "undefined") {
+            prsiLogger("Tried to kick a player, but this WebSocket isn't playing.", id);
+            sendOne(id, new ErrorResponse("Invalid request.", ErrorCode.CantKick));
+            return;
+        }
+
+        const room = rooms[socket.room.roomName];
+
+        if (typeof room.voteKick !== "undefined") {
+            prsiLogger("Tried to kick a player, but a VoteKick is already in progrss.", id);
+            sendOne(id, new ErrorResponse("Invalid request.", ErrorCode.CantKick));
+            return;
+        }
+
+        const voters = room.prsi.getPlayers();
+        room.voteKick = new VoteKickStatus(socket.room.nickName, parsed.voteKick, voters, (shouldKick: boolean) => {
+            if (shouldKick) {
+                prsiLogger(`Vote kick successful. Kicking ${parsed.voteKick} from ${socket.room?.roomName}.`)
+                room.prsi.unregisterPlayer((parsed as VoteKick).voteKick);
+                Object.values(openSockets).find((socket) => socket.room?.nickName === parsed.voteKick)!.room!.nickName = undefined;
+                sendEveryone(socket.room!.roomName);
+            } else {
+                prsiLogger(`Vote kick unsuccessful. ${parsed.voteKick} won't be kicked.`);
+            }
+
+            room.voteKick = undefined;
+            sendEveryone(socket.room!.roomName, new KickResolution(shouldKick ? KickResolutionEnum.Kicked : KickResolutionEnum.NotEnoughVotes));
+        });
+
+        prsiLogger(`Started a vote kick on ${parsed.voteKick}.`, id);
+        sendEveryone(socket.room.roomName, new KickState(parsed.voteKick, room.voteKick.status));
+        return;
+    }
+
+    if (isVote(parsed)) {
+        const socket = openSockets[id];
+        if (typeof socket === "undefined") {
+            prsiLogger("Tried to vote on an ongoing VoteKick, but this WebSocket doesn't exist in openSockets.", id);
+            return;
+        }
+
+        if (typeof socket.room === "undefined") {
+            prsiLogger("Tried to vote on an ongoing VoteKick, but this WebSocket isn't inside any room.", id);
+            sendOne(id, new ErrorResponse("Invalid request.", ErrorCode.CantKick));
+            return;
+        }
+
+        if (typeof socket.room.nickName === "undefined") {
+            prsiLogger("Tried to vote on an ongoing VoteKick, but this WebSocket isn't playing.", id);
+            sendOne(id, new ErrorResponse("Invalid request.", ErrorCode.CantKick));
+            return;
+        }
+
+        const room = rooms[socket.room.roomName];
+
+        if (typeof room.voteKick === "undefined") {
+            prsiLogger("Tried to vote on an ongoing VoteKick, but no VoteKick in progress.", id);
+            sendOne(id, new ErrorResponse("Invalid request.", ErrorCode.NoKickInProgress));
+            return;
+        }
+
+        if (typeof room.voteKick.status[socket.room.nickName] === "undefined") {
+            prsiLogger("Tried to vote on an ongoing VoteKick, but this player cannot vote.", id);
+            sendOne(id, new ErrorResponse("Invalid request.", ErrorCode.CantKick));
+            return;
+        }
+
+        room.voteKick.status[socket.room.nickName] = parsed.vote;
+        sendEveryone(socket.room.roomName, new KickState(room.voteKick.name, room.voteKick.status));
         return;
     }
 
@@ -169,14 +281,14 @@ const processMessage = (id: number, message: string): void => {
             return;
         }
         socket.room.nickName = parsed.registerPlayer;
-        rooms[socket.room.roomName].registerPlayer(parsed.registerPlayer);
+        rooms[socket.room.roomName].prsi.registerPlayer(parsed.registerPlayer);
         prsiLogger(`Registered "${parsed.registerPlayer}".`, id);
         if (typeof stats[parsed.registerPlayer] === "undefined") {
             stats[parsed.registerPlayer] = new Stats();
         }
         sendEveryone(socket.room.roomName, {
             connected: parsed.registerPlayer,
-            stats: Object.assign({}, ...rooms[socket.room.roomName].getPlayers().map(player => // FIXME: refactor stat building to a function
+            stats: Object.assign({}, ...rooms[socket.room.roomName].prsi.getPlayers().map(player => // FIXME: refactor stat building to a function
                 ({[player]: stats[player].current}))),
         });
         return;
@@ -204,7 +316,7 @@ const processMessage = (id: number, message: string): void => {
             return;
         }
 
-        rooms[socket.room.roomName].unregisterPlayer(parsed.unregisterPlayer);
+        rooms[socket.room.roomName].prsi.unregisterPlayer(parsed.unregisterPlayer);
         socket.room.nickName = undefined;
         prsiLogger(`Unregistered "${parsed.unregisterPlayer}".`, id);
         sendEveryone(socket.room.roomName);
@@ -223,9 +335,9 @@ const processMessage = (id: number, message: string): void => {
             return;
         }
 
-        const status = rooms[room.roomName].resolveAction(new PlayerAction(parsed.playType, room.nickName, parsed.playDetails));
+        const status = rooms[room.roomName].prsi.resolveAction(new PlayerAction(parsed.playType, room.nickName, parsed.playDetails));
         if (status === Status.Ok) {
-            const state = rooms[room.roomName].state();
+            const state = rooms[room.roomName].prsi.state();
             if (typeof state?.lastPlay?.playDetails?.returned !== "undefined") {
                 rollbackStats(stats[state?.lastPlay?.playDetails?.returned]);
                 // Last guy returned another guy, when he was already supposed
@@ -263,7 +375,7 @@ const processMessage = (id: number, message: string): void => {
             prsiLogger("Tried to start the game, even though, no name is assigned", id);
             return;
         }
-        rooms[room.roomName].newGame();
+        rooms[room.roomName].prsi.newGame();
         sendEveryone(room.roomName);
         return;
     }
@@ -322,7 +434,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
 
             // Have to check whether the closing socket was already registered
             if (typeof closed.room?.nickName !== "undefined") {
-                rooms[closed.room.roomName].unregisterPlayer(closed.room.nickName);
+                rooms[closed.room.roomName].prsi.unregisterPlayer(closed.room.nickName);
                 prsiLogger(`Unregistered "${closed.room.nickName}".`, id);
             }
 

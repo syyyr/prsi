@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FrontendState, ErrorResponse, ErrorCode, BadStatus, PlayerRegistration, Rooms, isFrontendState, FrontendConnected} from "../common/communication";
+import {FrontendState, ErrorResponse, ErrorCode, BadStatus, Rooms, isFrontendState, FrontendConnected, KickResolution, KickState, KickResolutionEnum} from "../common/communication";
 import {Card, Value, Color, ActionType, Status, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
 import Game from "./components/game";
@@ -16,10 +16,21 @@ import NameDialog from "./components/namedialog";
 import ErrorDialog from "./components/errordialog";
 import LeaveButton from "./components/leavebutton";
 import RoomsComponent from "./components/rooms";
+import Menu from "./components/menu";
+import KickDialog from "./components/kickdialog";
+import KickStateComponent from "./components/kickstate";
 import {wsErrCodeToString, promptExit} from "./strings";
 
+// FIXME: get rid of nulls, undefined works
 interface UIState {
     nameDialog: boolean;
+    kickDialog: boolean;
+    kickInProgress?: {
+        who: string;
+        state: {
+            [key in string]: boolean;
+        }
+    }
     gameState?: FrontendState | Rooms;
     status: Status;
     picker: null | Color;
@@ -38,13 +49,17 @@ export class UI extends React.Component<{}, UIState> {
     private io: PlayerInputOutput;
     private thisName?: string;
     private thisRoom?: string;
+    private kickTimeout?: {
+        intervalHandle: number,
+        secondsLeft: number;
+    };
 
     constructor(props: {}) {
         super(props);
         this.io = new PlayerInputOutput();
         this.initIO();
         // FIXME: look for a better solution for picker (don't save color of the played guy)
-        this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false, status: Status.Ok};
+        this.state = {picker: null, error: null, errorHighlight: false, nameDialog: false, kickDialog: false, status: Status.Ok};
         window.onbeforeunload = () => {
             this.clearEffectTimeout();
             if (this.playing()) {
@@ -122,6 +137,31 @@ export class UI extends React.Component<{}, UIState> {
                     nameDialog: message.connected === this.thisName ? false : this.state.nameDialog
                 });
             }
+        };
+
+        this.io.onKickResolution = (message: KickResolution) => {
+            if (this.state.kickInProgress?.who === this.thisName && message.kickResolution === KickResolutionEnum.Kicked) {
+                this.thisName = undefined;
+            }
+
+            this.setState({kickInProgress: undefined});
+        };
+
+        this.io.onKickState = (message: KickState) => {
+            if (typeof this.kickTimeout === "undefined") {
+                const countDowner = () => {
+                    if (this.kickTimeout!.secondsLeft === 0) {
+                        window.clearTimeout(this.kickTimeout!.intervalHandle);
+                        this.kickTimeout = undefined;
+                    };
+                }
+
+                this.kickTimeout = {
+                    secondsLeft: 30,
+                    intervalHandle: window.setInterval(countDowner, 1000)
+                }
+            }
+            this.setState({kickInProgress: {state: message.kickState, who: message.who}, kickDialog: false});
         };
 
         this.io.onError = (err: ErrorResponse) => {
@@ -236,6 +276,7 @@ export class UI extends React.Component<{}, UIState> {
     private readonly reconnect = (): void => {
         this.showError("Připojování...", undefined, "fatal");
         this.io = new PlayerInputOutput(() => {
+            this.setState({kickInProgress: undefined});
             if (typeof this.thisRoom !== "undefined") {
                 this.io.joinRoom(this.thisRoom);
                 if (typeof this.thisName !== "undefined") {
@@ -244,6 +285,14 @@ export class UI extends React.Component<{}, UIState> {
             }
         });
         this.initIO();
+    }
+
+    private readonly openKickDialog = (): void => {
+        this.setState({kickDialog: true});
+    }
+
+    private readonly closeKickDialog = (): void => {
+        this.setState({kickDialog: false});
     }
 
     private readonly openNameDialog = (): void => {
@@ -327,6 +376,12 @@ export class UI extends React.Component<{}, UIState> {
             buttons.push(React.createElement(JoinButton, {key: "joinButton", openDialog: this.openNameDialog}));
         } else {
             buttons.push(React.createElement(LeaveButton, {key: "leaveButton", leaveGame: this.leaveGame}));
+            elems.push(React.createElement(Menu, {key: "menu", openKickDialog: this.openKickDialog}));
+        }
+
+        if (typeof this.state.kickInProgress !== "undefined") {
+            // FIXME: get rid of null enforce
+            elems.push(React.createElement(KickStateComponent, {key: "kickState", kickState: this.state.kickInProgress, vote: this.io.voteKick, secondsLeft: this.kickTimeout!.secondsLeft}));
         }
 
         elems.push(React.createElement("div", {key: "buttonHolder", className: "flex-row button-holder"}, buttons));
@@ -347,6 +402,15 @@ export class UI extends React.Component<{}, UIState> {
                 confirmName: this.joinGame,
                 closeDialog: this.closeNameDialog,
                 initialValue: lastName
+            }));
+        }
+
+        if (this.state.kickDialog) {
+            elems.push(React.createElement(KickDialog, {
+                key: "kickDialog",
+                players: gameState.players,
+                kickPlayer: this.io.initiateKick,
+                closeDialog: this.closeKickDialog,
             }));
         }
 

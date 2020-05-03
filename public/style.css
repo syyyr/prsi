@@ -264,6 +264,36 @@ body {
     margin-top: 2em;
 }
 
+/* Menu */
+.menu {
+    position: fixed;
+    left: 1em;
+    bottom: 1em;
+}
+
+/* FIXME: refactor background and border to a class */
+/* Kick */
+.kick-dialog {
+    align-items: flex-start;
+    background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(0,224,0,1) 100%);
+    border-radius: 1em;
+    border: 0.2em solid darkgreen;
+    box-shadow: 1em 1em 1em black;
+    display: flex;
+    margin: auto;
+    padding: 1em;
+}
+/* FIXME: refactor this border to a class (fancy-button also has it) */
+.kick-state {
+    border-radius: 1em;
+    border: 0.2em solid slategray;
+    font-family: 'Roboto', sans-serif;
+    padding: 0.5em;
+    top: 1em;
+    left: 1em;
+    position: fixed;
+}
+
 /* ID */
 #game {
     margin: auto;

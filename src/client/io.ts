@@ -1,4 +1,4 @@
-import {ErrorResponse, PlayerRegistration, FrontendState, isErrorResponse, isFrontendState, PlayerInput, StartGame, PlayerUnregistration, BadStatus, isBadStatus, Rooms, isRooms, JoinRoom, FrontendConnected, isFrontendConnected} from "../common/communication";
+import {ErrorResponse, PlayerRegistration, FrontendState, isErrorResponse, isFrontendState, isKickResolution, PlayerInput, StartGame, PlayerUnregistration, BadStatus, isBadStatus, Rooms, isRooms, JoinRoom, FrontendConnected, isFrontendConnected, VoteKick, Vote, KickResolution, KickState, isKickState} from "../common/communication";
 import {PlayType, Card, Color, PlayDetails} from "../common/types";
 
 export default class PlayerInputOutput {
@@ -8,6 +8,8 @@ export default class PlayerInputOutput {
     onRooms: (message: Rooms) => void = () => {};
     onBadStatus: (message: BadStatus) => void = () => {};
     onPlayerConnect: (message: FrontendConnected) => void = () => {};
+    onKickState: (message: KickState) => void = () => {};
+    onKickResolution: (message: KickResolution) => void = () => {};
     onClose: (code: number) => void = () => {};
     self: PlayerInputOutput = this;
     constructor(onOpen?: () => void) {
@@ -47,6 +49,16 @@ export default class PlayerInputOutput {
                 this.onRooms(parsed);
                 return;
             }
+
+            if (isKickState(parsed)) {
+                this.onKickState(parsed);
+                return;
+            }
+
+            if (isKickResolution(parsed)) {
+                this.onKickResolution(parsed);
+                return;
+            }
         };
 
         this.ws.onclose = (event: CloseEvent) => {
@@ -78,5 +90,13 @@ export default class PlayerInputOutput {
 
     readonly joinRoom = (name: string): void => {
         this.ws.send(JSON.stringify(new JoinRoom(name)));
+    };
+
+    readonly initiateKick = (name: string): void => {
+        this.ws.send(JSON.stringify(new VoteKick(name)));
+    };
+
+    readonly voteKick = (vote: boolean): void => {
+        this.ws.send(JSON.stringify(new Vote(vote)));
     };
 }

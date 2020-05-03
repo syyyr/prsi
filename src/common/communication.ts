@@ -40,6 +40,22 @@ export function isStartGame(toCheck: any): toCheck is FrontendState {
     return typeof toCheck.startGame !== "undefined";
 }
 
+export function isVoteKick(toCheck: any): toCheck is VoteKick {
+    return typeof toCheck.voteKick !== "undefined";
+}
+
+export function isVote(toCheck: any): toCheck is Vote {
+    return typeof toCheck.vote !== "undefined";
+}
+
+export function isKickState(toCheck: any): toCheck is KickState {
+    return typeof toCheck.kickState !== "undefined";
+}
+
+export function isKickResolution(toCheck: any): toCheck is KickResolution {
+    return typeof toCheck.kickResolution !== "undefined";
+}
+
 export class FrontendConnected {
     connected: string;
     stats: {[key in string]: number[]};
@@ -84,7 +100,9 @@ export class StartGame {
 }
 
 export enum ErrorCode {
-    NameAlreadyUsed
+    CantKick,
+    NameAlreadyUsed,
+    NoKickInProgress
 }
 
 export class ErrorResponse {
@@ -124,6 +142,42 @@ export class Rooms {
     rooms: {[key in string]: string[]};
     constructor(rooms: {[key in string]: string[]}) {
         this.rooms = rooms;
+    }
+}
+
+export class VoteKick {
+    voteKick: string;
+    constructor(voteKick: string) {
+        this.voteKick = voteKick;
+    }
+}
+
+export enum KickResolutionEnum {
+    Kicked,
+    NotEnoughVotes,
+    Disconnected
+}
+
+export class KickResolution {
+    kickResolution: KickResolutionEnum;
+    constructor(kickResolution: KickResolutionEnum) {
+        this.kickResolution = kickResolution;
+    }
+}
+
+export class KickState {
+    who: string;
+    kickState: {[key in string]: boolean};
+    constructor(who: string, kickState: {[key in string]: boolean}) {
+        this.who = who;
+        this.kickState = kickState;
+    }
+}
+
+export class Vote {
+    vote: boolean;
+    constructor(vote: boolean) {
+        this.vote = vote;
     }
 }
 

@@ -51,8 +51,7 @@ export default class NameDialog extends React.PureComponent<NameDialogProps, {va
                         alertEmptyName();
                     }
                 },
-                text: "Potvrdit"
-            })
+            }, "Potvrdit")
         ]);
         return React.createElement(Dialog, {
             onClick: this.props.closeDialog

@@ -19,7 +19,7 @@ class Room extends React.PureComponent<{joinRoom: () => void, name: string, play
             React.createElement("p", {key: "roomText", className: "bold"}, this.props.name),
             React.createElement("div", {key: "roomPlayersCount"}, `počet hráčů: ${this.props.players.length}`),
             React.createElement(RoomPlayers, {key: "roomPlayers", players: this.props.players}),
-            React.createElement(Button, {key: "roomButton", onClick: this.props.joinRoom, text: "Připojit se"})
+            React.createElement(Button, {key: "roomButton", onClick: this.props.joinRoom}, "Připojit se")
         ];
     }
 }

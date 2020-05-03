@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FrontendState, FrontendStats, ErrorResponse, ErrorCode, BadStatus, PlayerRegistration, Rooms, isFrontendState, FrontendConnected} from "../common/communication";
+import {FrontendState, ErrorResponse, ErrorCode, BadStatus, PlayerRegistration, Rooms, isFrontendState, FrontendConnected} from "../common/communication";
 import {Card, Value, Color, ActionType, Status, LastAction} from "../common/types";
 import ColorPicker from "./components/colorpicker";
 import Game from "./components/game";
@@ -187,7 +187,7 @@ export class UI extends React.Component<{}, UIState> {
         throw new Error("canPlaySvrsek: Not inside a room");
     }
 
-    private readonly createStats = (stats: { [x: string]: FrontendStats; }): React.ReactNode | undefined => {
+    private readonly createStats = (stats: { [x: string]: number[]; }): React.ReactNode | undefined => {
         if (this.insideRoom(this.state.gameState)) {
             if (this.state.gameState?.players.length !== 0) {
                 return React.createElement(Stats, {key: "stats", stats});

@@ -8,23 +8,18 @@ import Prsi from "../server/backend";
 import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, ErrorCode, BadStatus, Rooms, isJoinRoom, FrontendConnected} from "../common/communication";
 import {ActionType, Status, PlayerAction} from "../common/types";
 
-// FIXME: get rid of this
-class impl_Stats {
-    acquiredPts: number[] = [];
-}
-
 class Stats {
-    current: impl_Stats = new impl_Stats();
-    last: impl_Stats = new impl_Stats();
+    current: number[] = [];
+    last: number[] = [];
 }
 
 const updateStats = (stats: Stats, acquiredPts: number) => {
-    stats.last = {...stats.current};
-    stats.current.acquiredPts.push(acquiredPts);
+    stats.last = [...stats.current];
+    stats.current.push(acquiredPts);
 };
 
 const rollbackStats = (stats: Stats) => {
-    stats.current = {...stats.last};
+    stats.current = [...stats.last];
 };
 
 let prsiLogger: (msg: string, id?: number | string) => void;

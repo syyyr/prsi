@@ -42,8 +42,8 @@ export function isStartGame(toCheck: any): toCheck is FrontendState {
 
 export class FrontendConnected {
     connected: string;
-    stats: {[key in string]: FrontendStats};
-    constructor(connected: string, stats: {[key in string]: FrontendStats}) {
+    stats: {[key in string]: number[]};
+    constructor(connected: string, stats: {[key in string]: number[]}) {
         this.connected = connected;
         this.stats = stats;
     }
@@ -120,13 +120,6 @@ export class BadStatus {
     }
 }
 
-export class FrontendStats {
-    acquiredPts: number[];
-    constructor(acquiredPts: number[]) {
-        this.acquiredPts = acquiredPts;
-    }
-}
-
 export class Rooms {
     rooms: {[key in string]: string[]};
     constructor(rooms: {[key in string]: string[]}) {
@@ -138,7 +131,7 @@ export class FrontendState {
     gameStarted: "yes" | "no";
     players: string[];
     gameInfo?: FrontendInfo;
-    stats: {[key in string]: FrontendStats} = {};
+    stats: {[key in string]: number[]} = {};
     constructor(gameStarted: "yes" | "no", players: string[], frontendInfo?: FrontendInfo) {
         this.gameStarted = gameStarted;
         this.players = players;

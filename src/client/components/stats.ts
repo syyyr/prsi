@@ -1,14 +1,13 @@
 import * as React from "react";
-import {FrontendStats} from "../../common/communication";
 
-const calcSuccess = (stats: FrontendStats) => {
-    if (stats.acquiredPts.length === 0) {
+const calcSuccess = (stats: number[]) => {
+    if (stats.length === 0) {
         return 0;
     }
-    return Math.round(stats.acquiredPts.reduce((a, b) => a + b, 0) / stats.acquiredPts.length * 100);
+    return Math.round(stats.reduce((a, b) => a + b, 0) / stats.length * 100);
 };
 
-export default class Stats extends React.PureComponent<{stats: {[key in string]: FrontendStats}}> {
+export default class Stats extends React.PureComponent<{stats: {[key in string]: number[]}}> {
     render(): React.ReactNode {
         return React.createElement("table", {className: "stats-table"},
             [

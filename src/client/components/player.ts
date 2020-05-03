@@ -1,17 +1,7 @@
 import * as React from "react";
 import CardBack from "./cardback";
-import playerImage from "../images/player";
 import PlaceComponent from "./place";
-
-class PlayerDetails extends React.PureComponent<{name: string, shouldEmphasize: boolean}> {
-    render(): React.ReactNode {
-        return [
-            React.createElement("img", {key: `${this.props.name}:img`, src: playerImage}),
-
-            React.createElement("p", {key: `${this.props.name}:text`, className: `${this.props.shouldEmphasize ? "bold" : ""}`}, this.props.name)
-        ];
-    }
-}
+import PlayerDetails from "./playerdetails";
 
 class PlayerCards extends React.PureComponent<{cards: number}> {
     render(): React.ReactNode {

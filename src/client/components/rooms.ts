@@ -1,16 +1,14 @@
 import * as React from "react";
 import {Rooms as RoomsType} from "../../common/communication";
-import playerImage from "../images/player";
 import Button from "./button";
+import PlayerDetails from "./playerdetails";
 
 class RoomPlayers extends React.PureComponent<{players: string[]}> {
     render(): React.ReactNode {
         return React.createElement("div", {className: "flex-row"}, this.props.players.map((player) =>
-            React.createElement("div", {key: `${name}:container`, className: "flex-column"}, [
-                // FIXME: refactor into component
-                React.createElement("img", {key: `${name}:img`, src: playerImage}),
-                React.createElement("p", {key: `${name}:name`}, player),
-            ]))
+            React.createElement("div", {key: `${player}:container`, className: "flex-column"},
+                React.createElement(PlayerDetails, {name: player, shouldEmphasize: false})
+            ))
         );
     }
 }

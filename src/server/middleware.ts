@@ -16,6 +16,9 @@ class Stats {
 const updateStats = (stats: Stats, acquiredPts: number) => {
     stats.last = [...stats.current];
     stats.current.push(acquiredPts);
+    if (stats.current.length > 50) {
+        stats.current.shift();
+    }
 };
 
 const rollbackStats = (stats: Stats) => {

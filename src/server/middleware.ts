@@ -5,13 +5,12 @@ import path from "path";
 import ws from "express-ws";
 import WebSocket from "ws";
 import Prsi from "../server/backend";
-import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, FrontendStats, ErrorCode, BadStatus, PlayerRegistration, Rooms, isJoinRoom, FrontendConnected} from "../common/communication";
+import {isPlayerRegistration, isPlayerUnregistration, isPlayerInput, ErrorResponse, FrontendState, isStartGame, ErrorCode, BadStatus, Rooms, isJoinRoom, FrontendConnected} from "../common/communication";
 import {ActionType, Status, PlayerAction} from "../common/types";
 
 // FIXME: get rid of this
 class impl_Stats {
-    acquiredPts: number = 0;
-    gamesPlayed: number = 0;
+    acquiredPts: number[] = [];
 }
 
 class Stats {
@@ -21,8 +20,7 @@ class Stats {
 
 const updateStats = (stats: Stats, acquiredPts: number) => {
     stats.last = {...stats.current};
-    stats.current.acquiredPts += acquiredPts;
-    stats.current.gamesPlayed++;
+    stats.current.acquiredPts.push(acquiredPts);
 };
 
 const rollbackStats = (stats: Stats) => {

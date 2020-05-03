@@ -121,11 +121,9 @@ export class BadStatus {
 }
 
 export class FrontendStats {
-    acquiredPts: number;
-    gamesPlayed: number;
-    constructor(acquiredPts: number, gamesPlayed: number) {
+    acquiredPts: number[];
+    constructor(acquiredPts: number[]) {
         this.acquiredPts = acquiredPts;
-        this.gamesPlayed = gamesPlayed;
     }
 }
 

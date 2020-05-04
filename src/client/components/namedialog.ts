@@ -9,6 +9,7 @@ interface NameDialogProps {
 }
 
 const alertEmptyName = () => window.alert("Zadals prázdný jméno. To nejde. Nebo jako sice to teoreticky jde, ale dej si neprázdný jméno.");
+const alertBinaryChars = () => window.alert("Co mi tam dáváš binární hodnoty???");
 
 export default class NameDialog extends React.PureComponent<NameDialogProps, {value: string}> {
     constructor(props: {closeDialog: () => void, confirmName: (name: string) => void}) {
@@ -30,10 +31,12 @@ export default class NameDialog extends React.PureComponent<NameDialogProps, {va
                     onChange: (event: Event) => {this.setState({value: (<HTMLInputElement>event.target).value});},
                     onKeyUp: (event: KeyboardEvent) => {
                         if (event.keyCode === 13) {
-                            if (this.state.value !== "") {
-                                this.props.confirmName(this.state.value);
-                            } else {
+                            if (this.state.value === "") {
                                 alertEmptyName();
+                            } else if (/[\x00-\x1F]/.test(this.state.value)) {
+                                alertBinaryChars();
+                            } else {
+                                this.props.confirmName(this.state.value);
                             }
                         }
                     },

@@ -243,10 +243,16 @@ export default class Prsi {
 
         const impl_draw = () => {
             if (this.currentGame!.drawn === this.currentGame!.deck.cards.length) {
+                // Take the last card aside
+                const lastPlayedCard = this.currentGame!.playedCards[this.currentGame!.playedCards.length - 1];
+                // Remove it from the played cards
+                this.currentGame!.playedCards.splice(this.currentGame!.playedCards.length-1);
+                // Now played cards become the deck, so reverse it, because it gets turned around
                 this.currentGame!.deck.cards = this.currentGame!.playedCards;
-                this.currentGame!.drawn = 0;
-                this.currentGame!.playedCards = [];
-                this.currentGame!.playedCards.push(this.currentGame!.deck.cards[this.currentGame!.drawn++]);
+                this.currentGame!.deck.cards.reverse();
+                // New playedCards become the lastPlayedCard
+                this.currentGame!.playedCards = [lastPlayedCard];
+
             }
 
             this.currentGame!.hands.get(player)!.push(this.currentGame!.deck.cards[this.currentGame!.drawn++]);

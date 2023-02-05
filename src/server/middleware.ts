@@ -135,7 +135,7 @@ const sendOne = (id: number, what?: BadStatus | ErrorResponse) => {
     } else {
         prsiLogger("updateOne: Socket not OPEN. Unregistering it from the game.", id);
         if (typeof room?.nickName !== "undefined") {
-            rooms[room.roomName].prsi.unregisterPlayer(name);
+            rooms[room.roomName].prsi.unregisterPlayer(room.nickName);
             openSockets[id].room = undefined;
         }
     }
@@ -421,7 +421,7 @@ const createPrsi = (wsEnabledRouter: ws.Router, prefix = "", logger = (msg: stri
                 processMessage(id, message.toString());
             } catch (err) {
                 prsiLogger("EXCEPTION WHILE HANDLING A MESSAGE:", id);
-                prsiLogger(err, id);
+                prsiLogger(err as string, id);
             }
         });
 
